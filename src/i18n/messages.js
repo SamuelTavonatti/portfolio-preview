@@ -30,6 +30,10 @@ export const messages = {
       unmute: 'UNMUTE',
       expand: 'EXPAND',
       close: 'CLOSE',
+      identity: 'Samuel Tavonatti',
+      role: 'UI/UX Designer & Front-End',
+      ctaPrimary: 'Esplora i Case Study',
+      ctaSecondary: 'Contattami',
     },
     contact: {
       lead: 'Disponibile per stage, collaborazioni su prodotti digitali e confronto su UI/UX ed ergonomia cognitiva.',
@@ -111,6 +115,10 @@ export const messages = {
       unmute: 'UNMUTE',
       expand: 'EXPAND',
       close: 'CLOSE',
+      identity: 'Samuel Tavonatti',
+      role: 'UI/UX Designer & Front-End',
+      ctaPrimary: 'Explore Case Studies',
+      ctaSecondary: 'Contact Me',
     },
     contact: {
       lead: 'Available for internships, digital product collaborations, and discussions on UI/UX and cognitive ergonomics.',

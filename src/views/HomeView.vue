@@ -3,8 +3,7 @@ import { profileData } from '../data/profile'
 import { experiences } from '../data/experience'
 import { useI18n } from '../i18n/useI18n'
 import { useScrollReveal } from '../composables/useScrollReveal'
-import HeroEditorial from '../components/sections/HeroEditorial.vue'
-import ShowreelStage from '../components/sections/ShowreelStage.vue'
+import HeroShowreel from '../components/sections/HeroShowreel.vue'
 import FeaturedWork from '../components/sections/FeaturedWork.vue'
 import ContactBento from '../components/sections/ContactBento.vue'
 import BaseBadge from '../components/ui/BaseBadge.vue'
@@ -17,9 +16,7 @@ useScrollReveal()
 
 <template>
   <div>
-    <HeroEditorial />
-
-    <ShowreelStage />
+    <HeroShowreel />
 
     <FeaturedWork />
 
