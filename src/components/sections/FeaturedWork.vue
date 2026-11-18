@@ -10,7 +10,7 @@ const featured = projects.filter((p) => p.featured)
 
 <template>
   <section class="section-block">
-    <div class="container">
+    <div class="container scroll-reveal">
       <div class="section-header">
         <div>
           <span class="section-kicker tabular-nums">{{ t('sections.workKicker') }}</span>

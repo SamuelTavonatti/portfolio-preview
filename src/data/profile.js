@@ -11,6 +11,11 @@ export const profileData = {
     it: {
       badge: 'Disponibile per collaborazioni & stage',
       title: 'UI/UX Designer focalizzato su ergonomia cognitiva e interfacce pulite.',
+      titleLines: [
+        'UI/UX Designer focalizzato',
+        'su ergonomia cognitiva e',
+        'interfacce pulite.',
+      ],
       subtitle:
         'Studente in Interfacce e Tecnologie della Comunicazione (UniTrento). Progetto esperienze digitali essenziali, accessibili e orientate all’usabilità, unendo design system, prototipazione su Figma e sviluppo front-end.',
       ctaPrimary: 'Esplora i Case Study',
@@ -19,6 +24,11 @@ export const profileData = {
     en: {
       badge: 'Open to collaborations & internships',
       title: 'UI/UX Designer focused on cognitive ergonomics and clean interfaces.',
+      titleLines: [
+        'UI/UX Designer focused',
+        'on cognitive ergonomics',
+        'and clean interfaces.',
+      ],
       subtitle:
         'Interfaces and Communication Technologies student (UniTrento). I design essential, accessible, usability-driven digital products bridging design systems, Figma prototyping, and front-end foundations.',
       ctaPrimary: 'Explore Case Studies',

@@ -9,7 +9,7 @@
   --accent: #C2A57E;
   --accent-hover: #D4B992;
   --accent-soft: rgba(194, 165, 126, 0.12);
-  --accent-border: rgba(194, 165, 126, 0.32);
+  --accent-border: rgba(194, 165, 126, 0.34);
 
   /* Status */
   --status-live: #34D399;
@@ -33,6 +33,7 @@
 
   /* Motion */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --transition-fast: 180ms var(--ease-out-expo);
   --transition-base: 280ms var(--ease-out-expo);
 }
@@ -86,22 +87,22 @@ section[id] {
 
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 1.25rem;
 }
 
 @media (min-width: 768px) {
   .container {
-    padding: 0 2rem;
+    padding: 0 2.5rem;
   }
 }
 
-/* 60fps Entrance Choreography */
+/* 60fps GPU-Accelerated Entrance Choreography */
 @keyframes revealUp {
   from {
-    opacity: 0.85;
-    transform: translateY(10px);
+    opacity: 0;
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -109,14 +110,63 @@ section[id] {
   }
 }
 
-.reveal {
-  animation: revealUp 0.38s var(--ease-out-expo) both;
+@keyframes maskSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(105%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.reveal-d1 { animation-delay: 40ms; }
-.reveal-d2 { animation-delay: 80ms; }
-.reveal-d3 { animation-delay: 120ms; }
-.reveal-d4 { animation-delay: 160ms; }
+@keyframes drawLineX {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.reveal {
+  animation: revealUp 0.65s var(--ease-out-expo) both;
+}
+
+.reveal-d1 { animation-delay: 80ms; }
+.reveal-d2 { animation-delay: 160ms; }
+.reveal-d3 { animation-delay: 240ms; }
+.reveal-d4 { animation-delay: 320ms; }
+
+.mask-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+
+.mask-line-inner {
+  display: block;
+  animation: maskSlideUp 0.72s var(--ease-out-expo) both;
+}
+
+.draw-line {
+  transform-origin: left center;
+  animation: drawLineX 0.85s var(--ease-out-expo) 260ms both;
+}
+
+/* Scroll-linked IntersectionObserver reveals */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.65s var(--ease-out-expo), transform 0.65s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 /* Page Transition */
 .page-fade-enter-active,
@@ -138,9 +188,17 @@ section[id] {
   html {
     scroll-behavior: auto;
   }
-  .reveal {
+  .reveal,
+  .mask-line-inner,
+  .draw-line {
     opacity: 1;
+    transform: none;
     animation: none;
+  }
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
   .page-fade-enter-active,
   .page-fade-leave-active {

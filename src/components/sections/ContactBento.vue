@@ -23,7 +23,7 @@ const copyEmail = async () => {
 
 <template>
   <section id="contatti" class="section-block">
-    <div class="container">
+    <div class="container scroll-reveal">
       <div class="grid-layout">
         <div class="col-left">
           <span class="section-kicker tabular-nums">{{ t('sections.contactKicker') }}</span>

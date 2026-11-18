@@ -58,10 +58,14 @@ const closeMobile = () => {
 
       <div class="header-actions">
         <div class="lang-switch" role="group" aria-label="Language selector">
+          <span
+            class="lang-thumb"
+            :class="{ 'is-en': lang === 'en' }"
+            aria-hidden="true"
+          />
           <button type="button" :class="{ active: lang === 'it' }" @click="setLang('it')">
             IT
           </button>
-          <span class="divider" aria-hidden="true">/</span>
           <button type="button" :class="{ active: lang === 'en' }" @click="setLang('en')">
             EN
           </button>
@@ -143,6 +147,11 @@ const closeMobile = () => {
   display: grid;
   place-items: center;
   letter-spacing: 0.02em;
+  transition: transform var(--transition-fast);
+}
+
+.brand:hover .brand-mark {
+  transform: scale(1.05);
 }
 
 .desktop-nav {
@@ -182,7 +191,7 @@ const closeMobile = () => {
   background: var(--accent);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform var(--transition-base);
+  transition: transform 0.34s var(--ease-spring);
 }
 
 .desktop-nav a.active::after,
@@ -196,19 +205,39 @@ const closeMobile = () => {
   gap: 1rem;
 }
 
+/* Elastic Sliding Pill Switcher */
 .lang-switch {
-  display: inline-flex;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 0.4rem;
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
-  padding: 0.28rem 0.65rem;
-  font-size: 0.78rem;
+  padding: 3px;
+  font-size: 0.76rem;
   font-weight: 600;
 }
 
+.lang-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  transition: transform 0.32s var(--ease-spring);
+}
+
+.lang-thumb.is-en {
+  transform: translateX(100%);
+}
+
 .lang-switch button {
+  position: relative;
+  z-index: 1;
   background: none;
   border: none;
   color: var(--text-tertiary);
@@ -216,16 +245,13 @@ const closeMobile = () => {
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
+  padding: 0.24rem 0.58rem;
   transition: color var(--transition-fast);
 }
 
 .lang-switch button.active,
 .lang-switch button:hover {
   color: var(--accent);
-}
-
-.divider {
-  color: var(--border-strong);
 }
 
 .mobile-toggle {

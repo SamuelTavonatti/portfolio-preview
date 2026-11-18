@@ -1,6 +1,7 @@
 <script setup>
 import { profileData } from '../data/profile'
 import { useI18n } from '../i18n/useI18n'
+import { useScrollReveal } from '../composables/useScrollReveal'
 import HeroEditorial from '../components/sections/HeroEditorial.vue'
 import FeaturedWork from '../components/sections/FeaturedWork.vue'
 import ContactBento from '../components/sections/ContactBento.vue'
@@ -8,6 +9,7 @@ import AppIcon from '../components/ui/AppIcon.vue'
 
 const { lang, t } = useI18n()
 const baseUrl = import.meta.env.BASE_URL
+useScrollReveal()
 </script>
 
 <template>
@@ -18,7 +20,7 @@ const baseUrl = import.meta.env.BASE_URL
 
     <!-- 02. CHI SONO -->
     <section id="chi-sono" class="section-block">
-      <div class="container grid-layout">
+      <div class="container grid-layout scroll-reveal">
         <div class="col-left">
           <span class="section-kicker tabular-nums">{{ t('sections.aboutKicker') }}</span>
           <h2 class="section-heading">{{ t('sections.aboutTitle') }}</h2>
@@ -46,7 +48,7 @@ const baseUrl = import.meta.env.BASE_URL
 
     <!-- 03. COMPETENZE -->
     <section id="competenze" class="section-block">
-      <div class="container grid-layout">
+      <div class="container grid-layout scroll-reveal">
         <div class="col-left">
           <span class="section-kicker tabular-nums">{{ t('sections.skillsKicker') }}</span>
           <h2 class="section-heading">{{ t('sections.skillsTitle') }}</h2>
