@@ -9,42 +9,91 @@ const { t } = useI18n()
 const elapsedMs = ref(0)
 const isAutoPlaying = ref(true)
 
-const BEAT_DURATION = 4000
+const ACT_DURATION = 4000
 const LOOP_DURATION = 16000
 
 let rafId = null
 let lastTs = null
 
-const loopMs = computed(() => elapsedMs.value % LOOP_DURATION)
-const currentBeat = computed(() => Math.floor(loopMs.value / BEAT_DURATION))
-const beatTime = computed(() => (loopMs.value % BEAT_DURATION) / 1000) // 0..4.0s within current beat
+const clamp = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v))
+const easeOutExpo = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x)))
+const easeInOutCubic = (x) => {
+  const c = clamp(x)
+  return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2
+}
 
-// Beat 01 phases
-const b1WordIndex = computed(() => {
-  if (currentBeat.value !== 0) return -1
-  if (beatTime.value < 0.30) return 0 // Chiarezza.
-  if (beatTime.value < 0.60) return 1 // Gerarchia.
-  if (beatTime.value < 0.92) return 2 // Precisione.
-  return 3 // Hero Lock-Up
+const loopSec = computed(() => (elapsedMs.value % LOOP_DURATION) / 1000)
+const currentAct = computed(() => Math.floor(loopSec.value / 4))
+const actTime = computed(() => loopSec.value % 4) // 0..4.0s
+
+// =========================================================
+// ACT 01 (0.0s - 4.0s): + Nuova Idea -> UX/UI DESIGN + Voltrep App Card -> Node Bridge
+// =========================================================
+const act1PillPhase = computed(() => currentAct.value === 0 && actTime.value < 0.72)
+const act1Clicked = computed(() => currentAct.value === 0 && actTime.value >= 0.42)
+const act1TabIndex = computed(() => {
+  if (currentAct.value !== 0) return 0
+  if (actTime.value < 1.7) return 0
+  if (actTime.value < 2.55) return 1
+  return 2
+})
+const act1BridgeProgress = computed(() => {
+  if (currentAct.value !== 0) return 0
+  return clamp((actTime.value - 3.32) / 0.68)
 })
 
-const b1ToggleActive = computed(() => currentBeat.value === 0 && beatTime.value >= 1.65)
-
-// Beat 02 animated counter (-42%)
-const b2Counter = computed(() => {
-  if (currentBeat.value !== 1) return 42
-  const p = Math.min(1, Math.max(0, (beatTime.value - 0.85) / 0.85))
-  const eased = 1 - Math.pow(1 - p, 3)
-  return Math.round(eased * 42)
+// =========================================================
+// ACT 02 (4.0s - 8.0s): USER RESEARCH + Flow Map + Telemetry + Wireframe-to-UI Slider -> Prompt Bar Bridge
+// =========================================================
+const act2Friction = computed(() => {
+  if (currentAct.value !== 1) return 42
+  return Math.round(easeOutExpo((actTime.value - 0.55) / 1.1) * 42)
+})
+const act2Clarity = computed(() => {
+  if (currentAct.value !== 1) return 98
+  return Math.round(easeOutExpo((actTime.value - 0.55) / 1.1) * 98)
+})
+const act2SliderPct = computed(() => {
+  if (currentAct.value !== 1) return 50
+  const p = clamp((actTime.value - 0.85) / 1.9)
+  return Math.round(12 + easeInOutCubic(p) * 78)
+})
+const act2BridgeProgress = computed(() => {
+  if (currentAct.value !== 1) return 0
+  return clamp((actTime.value - 3.35) / 0.65)
 })
 
-// Beat 03 typing prompt
-const PROMPT_TEXT = 'Design system accessibile ad alto contrasto...'
-const b3TypedPrompt = computed(() => {
-  if (currentBeat.value !== 2) return ''
-  const p = Math.min(1, Math.max(0, beatTime.value / 0.82))
-  const count = Math.floor(p * PROMPT_TEXT.length)
-  return PROMPT_TEXT.slice(0, count)
+// =========================================================
+// ACT 03 (8.0s - 12.0s): Prompt Bar -> CREATIVE AI + 3 Spatial App Concept Cards -> Swipe Pill Bridge
+// =========================================================
+const AI_PROMPT = 'Genera prototipo accessibile...'
+const act3Typed = computed(() => {
+  if (currentAct.value !== 2) return AI_PROMPT
+  const p = clamp(actTime.value / 0.75)
+  return AI_PROMPT.slice(0, Math.max(4, Math.floor(p * AI_PROMPT.length)))
+})
+const act3PaletteStep = computed(() => {
+  if (currentAct.value !== 2) return 0
+  return actTime.value < 2.0 ? 0 : 1
+})
+const act3BridgeProgress = computed(() => {
+  if (currentAct.value !== 2) return 0
+  return clamp((actTime.value - 3.35) / 0.65)
+})
+
+// =========================================================
+// ACT 04 (12.0s - 16.0s): Swipe Wipe -> MOTION & FRONT-END + Dock & Responsive Morph -> + Nuova Idea Loop Bridge
+// =========================================================
+const act4DockIndex = computed(() => {
+  if (currentAct.value !== 3) return 0
+  if (actTime.value < 1.55) return 0
+  if (actTime.value < 2.45) return 1
+  return 2
+})
+const act4IsMobileFrame = computed(() => currentAct.value === 3 && actTime.value >= 1.75 && actTime.value < 3.35)
+const act4LoopBridge = computed(() => {
+  if (currentAct.value !== 3) return 0
+  return clamp((actTime.value - 3.35) / 0.65)
 })
 
 const chapters = [
@@ -54,8 +103,7 @@ const chapters = [
   { id: 'motion-fe', num: '04', label: 'Motion & Front-End' },
 ]
 
-// Ambient orb palette shifting smoothly per chapter
-const activeOrbTheme = computed(() => `theme-beat-${currentBeat.value + 1}`)
+const activeTheme = computed(() => `theme-act-${currentAct.value + 1}`)
 
 const tick = (ts) => {
   if (lastTs !== null && isAutoPlaying.value) {
@@ -65,19 +113,17 @@ const tick = (ts) => {
   rafId = window.requestAnimationFrame(tick)
 }
 
-const jumpToBeat = (idx) => {
-  // Jump directly to the Hero Lock-Up moment of the selected beat
-  const lockOffsets = [1350, 1100, 1050, 950]
-  elapsedMs.value = idx * BEAT_DURATION + (lockOffsets[idx] || 1000)
+const jumpToAct = (idx) => {
+  const offsets = [1450, 1650, 1500, 1400]
+  elapsedMs.value = idx * ACT_DURATION + (offsets[idx] || 1400)
 }
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       isAutoPlaying.value = false
-      elapsedMs.value = 1650
+      elapsedMs.value = 1600
     } else {
-      // Start at 0s for the rapid staccato intro
       elapsedMs.value = 0
     }
     rafId = window.requestAnimationFrame(tick)
@@ -90,205 +136,240 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="keynote-hero" aria-label="Hero Keynote Showcase">
-    <div class="keynote-stage" :class="activeOrbTheme">
-      <!-- Subtle Breathing Ambient Radial Light Blooms (No Grid, No Checkerboard) -->
+  <section class="keynote-hero" aria-label="Hero Match-Cut Showreel">
+    <div class="keynote-stage" :class="activeTheme">
+      <!-- Subtle Breathing Ambient Radial Light Blooms (Zero Grid / Checkerboard) -->
       <div class="ambient-blooms" aria-hidden="true">
-        <div class="bloom bloom-primary" />
-        <div class="bloom bloom-secondary" />
+        <div class="bloom bloom-a" />
+        <div class="bloom bloom-b" />
       </div>
 
-      <!-- Center Keynote Motion Stage -->
+      <!-- Center Spatial Stage -->
       <div class="stage-viewport">
         <!-- =========================================================
-             BEAT 01: UX/UI DESIGN (0.0s - 4.0s)
+             ACT 01: + NUOVA IDEA -> UX/UI DESIGN + MOBILE APP CARD
              ========================================================= -->
-        <div v-if="currentBeat === 0" class="beat-layer beat-01">
-          <!-- Staccato Word Flashes (0.0s - 0.92s) -->
-          <div v-if="b1WordIndex >= 0 && b1WordIndex < 3" class="staccato-wrap">
-            <span v-if="b1WordIndex === 0" key="w0" class="staccato-word">Chiarezza.</span>
-            <span v-else-if="b1WordIndex === 1" key="w1" class="staccato-word">Gerarchia.</span>
-            <span v-else-if="b1WordIndex === 2" key="w2" class="staccato-word is-gold">Precisione.</span>
+        <div v-if="currentAct === 0" class="act-layer act-01" :class="{ 'is-bridging': act1BridgeProgress > 0 }">
+          <!-- Opening Pill + Animated Cursor Click (0.0s - 0.72s) -->
+          <div v-if="act1PillPhase" class="idea-pill-stage">
+            <div class="idea-pill" :class="{ clicked: act1Clicked }">
+              <span class="idea-plus" aria-hidden="true">+</span>
+              <span>Nuova Idea</span>
+            </div>
+            <svg class="act1-cursor" :class="{ clicking: act1Clicked }" viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+              <path d="M4 3L19 11L12 13L9 20L4 3Z" fill="#E2B878" stroke="#050507" stroke-width="1.5" stroke-linejoin="round" />
+            </svg>
           </div>
 
-          <!-- Hero Lock-Up + Glassmorphic UI Assembly (0.92s - 4.0s) -->
-          <div v-else class="lockup-composition">
-            <!-- Floating UI Prop 1: Token Card (Top-Left of stage) -->
-            <div class="glass-prop prop-tokens">
-              <span class="prop-dot is-gold" aria-hidden="true" />
-              <span class="tabular-nums">8pt Grid · WCAG AA · 60fps</span>
+          <!-- UX/UI DESIGN Lock-Up + Real Mobile App Interface Card (0.72s - 4.0s) -->
+          <div v-else class="act-grid act-01-grid">
+            <div class="act-copy-col">
+              <span class="act-kicker is-gold">Idea → Interfaccia</span>
+              <h1 class="act-headline">
+                <span class="mask-clip"><span class="mask-rise tone-ice">UX/UI</span></span>
+                <span class="mask-clip"><span class="mask-rise delay-1 tone-gold">DESIGN</span></span>
+              </h1>
             </div>
 
-            <!-- Floating UI Prop 2: Interactive Apple Pill Toggle (Top-Right of stage) -->
-            <div class="glass-prop prop-toggle" :class="{ 'is-on': b1ToggleActive }">
-              <span class="toggle-label">High-Contrast UI</span>
-              <span class="apple-switch" :class="{ active: b1ToggleActive }" aria-hidden="true">
-                <span class="switch-knob" />
-              </span>
+            <!-- Real Tactile Mobile App Card (Voltrep / Apple-Grade UI) -->
+            <div class="app-frame-card" :style="{ transform: act1BridgeProgress > 0 ? `scale(${1 - act1BridgeProgress * 0.14}) translate3d(${act1BridgeProgress * 32}px, 0, 0)` : undefined }">
+              <div class="app-header">
+                <span class="app-brand-dot" aria-hidden="true" />
+                <span class="app-title">Voltrep</span>
+                <span class="app-badge tabular-nums">8pt Grid</span>
+              </div>
+
+              <!-- Sliding Segmented Control -->
+              <div class="segmented-bar" aria-hidden="true">
+                <span class="seg-thumb" :style="{ transform: `translate3d(${act1TabIndex * 100}%, 0, 0)` }" />
+                <span class="seg-item" :class="{ active: act1TabIndex === 0 }">Scheda</span>
+                <span class="seg-item" :class="{ active: act1TabIndex === 1 }">Volume</span>
+                <span class="seg-item" :class="{ active: act1TabIndex === 2 }">Mappa</span>
+              </div>
+
+              <!-- Workout Load Card -->
+              <div class="workout-mini-card">
+                <div class="wk-top">
+                  <span class="wk-name">Panca Piana</span>
+                  <span class="wk-delta tabular-nums">+4.2%</span>
+                </div>
+                <div class="wk-metrics tabular-nums">
+                  <span class="wk-load">82.5 kg</span>
+                  <span class="wk-sets">4 × 8 rep</span>
+                </div>
+                <div class="wk-bar-track" aria-hidden="true">
+                  <div class="wk-bar-fill" />
+                </div>
+              </div>
             </div>
 
-            <!-- Massive Two-Tone Display Lock-Up -->
-            <h1 class="keynote-headline">
-              <span class="mask-clip">
-                <span class="mask-rise tone-ice">UX/UI</span>
-              </span>
-              <span class="mask-clip">
-                <span class="mask-rise delay-1 tone-gold">DESIGN</span>
-              </span>
-            </h1>
-
-            <!-- Floating UI Prop 3: Mobile Viewport Wireframe Card -->
-            <div class="glass-prop prop-wireframe" aria-hidden="true">
-              <div class="wf-notch" />
-              <div class="wf-row-lg" />
-              <div class="wf-row-sm" />
-              <div class="wf-pill-accent" />
-            </div>
+            <!-- Match-Cut Bridge Object: Detaching Research Node + SVG Bezier Path -->
+            <div v-if="act1BridgeProgress > 0" class="bridge-node-shot" :style="{ transform: `translate3d(${(act1BridgeProgress - 0.5) * 260}px, 0, 0) scale(${0.6 + act1BridgeProgress * 0.7})`, opacity: Math.min(1, act1BridgeProgress * 2) }" aria-hidden="true" />
           </div>
         </div>
 
         <!-- =========================================================
-             BEAT 02: USER RESEARCH (4.0s - 8.0s)
+             ACT 02: USER RESEARCH + FLOW MAP + TELEMETRY + WIREFRAME-TO-UI SLIDER
              ========================================================= -->
-        <div v-else-if="currentBeat === 1" class="beat-layer beat-02">
-          <!-- Animated SVG Bezier Node Paths -->
-          <svg class="research-svg" viewBox="0 0 800 300" fill="none" aria-hidden="true">
-            <path
-              class="bezier-draw"
-              d="M110 190 C 230 60, 350 60, 400 150 C 450 240, 570 240, 690 110"
-              stroke="url(#researchGrad)"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <circle class="node-pulse" cx="110" cy="190" r="6" fill="#34D399" />
-            <circle class="node-pulse delay-n1" cx="400" cy="150" r="7" fill="#E2B878" />
-            <circle class="node-pulse delay-n2" cx="690" cy="110" r="6" fill="#34D399" />
+        <div v-else-if="currentAct === 1" class="act-layer act-02">
+          <!-- Luminous SVG User-Journey Path Split -->
+          <svg class="journey-svg" viewBox="0 0 900 180" fill="none" aria-hidden="true">
+            <path class="journey-path" d="M60 110 C 240 20, 380 160, 460 90 C 560 15, 720 140, 840 70" stroke="url(#journeyGrad)" stroke-width="2" stroke-linecap="round" />
+            <circle cx="60" cy="110" r="5" fill="#34D399" />
+            <circle cx="460" cy="90" r="6" fill="#E2B878" />
+            <circle cx="840" cy="70" r="5" fill="#34D399" />
             <defs>
-              <linearGradient id="researchGrad" x1="110" y1="190" x2="690" y2="110" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#34D399" stop-opacity="0.2" />
-                <stop offset="0.5" stop-color="#34D399" stop-opacity="0.9" />
-                <stop offset="1" stop-color="#E2B878" stop-opacity="0.4" />
+              <linearGradient id="journeyGrad" x1="60" y1="110" x2="840" y2="70" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#34D399" stop-opacity="0.25" />
+                <stop offset="0.5" stop-color="#34D399" stop-opacity="0.95" />
+                <stop offset="1" stop-color="#E2B878" stop-opacity="0.45" />
               </linearGradient>
             </defs>
           </svg>
 
-          <div class="lockup-composition">
-            <div class="sub-pill is-emerald">
-              <span>Ergonomia Cognitiva &amp; Usabilità</span>
-            </div>
-
-            <h1 class="keynote-headline">
-              <span class="mask-clip">
-                <span class="mask-rise tone-ice">USER</span>
-              </span>
-              <span class="mask-clip">
-                <span class="mask-rise delay-1 tone-emerald">RESEARCH</span>
-              </span>
+          <div class="act-stack">
+            <span class="act-kicker is-emerald">Ergonomia Cognitiva &amp; Flussi</span>
+            <h1 class="act-headline">
+              <span class="mask-clip"><span class="mask-rise tone-ice">USER</span></span>
+              <span class="mask-clip"><span class="mask-rise delay-1 tone-emerald">RESEARCH</span></span>
             </h1>
 
-            <div class="insight-row">
-              <div class="glass-prop insight-badge">
-                <span class="insight-metric tabular-nums">-{{ b2Counter }}%</span>
-                <span class="insight-text">Attrito Cognitivo</span>
+            <!-- 3 Tangible UX Research Artifacts -->
+            <div class="research-artifacts">
+              <!-- Artifact 1: User Flow / Card Sorting Map -->
+              <div class="glass-card flow-card">
+                <div class="flow-nodes">
+                  <span class="f-node active">Scoperta</span>
+                  <span class="f-line" aria-hidden="true" />
+                  <span class="f-node active">Flusso</span>
+                  <span class="f-line" aria-hidden="true" />
+                  <span class="f-node is-accent">Azione</span>
+                </div>
               </div>
 
-              <div class="glass-prop insight-badge delay-b1">
-                <svg class="check-svg" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
-                  <path class="check-draw" d="M4 10.5L8 14.5L16 6.5" stroke="#34D399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <span class="insight-text">User Flow Validato</span>
+              <!-- Artifact 2: Usability Telemetry Pill -->
+              <div class="glass-card telemetry-pill tabular-nums">
+                <span class="tel-em">-{{ act2Friction }}%</span>
+                <span class="tel-lbl">Attrito</span>
+                <span class="tel-sep" aria-hidden="true">·</span>
+                <span class="tel-gold">{{ act2Clarity }}%</span>
+                <span class="tel-lbl">Chiarezza</span>
               </div>
 
-              <div class="glass-prop insight-badge delay-b2">
-                <span class="orbit-cluster" aria-hidden="true">
-                  <span class="orbit-dot d1" />
-                  <span class="orbit-dot d2" />
-                </span>
-                <span class="insight-text">Architettura Intuitiva</span>
+              <!-- Artifact 3: Wireframe-to-UI Comparison Slider -->
+              <div
+                class="glass-card compare-card"
+                :style="{ transform: act2BridgeProgress > 0 ? `rotate(${act2BridgeProgress * 90}deg) scale(${1 - act2BridgeProgress * 0.2})` : undefined }"
+              >
+                <!-- Low-Fi Wireframe Base -->
+                <div class="compare-layer compare-lowfi" aria-hidden="true">
+                  <div class="wf-box-lg" />
+                  <div class="wf-box-sm" />
+                </div>
+                <!-- Polished High-Contrast UI Reveal -->
+                <div class="compare-layer compare-hifi" :style="{ clipPath: `inset(0 ${100 - act2SliderPct}% 0 0)` }">
+                  <span class="hifi-title">UI Validata</span>
+                  <span class="hifi-badge">WCAG AA</span>
+                </div>
+                <!-- Animated Vertical Slider Handle -->
+                <div class="compare-handle" :style="{ left: `${act2SliderPct}%` }" aria-hidden="true" />
               </div>
             </div>
           </div>
         </div>
 
         <!-- =========================================================
-             BEAT 03: CREATIVE AI (8.0s - 12.0s)
+             ACT 03: PROMPT BAR -> CREATIVE AI + 3 SPATIAL APP CONCEPT CARDS
              ========================================================= -->
-        <div v-else-if="currentBeat === 2" class="beat-layer beat-03">
-          <div class="lockup-composition">
-            <!-- Prompt-to-UI Glassmorphic Input Bar -->
-            <div class="glass-prop prompt-bar">
-              <span class="prompt-sparkle" aria-hidden="true">✦</span>
-              <span class="prompt-text">{{ b3TypedPrompt }}</span>
+        <div v-else-if="currentAct === 2" class="act-layer act-03">
+          <div class="act-stack">
+            <!-- Morphing Prompt Bar (Continues from rotated Act 02 slider) -->
+            <div class="glass-card prompt-command-bar">
+              <span class="prompt-star" aria-hidden="true">✦</span>
+              <span class="prompt-str">{{ act3Typed }}</span>
               <span class="prompt-caret" aria-hidden="true" />
             </div>
 
-            <h1 class="keynote-headline">
-              <span class="mask-clip">
-                <span class="mask-rise tone-ice">CREATIVE</span>
-              </span>
-              <span class="mask-clip">
-                <span class="mask-rise delay-1 tone-iridescent">AI</span>
-              </span>
+            <h1 class="act-headline">
+              <span class="mask-clip"><span class="mask-rise tone-ice">CREATIVE</span></span>
+              <span class="mask-clip"><span class="mask-rise delay-1 tone-iridescent">AI</span></span>
             </h1>
 
-            <!-- Generative Component Matrix -->
-            <div class="matrix-row">
-              <div class="glass-prop matrix-card">
-                <span class="matrix-step">01</span>
-                <span class="matrix-label">Prompt</span>
+            <!-- 3 Modular Spatial App Concept Cards -->
+            <div class="concept-stack" :class="{ 'is-converging': act3BridgeProgress > 0 }">
+              <div class="glass-card concept-card card-left">
+                <div class="swatch-row" aria-hidden="true">
+                  <span class="swatch" :style="{ background: act3PaletteStep === 0 ? '#E2B878' : '#34D399' }" />
+                  <span class="swatch" style="background: #F5F5F7" />
+                  <span class="swatch" style="background: #1A1D24" />
+                </div>
+                <span class="concept-title">Design Token Generator</span>
+                <span class="concept-meta tabular-nums">WCAG AA · 11.4:1</span>
               </div>
-              <span class="matrix-arrow" aria-hidden="true">→</span>
-              <div class="glass-prop matrix-card delay-b1 is-highlighted">
-                <span class="matrix-step">02</span>
-                <span class="matrix-label">Prototipo</span>
+
+              <div class="glass-card concept-card card-center">
+                <div class="layout-preview" aria-hidden="true">
+                  <span class="lp-col" />
+                  <span class="lp-col is-wide" />
+                </div>
+                <span class="concept-title">Adaptive Layout</span>
+                <span class="concept-meta">Desktop ↔ Mobile</span>
               </div>
-              <span class="matrix-arrow" aria-hidden="true">→</span>
-              <div class="glass-prop matrix-card delay-b2">
-                <span class="matrix-step">03</span>
-                <span class="matrix-label">Iterazione</span>
+
+              <div class="glass-card concept-card card-right">
+                <div class="copy-pill-preview" aria-hidden="true">Esplora →</div>
+                <span class="concept-title">Smart Micro-Copy</span>
+                <span class="concept-meta">Chiarezza UX</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- =========================================================
-             BEAT 04: MOTION & FRONT-END (12.0s - 16.0s)
+             ACT 04: SWIPE WIPE -> MOTION & FRONT-END + DOCK & RESPONSIVE MORPH
              ========================================================= -->
-        <div v-else class="beat-layer beat-04">
-          <div class="lockup-composition">
-            <div class="sub-pill is-gold">
-              <span>60fps GPU-Accelerated Execution</span>
+        <div v-else class="act-layer act-04">
+          <div v-if="act4LoopBridge > 0.65" class="idea-pill-stage">
+            <div class="idea-pill">
+              <span class="idea-plus" aria-hidden="true">+</span>
+              <span>Nuova Idea</span>
             </div>
+          </div>
 
-            <h1 class="keynote-headline is-compact">
-              <span class="mask-clip">
-                <span class="mask-rise tone-gold">MOTION &amp;</span>
-              </span>
-              <span class="mask-clip">
-                <span class="mask-rise delay-1 tone-ice">FRONT-END</span>
-              </span>
+          <div v-else class="act-stack" :style="{ opacity: 1 - act4LoopBridge * 0.9, transform: `scale(${1 - act4LoopBridge * 0.12})` }">
+            <span class="act-kicker is-gold">60 FPS · WCAG AA · ZERO BLOAT</span>
+            <h1 class="act-headline is-compact">
+              <span class="mask-clip"><span class="mask-rise tone-gold">MOTION &amp;</span></span>
+              <span class="mask-clip"><span class="mask-rise delay-1 tone-ice">FRONT-END</span></span>
             </h1>
 
-            <!-- Spring Curve & Semantic Code Parity Dock -->
-            <div class="dock-row">
-              <div class="glass-prop dock-curve-card">
-                <svg viewBox="0 0 120 44" width="108" height="38" fill="none" aria-hidden="true">
-                  <path d="M8 36 C 28 36, 36 8, 112 8" stroke="#E2B878" stroke-width="2.2" stroke-linecap="round" />
-                  <circle class="curve-runner" cx="112" cy="8" r="4" fill="#34D399" />
-                </svg>
-                <span class="dock-mono">cubic-bezier(0.16, 1, 0.3, 1)</span>
+            <!-- Interactive App Dock + Responsive Desktop-to-Mobile Frame Morph -->
+            <div class="motion-stage-row">
+              <!-- Live Elastic Apple Dock -->
+              <div class="glass-card elastic-dock" aria-hidden="true">
+                <span class="dock-pill-bg" :style="{ transform: `translate3d(${act4DockIndex * 100}%, 0, 0)` }" />
+                <span class="dock-item" :class="{ active: act4DockIndex === 0 }">UI</span>
+                <span class="dock-item" :class="{ active: act4DockIndex === 1 }">Code</span>
+                <span class="dock-item" :class="{ active: act4DockIndex === 2 }">60fps</span>
               </div>
 
-              <div class="glass-prop dock-parity-card delay-b1">
-                <span class="parity-tag">Design ↔ Code Parity</span>
-                <span class="parity-sub">Vue 3 · TypeScript · Zero CLS</span>
+              <!-- Desktop-to-Mobile Responsive Frame Morph -->
+              <div class="glass-card morph-device" :class="{ 'is-mobile': act4IsMobileFrame }" aria-hidden="true">
+                <div class="md-topbar">
+                  <span class="md-dot" />
+                  <span class="md-dot" />
+                </div>
+                <div class="md-body">
+                  <span class="md-hero-bar" />
+                  <span class="md-sub-bar" />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Bottom Safe-Zone Anchor: Identity & CTAs (Left) + Minimalist Chapter Pills (Right) -->
+      <!-- Bottom Safe-Zone Anchor: Identity + CTAs (Left) & Minimalist Chapter Pills (Right) -->
       <div class="hud-container stage-footer">
         <div class="identity-cta-block">
           <div class="identity-line">
@@ -308,18 +389,17 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Ultra-Minimalist Interactive Chapter Pills -->
-        <div class="chapter-pills" role="tablist" aria-label="Keynote chapters">
+        <div class="chapter-pills" role="tablist" aria-label="Showreel chapters">
           <button
             v-for="(ch, idx) in chapters"
             :key="ch.id"
             type="button"
             role="tab"
-            :aria-selected="currentBeat === idx"
+            :aria-selected="currentAct === idx"
             :aria-label="`${ch.num} ${ch.label}`"
             class="chapter-pill"
-            :class="{ active: currentBeat === idx }"
-            @click="jumpToBeat(idx)"
+            :class="{ active: currentAct === idx }"
+            @click="jumpToAct(idx)"
           >
             <span class="tabular-nums">{{ ch.num }}</span>
           </button>
@@ -347,17 +427,17 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 5.5rem 0 1.75rem;
+  padding: 5.25rem 0 1.65rem;
 }
 
 @media (min-width: 768px) {
   .keynote-stage {
     min-height: 95vh;
-    padding: 6rem 0 2.25rem;
+    padding: 5.75rem 0 2.15rem;
   }
 }
 
-/* Subtle Ambient Radial Blooms (Zero Grid, Zero Checkerboard) */
+/* Subtle Ambient Radial Blooms (Zero Grid / Zero Checkerboard) */
 .ambient-blooms {
   position: absolute;
   inset: 0;
@@ -368,70 +448,44 @@ onUnmounted(() => {
 .bloom {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(95px);
   will-change: transform, opacity;
-  transition: background 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.bloom-primary {
-  width: 58vw;
-  height: 58vw;
-  max-width: 780px;
-  max-height: 780px;
-  top: 10%;
-  left: 22%;
-  opacity: 0.09;
-  animation: breatheSlow 9s ease-in-out infinite alternate;
+.bloom-a {
+  width: 56vw;
+  height: 56vw;
+  max-width: 760px;
+  max-height: 760px;
+  top: 12%;
+  left: 20%;
+  opacity: 0.095;
 }
 
-.bloom-secondary {
-  width: 44vw;
-  height: 44vw;
-  max-width: 600px;
-  max-height: 600px;
-  bottom: 8%;
-  right: 14%;
-  opacity: 0.07;
-  animation: breatheSlow 11s ease-in-out infinite alternate-reverse;
+.bloom-b {
+  width: 42vw;
+  height: 42vw;
+  max-width: 580px;
+  max-height: 580px;
+  bottom: 10%;
+  right: 12%;
+  opacity: 0.075;
 }
 
-.theme-beat-1 .bloom-primary {
-  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
-}
-.theme-beat-1 .bloom-secondary {
-  background: radial-gradient(circle, #F5F5F7 0%, transparent 70%);
-}
+.theme-act-1 .bloom-a { background: radial-gradient(circle, #E2B878 0%, transparent 70%); }
+.theme-act-1 .bloom-b { background: radial-gradient(circle, #F5F5F7 0%, transparent 70%); }
 
-.theme-beat-2 .bloom-primary {
-  background: radial-gradient(circle, #34D399 0%, transparent 70%);
-  transform: translate3d(-4%, 4%, 0);
-}
-.theme-beat-2 .bloom-secondary {
-  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
-}
+.theme-act-2 .bloom-a { background: radial-gradient(circle, #34D399 0%, transparent 70%); transform: translate3d(-4%, 3%, 0); }
+.theme-act-2 .bloom-b { background: radial-gradient(circle, #E2B878 0%, transparent 70%); }
 
-.theme-beat-3 .bloom-primary {
-  background: radial-gradient(circle, #6366F1 0%, transparent 70%);
-  transform: translate3d(5%, -3%, 0);
-}
-.theme-beat-3 .bloom-secondary {
-  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
-}
+.theme-act-3 .bloom-a { background: radial-gradient(circle, #6366F1 0%, transparent 70%); transform: translate3d(5%, -3%, 0); }
+.theme-act-3 .bloom-b { background: radial-gradient(circle, #34D399 0%, transparent 70%); }
 
-.theme-beat-4 .bloom-primary {
-  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
-  transform: translate3d(0, 2%, 0);
-}
-.theme-beat-4 .bloom-secondary {
-  background: radial-gradient(circle, #34D399 0%, transparent 70%);
-}
+.theme-act-4 .bloom-a { background: radial-gradient(circle, #E2B878 0%, transparent 70%); }
+.theme-act-4 .bloom-b { background: radial-gradient(circle, #34D399 0%, transparent 70%); }
 
-@keyframes breatheSlow {
-  0% { transform: scale(0.96) translate3d(0, 0, 0); }
-  100% { transform: scale(1.06) translate3d(2%, -2%, 0); }
-}
-
-/* Center Stage Viewport */
+/* Stage Viewport */
 .stage-viewport {
   position: relative;
   z-index: 2;
@@ -442,81 +496,111 @@ onUnmounted(() => {
   width: 100%;
   max-width: 1320px;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem;
+  padding: 1rem 1.25rem;
 }
 
 @media (min-width: 768px) {
   .stage-viewport {
-    padding: 2rem 2.5rem;
+    padding: 1.5rem 2.5rem;
   }
 }
 
-.beat-layer {
+.act-layer {
   position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
 }
 
-/* Staccato Flash Words */
-.staccato-wrap {
+/* Opening / Loop Pill: + Nuova Idea */
+.idea-pill-stage {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.idea-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.65rem;
+  border-radius: 999px;
+  background: rgba(18, 19, 24, 0.9);
+  border: 1px solid rgba(226, 184, 120, 0.45);
+  color: #F5F5F7;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  box-shadow: 0 20px 50px -15px rgba(226, 184, 120, 0.25);
+  transition: transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease;
+}
+
+.idea-pill.clicked {
+  transform: scale(0.92);
+  background: rgba(226, 184, 120, 0.16);
+}
+
+.idea-plus {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #E2B878;
+  color: #050507;
   display: grid;
   place-items: center;
-  min-height: 160px;
-}
-
-.staccato-word {
-  font-size: clamp(3rem, 8.5vw, 6.8rem);
   font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: #F5F5F7;
-  animation: scalePunch 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.staccato-word.is-gold {
+.act1-cursor {
+  position: absolute;
+  right: -12px;
+  bottom: -14px;
+  transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.act1-cursor.clicking {
+  transform: translate3d(-14px, -12px, 0) scale(0.84);
+}
+
+/* Shared Typography */
+.act-kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.34rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.act-kicker.is-gold {
+  background: rgba(226, 184, 120, 0.12);
+  border: 1px solid rgba(226, 184, 120, 0.38);
   color: #E2B878;
 }
 
-@keyframes scalePunch {
-  0% {
-    opacity: 0.92;
-    transform: scale(1.1);
-    filter: blur(3px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0);
-  }
+.act-kicker.is-emerald {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.36);
+  color: #6EE7B7;
 }
 
-/* Hero Lock-Up Typography */
-.lockup-composition {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.35rem;
-  width: 100%;
-}
-
-.keynote-headline {
+.act-headline {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.25rem 0.9rem;
-  font-size: clamp(3.1rem, 7.6vw, 6.9rem);
+  gap: 0.2rem 0.8rem;
+  font-size: clamp(2.65rem, 6.8vw, 6.2rem);
   font-weight: 800;
   letter-spacing: -0.038em;
   line-height: 0.96;
 }
 
-.keynote-headline.is-compact {
-  font-size: clamp(2.55rem, 6.6vw, 6rem);
+.act-headline.is-compact {
+  font-size: clamp(2.35rem, 6vw, 5.5rem);
 }
 
 .mask-clip {
@@ -527,390 +611,583 @@ onUnmounted(() => {
 
 .mask-rise {
   display: inline-block;
-  animation: maskRise 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: maskRise 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .mask-rise.delay-1 {
-  animation-delay: 90ms;
+  animation-delay: 85ms;
 }
 
 @keyframes maskRise {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 108%, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+  0% { opacity: 0; transform: translate3d(0, 105%, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-.tone-ice {
-  color: #F5F5F7;
-}
-
-.tone-gold {
-  color: #E2B878;
-}
-
-.tone-emerald {
-  color: #34D399;
-}
+.tone-ice { color: #F5F5F7; }
+.tone-gold { color: #E2B878; }
+.tone-emerald { color: #34D399; }
 
 .tone-iridescent {
-  background: linear-gradient(110deg, #F5F5F7 10%, #E2B878 55%, #F5F5F7 90%);
+  background: linear-gradient(110deg, #F5F5F7 10%, #E2B878 52%, #34D399 90%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: maskRise 560ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both, shimmerText 3.2s linear infinite;
 }
 
-@keyframes shimmerText {
-  0% { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
-
-/* Glassmorphic Apple-Grade UI Props */
-.glass-prop {
-  background: rgba(18, 19, 24, 0.72);
+/* Glass Card Base */
+.glass-card {
+  background: rgba(17, 18, 23, 0.82);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  box-shadow: 0 20px 44px -18px rgba(0, 0, 0, 0.7);
-  animation: springPop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  border-radius: 18px;
+  box-shadow: 0 22px 48px -20px rgba(0, 0, 0, 0.78);
 }
 
-@keyframes springPop {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 16px, 0) scale(0.92);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-/* Beat 01 Props */
-.prop-tokens {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.45rem 0.9rem;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  color: #D1D5DB;
-  animation-delay: 140ms;
-}
-
-.prop-dot.is-gold {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #E2B878;
-}
-
-.prop-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #F5F5F7;
-  animation-delay: 240ms;
-  transition: border-color 300ms ease, box-shadow 300ms ease;
-}
-
-.prop-toggle.is-on {
-  border-color: rgba(52, 211, 153, 0.45);
-  box-shadow: 0 0 28px -6px rgba(52, 211, 153, 0.35);
-}
-
-.apple-switch {
-  width: 38px;
-  height: 22px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  transition: background-color 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.apple-switch.active {
-  background: #34D399;
-}
-
-.switch-knob {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #F5F5F7;
-  transform: translate3d(0, 0, 0);
-  transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.apple-switch.active .switch-knob {
-  transform: translate3d(16px, 0, 0);
-}
-
-.prop-wireframe {
-  width: 120px;
-  padding: 0.65rem;
+/* =========================================================
+   ACT 01 LAYOUT & MOBILE APP CARD (VOLTREP)
+   ========================================================= */
+.act-01-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.38rem;
-  animation-delay: 320ms;
-}
-
-.wf-notch {
-  width: 32px;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  margin: 0 auto 0.2rem;
-}
-
-.wf-row-lg {
-  width: 100%;
-  height: 7px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.wf-row-sm {
-  width: 68%;
-  height: 5px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.wf-pill-accent {
-  width: 52%;
-  height: 10px;
-  border-radius: 999px;
-  background: #E2B878;
-  margin-top: 0.2rem;
-}
-
-@media (min-width: 900px) {
-  .prop-tokens {
-    position: absolute;
-    left: 4%;
-    top: -18%;
-  }
-  .prop-toggle {
-    position: absolute;
-    right: 4%;
-    top: -12%;
-  }
-  .prop-wireframe {
-    position: absolute;
-    right: 8%;
-    bottom: -48%;
-  }
-}
-
-/* Beat 02: User Research */
-.research-svg {
-  position: absolute;
-  width: min(820px, 95vw);
-  height: auto;
-  pointer-events: none;
-  opacity: 0.72;
-}
-
-.bezier-draw {
-  stroke-dasharray: 920;
-  stroke-dashoffset: 920;
-  animation: drawStroke 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes drawStroke {
-  to { stroke-dashoffset: 0; }
-}
-
-.node-pulse {
-  animation: pulseScale 2s ease-in-out infinite;
-  transform-origin: center;
-}
-
-.sub-pill {
-  display: inline-flex;
   align-items: center;
-  padding: 0.38rem 0.9rem;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  animation: springPop 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  gap: 1.5rem;
+  width: 100%;
 }
 
-.sub-pill.is-emerald {
-  background: rgba(52, 211, 153, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  color: #6EE7B7;
+@media (min-width: 960px) {
+  .act-01-grid {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.5rem;
+  }
+
+  .act-copy-col {
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+
+  .act-copy-col .act-headline {
+    justify-content: flex-start;
+  }
 }
 
-.sub-pill.is-gold {
-  background: rgba(226, 184, 120, 0.12);
-  border: 1px solid rgba(226, 184, 120, 0.38);
-  color: #E2B878;
-}
-
-.insight-row {
+.act-copy-col {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.65rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.9rem;
 }
 
-.insight-badge {
-  display: inline-flex;
+.app-frame-card {
+  width: min(330px, 90vw);
+  padding: 1.15rem;
+  border-radius: 22px;
+  background: rgba(17, 18, 23, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 28px 60px -22px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  animation: springCard 560ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes springCard {
+  0% { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.9); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.app-header {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.8rem;
+}
+
+.app-brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E2B878;
+}
+
+.app-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #F5F5F7;
+  margin-right: auto;
+}
+
+.app-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #9CA3AF;
+  padding: 0.18rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.segmented-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.seg-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 3);
+  height: calc(100% - 6px);
+  border-radius: 8px;
+  background: rgba(226, 184, 120, 0.22);
+  border: 1px solid rgba(226, 184, 120, 0.45);
+  transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.seg-item {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9CA3AF;
+  padding: 0.34rem 0;
+}
+
+.seg-item.active {
   color: #F5F5F7;
 }
 
-.insight-metric {
+.workout-mini-card {
+  padding: 0.85rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.wk-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wk-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #F5F5F7;
+}
+
+.wk-delta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 700;
   color: #34D399;
 }
 
-.delay-b1 { animation-delay: 140ms; }
-.delay-b2 { animation-delay: 260ms; }
-
-.check-draw {
-  stroke-dasharray: 24;
-  stroke-dashoffset: 24;
-  animation: drawStroke 550ms cubic-bezier(0.16, 1, 0.3, 1) 240ms forwards;
+.wk-metrics {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
 }
 
-.orbit-cluster {
-  position: relative;
-  width: 14px;
-  height: 14px;
-  display: inline-block;
+.wk-load {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #E2B878;
 }
 
-.orbit-dot {
-  position: absolute;
-  width: 5px;
+.wk-sets {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+}
+
+.wk-bar-track {
+  width: 100%;
   height: 5px;
-  border-radius: 50%;
-  background: #E2B878;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
 }
 
-.orbit-dot.d1 { top: 0; left: 4px; }
-.orbit-dot.d2 { bottom: 0; right: 2px; background: #34D399; }
+.wk-bar-fill {
+  width: 78%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #E2B878, #34D399);
+}
 
-/* Beat 03: Creative AI */
-.prompt-bar {
+.bridge-node-shot {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 28px 6px rgba(52, 211, 153, 0.6);
+  pointer-events: none;
+}
+
+/* =========================================================
+   ACT 02: USER RESEARCH + ARTIFACTS
+   ========================================================= */
+.act-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.15rem;
+  width: 100%;
+}
+
+.journey-svg {
+  position: absolute;
+  width: min(880px, 96vw);
+  height: auto;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.journey-path {
+  stroke-dasharray: 1050;
+  stroke-dashoffset: 1050;
+  animation: drawJourney 950ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes drawJourney {
+  to { stroke-dashoffset: 0; }
+}
+
+.research-artifacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.flow-card {
+  padding: 0.58rem 0.9rem;
+}
+
+.flow-nodes {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.f-node {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.24rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #D1D5DB;
+}
+
+.f-node.is-accent {
+  background: rgba(52, 211, 153, 0.16);
+  color: #6EE7B7;
+}
+
+.f-line {
+  width: 14px;
+  height: 2px;
+  background: rgba(52, 211, 153, 0.5);
+}
+
+.telemetry-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+}
+
+.tel-em { font-weight: 700; color: #34D399; }
+.tel-gold { font-weight: 700; color: #E2B878; }
+.tel-lbl { color: #D1D5DB; }
+.tel-sep { color: #6B7280; }
+
+/* Wireframe-to-UI Comparison Slider */
+.compare-card {
+  position: relative;
+  width: 196px;
+  height: 54px;
+  overflow: hidden;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.compare-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.85rem;
+}
+
+.compare-lowfi {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.wf-box-lg {
+  width: 66px;
+  height: 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.wf-box-sm {
+  width: 44px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.26);
+}
+
+.compare-hifi {
+  background: linear-gradient(90deg, rgba(226, 184, 120, 0.18), rgba(52, 211, 153, 0.16));
+}
+
+.hifi-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #F5F5F7;
+}
+
+.hifi-badge {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #050507;
+  background: #34D399;
+  padding: 0.16rem 0.45rem;
+  border-radius: 999px;
+}
+
+.compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #E2B878;
+  box-shadow: 0 0 10px #E2B878;
+}
+
+/* =========================================================
+   ACT 03: CREATIVE AI + 3 SPATIAL CONCEPT CARDS
+   ========================================================= */
+.prompt-command-bar {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
   padding: 0.52rem 1rem;
-  max-width: 92vw;
   font-family: var(--font-mono);
-  font-size: clamp(0.7rem, 1.4vw, 0.82rem);
-  color: #E5E7EB;
+  font-size: clamp(0.72rem, 1.4vw, 0.82rem);
+  color: #F5F5F7;
+  border-color: rgba(226, 184, 120, 0.4);
 }
 
-.prompt-sparkle {
-  color: #E2B878;
-}
+.prompt-star { color: #E2B878; }
 
 .prompt-caret {
   width: 2px;
   height: 1em;
-  background: #E2B878;
-  animation: blinkCaret 0.8s step-end infinite;
+  background: #34D399;
+  animation: blinkCaret 0.75s step-end infinite;
 }
 
 @keyframes blinkCaret {
   50% { opacity: 0; }
 }
 
-.matrix-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-}
-
-.matrix-card {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.95rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #F5F5F7;
-}
-
-.matrix-card.is-highlighted {
-  border-color: rgba(226, 184, 120, 0.45);
-}
-
-.matrix-step {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #E2B878;
-}
-
-.matrix-arrow {
-  color: rgba(255, 255, 255, 0.35);
-  font-family: var(--font-mono);
-}
-
-/* Beat 04: Motion & Front-End */
-.dock-row {
+.concept-stack {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.dock-curve-card {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
+.concept-stack.is-converging {
+  transform: scale(0.84);
+  opacity: 0.45;
 }
 
-.dock-mono {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: #D1D5DB;
-}
-
-.dock-parity-card {
+.concept-card {
+  width: 190px;
+  padding: 0.85rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
-  padding: 0.55rem 1rem;
+  gap: 0.45rem;
+  text-align: left;
+  animation: springCard 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.parity-tag {
+.card-center { animation-delay: 90ms; border-color: rgba(226, 184, 120, 0.42); }
+.card-right { animation-delay: 180ms; }
+
+.swatch-row {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background-color 400ms ease;
+}
+
+.layout-preview {
+  display: flex;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.lp-col {
+  height: 16px;
+  flex: 1;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.lp-col.is-wide {
+  flex: 2;
+  background: rgba(226, 184, 120, 0.32);
+}
+
+.copy-pill-preview {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #050507;
+  background: #E2B878;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+}
+
+.concept-title {
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #F5F5F7;
 }
 
-.parity-sub {
+.concept-meta {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   color: #9CA3AF;
 }
 
-/* Bottom Safe-Zone Footer */
+/* =========================================================
+   ACT 04: MOTION & FRONT-END + DOCK & RESPONSIVE MORPH
+   ========================================================= */
+.motion-stage-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.elastic-dock {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 68px);
+  padding: 5px;
+  border-radius: 999px;
+}
+
+.dock-pill-bg {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 68px;
+  height: calc(100% - 10px);
+  border-radius: 999px;
+  background: #E2B878;
+  transition: transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dock-item {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0.42rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #A1A7B3;
+  transition: color 250ms ease;
+}
+
+.dock-item.active {
+  color: #050507;
+}
+
+.morph-device {
+  width: 148px;
+  height: 68px;
+  padding: 0.55rem;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: width 520ms cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 520ms ease;
+}
+
+.morph-device.is-mobile {
+  width: 64px;
+  border-radius: 18px;
+  border-color: rgba(52, 211, 153, 0.5);
+}
+
+.md-topbar {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.md-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.md-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.md-hero-bar {
+  width: 82%;
+  height: 10px;
+  border-radius: 4px;
+  background: rgba(226, 184, 120, 0.45);
+}
+
+.md-sub-bar {
+  width: 56%;
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* =========================================================
+   BOTTOM SAFE-ZONE FOOTER
+   ========================================================= */
 .hud-container {
   position: relative;
   z-index: 3;
@@ -971,7 +1248,6 @@ onUnmounted(() => {
     align-items: center;
     gap: 0.45rem;
   }
-
   .identity-sep {
     display: inline;
   }
@@ -1002,7 +1278,6 @@ onUnmounted(() => {
   font-size: 0.85rem !important;
 }
 
-/* Minimalist Chapter Pills (01 02 03 04) */
 .chapter-pills {
   display: flex;
   align-items: center;
@@ -1010,7 +1285,7 @@ onUnmounted(() => {
 }
 
 .chapter-pill {
-  background: rgba(18, 19, 24, 0.75);
+  background: rgba(18, 19, 24, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #737986;
   font-family: var(--font-mono);
@@ -1034,12 +1309,10 @@ onUnmounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bloom,
-  .staccato-word,
   .mask-rise,
-  .glass-prop,
-  .bezier-draw,
-  .check-draw,
+  .app-frame-card,
+  .concept-card,
+  .journey-path,
   .prompt-caret {
     animation: none !important;
     stroke-dashoffset: 0 !important;
