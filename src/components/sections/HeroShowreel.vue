@@ -6,758 +6,290 @@ import AppIcon from '../ui/AppIcon.vue'
 
 const { t } = useI18n()
 
-const stageRef = ref(null)
-const canvasRef = ref(null)
-
-const isPlaying = ref(true)
-const isMuted = ref(true)
-const isExpanded = ref(false)
 const elapsedMs = ref(0)
+const isAutoPlaying = ref(true)
 
 const BEAT_DURATION = 4000
-const TOTAL_BEATS = 4
-const LOOP_DURATION = BEAT_DURATION * TOTAL_BEATS
+const LOOP_DURATION = 16000
 
 let rafId = null
 let lastTs = null
-let prevBeat = 0
-let audioCtx = null
-let resizeObs = null
-let ctx = null
-let viewW = 1440
-let viewH = 900
 
-const currentBeatIndex = computed(() => {
-  return Math.floor((elapsedMs.value % LOOP_DURATION) / BEAT_DURATION)
+const loopMs = computed(() => elapsedMs.value % LOOP_DURATION)
+const currentBeat = computed(() => Math.floor(loopMs.value / BEAT_DURATION))
+const beatTime = computed(() => (loopMs.value % BEAT_DURATION) / 1000) // 0..4.0s within current beat
+
+// Beat 01 phases
+const b1WordIndex = computed(() => {
+  if (currentBeat.value !== 0) return -1
+  if (beatTime.value < 0.30) return 0 // Chiarezza.
+  if (beatTime.value < 0.60) return 1 // Gerarchia.
+  if (beatTime.value < 0.92) return 2 // Precisione.
+  return 3 // Hero Lock-Up
 })
 
-const totalProgress = computed(() => {
-  return ((elapsedMs.value % LOOP_DURATION) / LOOP_DURATION) * 100
+const b1ToggleActive = computed(() => currentBeat.value === 0 && beatTime.value >= 1.65)
+
+// Beat 02 animated counter (-42%)
+const b2Counter = computed(() => {
+  if (currentBeat.value !== 1) return 42
+  const p = Math.min(1, Math.max(0, (beatTime.value - 0.85) / 0.85))
+  const eased = 1 - Math.pow(1 - p, 3)
+  return Math.round(eased * 42)
 })
 
-const formattedTimecode = computed(() => {
-  const loopMs = elapsedMs.value % LOOP_DURATION
-  const totalSec = Math.floor(loopMs / 1000)
-  const mins = String(Math.floor(totalSec / 60)).padStart(2, '0')
-  const secs = String(totalSec % 60).padStart(2, '0')
-  const frames = String(Math.floor((loopMs % 1000) / 16.67)).padStart(2, '0')
-  return `${mins}:${secs}:${frames}`
+// Beat 03 typing prompt
+const PROMPT_TEXT = 'Design system accessibile ad alto contrasto...'
+const b3TypedPrompt = computed(() => {
+  if (currentBeat.value !== 2) return ''
+  const p = Math.min(1, Math.max(0, beatTime.value / 0.82))
+  const count = Math.floor(p * PROMPT_TEXT.length)
+  return PROMPT_TEXT.slice(0, count)
 })
 
-const beats = [
-  { id: 'ux-ui', label: 'UX/UI DESIGN' },
-  { id: 'user-research', label: 'USER RESEARCH' },
-  { id: 'creative-ai', label: 'CREATIVE AI' },
-  { id: 'motion-fe', label: 'MOTION & FRONT-END' },
+const chapters = [
+  { id: 'ux-ui', num: '01', label: 'UX/UI Design' },
+  { id: 'user-research', num: '02', label: 'User Research' },
+  { id: 'creative-ai', num: '03', label: 'Creative AI' },
+  { id: 'motion-fe', num: '04', label: 'Motion & Front-End' },
 ]
 
-// Easing helpers
-const clamp = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v))
-const lerp = (a, b, t) => a + (b - a) * t
-const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(t)))
-const easeOutBack = (t) => {
-  const x = clamp(t)
-  const c1 = 1.70158
-  const c3 = c1 + 1
-  return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
-}
-const easeInOutCubic = (t) => {
-  const x = clamp(t)
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2
-}
-
-// 5x7 Pixel LED bitmap font for kinetic dot-matrix letters
-const LED_FONT = {
-  U: ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
-  X: ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
-  '/': ['00001', '00010', '00010', '00100', '01000', '01000', '10000'],
-  I: ['01110', '00100', '00100', '00100', '00100', '00100', '01110'],
-  A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
-  S: ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
-  R: ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
-  E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
-}
-
-const drawDotMatrixText = (c, text, cx, cy, dotPitch, waveProgress, colorPrimary, colorGlow) => {
-  const chars = text.split('')
-  const charCols = 5
-  const charGap = 1.6
-  const totalCols = chars.length * charCols + (chars.length - 1) * charGap
-  const totalW = totalCols * dotPitch
-  const totalH = 7 * dotPitch
-  const startX = cx - totalW / 2
-  const startY = cy - totalH / 2
-  const radius = Math.max(1.6, dotPitch * 0.36)
-
-  chars.forEach((ch, ci) => {
-    const map = LED_FONT[ch]
-    if (!map) return
-    const offsetCol = ci * (charCols + charGap)
-    for (let row = 0; row < 7; row++) {
-      for (let col = 0; col < 5; col++) {
-        if (map[row][col] !== '1') continue
-        const px = startX + (offsetCol + col) * dotPitch + dotPitch / 2
-        const py = startY + row * dotPitch + dotPitch / 2
-        const normX = (offsetCol + col) / totalCols
-        const lit = clamp((waveProgress - normX * 0.55) / 0.25)
-
-        // Unlit base dot
-        c.fillStyle = 'rgba(255, 255, 255, 0.08)'
-        c.beginPath()
-        c.arc(px, py, radius * 0.82, 0, Math.PI * 2)
-        c.fill()
-
-        if (lit > 0.02) {
-          c.save()
-          c.globalAlpha = lit
-          c.fillStyle = (ci + row) % 3 === 0 ? colorGlow : colorPrimary
-          c.shadowColor = (ci + row) % 3 === 0 ? colorGlow : colorPrimary
-          c.shadowBlur = dotPitch * 0.9 * lit
-          c.beginPath()
-          c.arc(px, py, radius * (0.85 + 0.18 * lit), 0, Math.PI * 2)
-          c.fill()
-          c.restore()
-        }
-      }
-    }
-  })
-}
-
-const drawRoundRect = (c, x, y, w, h, r) => {
-  const rad = Math.min(r, w / 2, h / 2)
-  c.beginPath()
-  c.moveTo(x + rad, y)
-  c.lineTo(x + w - rad, y)
-  c.quadraticCurveTo(x + w, y, x + w, y + rad)
-  c.lineTo(x + w, y + h - rad)
-  c.quadraticCurveTo(x + w, y + h, x + w - rad, y + h)
-  c.lineTo(x + rad, y + h)
-  c.quadraticCurveTo(x, y + h, x, y + h - rad)
-  c.lineTo(x, y + rad)
-  c.quadraticCurveTo(x, y, x + rad, y)
-  c.closePath()
-}
-
-const drawCursor = (c, x, y, scale = 1, clickPulse = 0) => {
-  c.save()
-  c.translate(x, y)
-
-  if (clickPulse > 0) {
-    c.save()
-    c.strokeStyle = '#34D399'
-    c.lineWidth = 2
-    c.globalAlpha = 1 - clickPulse
-    c.beginPath()
-    c.arc(0, 0, 10 + clickPulse * 28, 0, Math.PI * 2)
-    c.stroke()
-    c.restore()
-  }
-
-  c.scale(scale, scale)
-  c.shadowColor = 'rgba(0, 0, 0, 0.55)'
-  c.shadowBlur = 12
-  c.shadowOffsetY = 4
-
-  c.beginPath()
-  c.moveTo(0, 0)
-  c.lineTo(24, 11)
-  c.lineTo(13, 14)
-  c.lineTo(9, 25)
-  c.closePath()
-  c.fillStyle = '#34D399'
-  c.fill()
-  c.lineWidth = 2
-  c.strokeStyle = '#0B0C0E'
-  c.stroke()
-  c.restore()
-}
-
-const drawScene = (ms) => {
-  if (!ctx) return
-  const w = viewW
-  const h = viewH
-  const isMobile = w < 640
-  const loopMs = ms % LOOP_DURATION
-  const beat = Math.floor(loopMs / BEAT_DURATION)
-  const bt = (loopMs % BEAT_DURATION) / BEAT_DURATION // 0..1 within current beat
-
-  // Base background #0B0C0E
-  ctx.fillStyle = '#0B0C0E'
-  ctx.fillRect(0, 0, w, h)
-
-  // Edge-to-edge architectural grid (#1B1D22)
-  const gridSize = isMobile ? 42 : 56
-  ctx.strokeStyle = '#1B1D22'
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  for (let gx = (w % gridSize) / 2; gx <= w; gx += gridSize) {
-    const px = Math.round(gx) + 0.5
-    ctx.moveTo(px, 0)
-    ctx.lineTo(px, h)
-  }
-  for (let gy = (h % gridSize) / 2; gy <= h; gy += gridSize) {
-    const py = Math.round(gy) + 0.5
-    ctx.moveTo(0, py)
-    ctx.lineTo(w, py)
-  }
-  ctx.stroke()
-
-  // Subtle ambient radial focus glow
-  const grad = ctx.createRadialGradient(w * 0.5, h * 0.48, 20, w * 0.5, h * 0.48, Math.max(w, h) * 0.46)
-  grad.addColorStop(0, 'rgba(52, 211, 153, 0.075)')
-  grad.addColorStop(0.45, 'rgba(194, 165, 126, 0.04)')
-  grad.addColorStop(1, 'rgba(11, 12, 14, 0)')
-  ctx.fillStyle = grad
-  ctx.fillRect(0, 0, w, h)
-
-  const cx = w * 0.5
-  const cy = isMobile ? h * 0.44 : h * 0.48
-  const fontScale = clamp(w / 1280, 0.42, 1.15)
-  const dotPitch = Math.max(4.4, Math.round(10 * fontScale))
-
-  // Exit fade/wipe at end of each beat (last 12%)
-  const beatOut = bt > 0.88 ? 1 - easeInOutCubic((bt - 0.88) / 0.12) : 1
-  const beatIn = easeOutExpo(bt / 0.2)
-  const alpha = beatIn * beatOut
-
-  // =========================================================
-  // BEAT 01: UX / UI DESIGN
-  // =========================================================
-  if (beat === 0) {
-    ctx.save()
-    ctx.globalAlpha = alpha
-
-    // 1. Oversized white toolbar pill (< > ↓ •••) sliding down above typography
-    const pillW = isMobile ? 210 : 272
-    const pillH = isMobile ? 42 : 52
-    const pillY = cy - (isMobile ? 102 : 148) + (1 - easeOutBack(bt / 0.25)) * -30
-    const pillX = cx - pillW / 2
-
-    ctx.save()
-    ctx.fillStyle = '#F3F4F6'
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
-    ctx.shadowBlur = 24
-    ctx.shadowOffsetY = 10
-    drawRoundRect(ctx, pillX, pillY, pillW, pillH, pillH / 2)
-    ctx.fill()
-    ctx.restore()
-
-    // Active highlight on '>' button when cursor clicks (~0.38..0.55)
-    const clickProgress = clamp((bt - 0.36) / 0.14)
-    const gtX = pillX + pillW * 0.37
-    if (clickProgress > 0) {
-      ctx.save()
-      ctx.fillStyle = '#0B0C0E'
-      ctx.globalAlpha = alpha * Math.sin(clamp(clickProgress) * Math.PI) * 0.16 + (bt > 0.42 ? 0.12 : 0)
-      drawRoundRect(ctx, gtX - 18, pillY + 6, 36, pillH - 12, 14)
-      ctx.fill()
-      ctx.restore()
-    }
-
-    ctx.fillStyle = '#0B0C0E'
-    ctx.font = `700 ${isMobile ? 15 : 18}px ui-monospace, SFMono-Regular, Menlo, monospace`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('<', pillX + pillW * 0.17, pillY + pillH / 2 + 1)
-    ctx.fillText('>', gtX, pillY + pillH / 2 + 1)
-    ctx.fillText('↓', pillX + pillW * 0.58, pillY + pillH / 2 + 1)
-    ctx.fillText('•••', pillX + pillW * 0.81, pillY + pillH / 2 + 1)
-
-    // 2. Massive Dot-Matrix LED "UX/UI" + Elastic "DESIGN"
-    const titleY = cy - (isMobile ? 28 : 42)
-    drawDotMatrixText(ctx, 'UX/UI', cx, titleY, dotPitch, clamp(bt / 0.45), '#F3F4F6', '#34D399')
-
-    const designY = cy + (isMobile ? 38 : 54)
-    const snap = easeOutBack(clamp((bt - 0.08) / 0.3))
-    ctx.save()
-    ctx.translate(cx, designY)
-    ctx.scale(0.88 + 0.12 * snap, 0.88 + 0.12 * snap)
-    ctx.fillStyle = '#F3F4F6'
-    ctx.font = `800 ${Math.round((isMobile ? 54 : 112) * clamp(w / 1200, 0.72, 1.08))}px "Inter Variable", Inter, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('DESIGN', 0, 0)
-    ctx.restore()
-
-    // 3. Mint/Lime System Card triggered after cursor clicks '>'
-    const cardTrigger = easeOutBack(clamp((bt - 0.42) / 0.25))
-    if (cardTrigger > 0.01) {
-      const cardW = isMobile ? 290 : 370
-      const cardH = isMobile ? 42 : 48
-      const cardX = cx - cardW / 2
-      const cardY = cy + (isMobile ? 92 : 136) + (1 - cardTrigger) * 18
-
-      ctx.save()
-      ctx.globalAlpha = alpha * clamp(cardTrigger)
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.14)'
-      ctx.strokeStyle = '#34D399'
-      ctx.lineWidth = 1.5
-      drawRoundRect(ctx, cardX, cardY, cardW, cardH, 12)
-      ctx.fill()
-      ctx.stroke()
-
-      // Live green dot
-      ctx.fillStyle = '#34D399'
-      ctx.beginPath()
-      ctx.arc(cardX + 20, cardY + cardH / 2, 4.5, 0, Math.PI * 2)
-      ctx.fill()
-
-      ctx.fillStyle = '#6EE7B7'
-      ctx.font = `600 ${isMobile ? 11.5 : 13.5}px ui-monospace, SFMono-Regular, Menlo, monospace`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText('UX/UI SYSTEM // V2.0  →  [FIGMA_01]', cx + 8, cardY + cardH / 2)
-      ctx.restore()
-    }
-
-    // 4. Oversized '+' circle badge on left
-    const plusX = isMobile ? w * 0.14 : cx - 340 * fontScale
-    const plusY = cy - (isMobile ? 128 : 40)
-    const plusSize = isMobile ? 42 : 58
-    ctx.save()
-    ctx.fillStyle = '#F3F4F6'
-    ctx.shadowColor = 'rgba(0,0,0,0.4)'
-    ctx.shadowBlur = 18
-    ctx.beginPath()
-    ctx.arc(plusX, plusY + Math.sin(bt * Math.PI * 2) * 5, plusSize / 2, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.fillStyle = '#0B0C0E'
-    ctx.font = `700 ${isMobile ? 22 : 28}px "Inter Variable", Inter, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('+', plusX, plusY + Math.sin(bt * Math.PI * 2) * 5 + 1)
-    ctx.restore()
-
-    // 5. Animated Vector Cursor sweeping to '>' and clicking, then moving to card
-    const cMove1 = easeInOutCubic(clamp(bt / 0.36))
-    const cMove2 = easeInOutCubic(clamp((bt - 0.5) / 0.3))
-    let curX = lerp(cx + 220 * fontScale, gtX, cMove1)
-    let curY = lerp(cy + 110, pillY + pillH / 2 + 4, cMove1)
-    if (bt > 0.5) {
-      curX = lerp(gtX, cx + 110 * fontScale, cMove2)
-      curY = lerp(pillY + pillH / 2 + 4, cy + (isMobile ? 112 : 156), cMove2)
-    }
-    const clickScale = bt > 0.36 && bt < 0.46 ? 0.82 : 1
-    const ripple = bt > 0.38 && bt < 0.62 ? (bt - 0.38) / 0.24 : 0
-    drawCursor(ctx, curX, curY, (isMobile ? 0.95 : 1.25) * clickScale, ripple)
-
-    ctx.restore()
-  }
-
-  // =========================================================
-  // BEAT 02: USER RESEARCH (Ergonomia Cognitiva & Node Flow)
-  // =========================================================
-  else if (beat === 1) {
-    ctx.save()
-    ctx.globalAlpha = alpha
-
-    // Interactive cognitive ergonomics node-flow diagram
-    const nodeSpan = isMobile ? w * 0.34 : Math.min(340, w * 0.25)
-    const nodes = [
-      { x: cx - nodeSpan, y: cy - (isMobile ? 110 : 120), label: 'INPUT' },
-      { x: cx, y: cy - (isMobile ? 145 : 165), label: 'COGNITION' },
-      { x: cx + nodeSpan, y: cy - (isMobile ? 110 : 120), label: 'ACTION' },
-    ]
-
-    // Draw animated bezier paths between nodes
-    const pathDraw = easeOutExpo(clamp(bt / 0.55))
-    ctx.save()
-    ctx.strokeStyle = '#34D399'
-    ctx.lineWidth = 2.2
-    ctx.setLineDash([8, 6])
-    ctx.lineDashOffset = -bt * 120
-    ctx.globalAlpha = alpha * pathDraw * 0.85
-
-    ctx.beginPath()
-    ctx.moveTo(nodes[0].x, nodes[0].y)
-    ctx.quadraticCurveTo((nodes[0].x + nodes[1].x) / 2, nodes[0].y - 45, nodes[1].x, nodes[1].y)
-    ctx.quadraticCurveTo((nodes[1].x + nodes[2].x) / 2, nodes[2].y - 45, nodes[2].x, nodes[2].y)
-    ctx.stroke()
-    ctx.restore()
-
-    // Heatmap pulses & glowing anchor nodes
-    nodes.forEach((n, idx) => {
-      const nAppear = easeOutBack(clamp((bt - idx * 0.08) / 0.25))
-      const pulse = (bt * 2 + idx * 0.3) % 1
-
-      ctx.save()
-      ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)'
-      ctx.lineWidth = 1.5
-      ctx.globalAlpha = alpha * (1 - pulse) * 0.7
-      ctx.beginPath()
-      ctx.arc(n.x, n.y, 12 + pulse * 26, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.restore()
-
-      ctx.save()
-      ctx.fillStyle = '#0B0C0E'
-      ctx.strokeStyle = '#34D399'
-      ctx.lineWidth = 2.5
-      ctx.beginPath()
-      ctx.arc(n.x, n.y, 10 * nAppear, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.stroke()
-
-      ctx.fillStyle = '#A1A7B3'
-      ctx.font = `600 ${isMobile ? 10 : 11}px ui-monospace, SFMono-Regular, Menlo, monospace`
-      ctx.textAlign = 'center'
-      ctx.fillText(n.label, n.x, n.y - 20)
-      ctx.restore()
-    })
-
-    // Massive Kinetic "USER" + Dot-Matrix "RESEARCH"
-    const userY = cy - (isMobile ? 22 : 30)
-    const snap = easeOutBack(clamp(bt / 0.28))
-    ctx.save()
-    ctx.translate(cx, userY)
-    ctx.scale(0.9 + 0.1 * snap, 0.9 + 0.1 * snap)
-    ctx.fillStyle = '#F3F4F6'
-    ctx.font = `800 ${Math.round((isMobile ? 54 : 108) * clamp(w / 1200, 0.72, 1.08))}px "Inter Variable", Inter, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('USER', 0, 0)
-    ctx.restore()
-
-    const resY = cy + (isMobile ? 38 : 60)
-    drawDotMatrixText(ctx, 'RESEARCH', cx, resY, Math.max(3.8, dotPitch * 0.85), clamp((bt - 0.08) / 0.45), '#F3F4F6', '#34D399')
-
-    // Validation Metric Pill
-    const valTrigger = easeOutBack(clamp((bt - 0.25) / 0.25))
-    const valW = isMobile ? 260 : 340
-    const valH = isMobile ? 40 : 46
-    const valX = cx - valW / 2
-    const valY = cy + (isMobile ? 92 : 138) + (1 - valTrigger) * 16
-
-    ctx.save()
-    ctx.globalAlpha = alpha * clamp(valTrigger)
-    ctx.fillStyle = 'rgba(194, 165, 126, 0.12)'
-    ctx.strokeStyle = 'rgba(194, 165, 126, 0.5)'
-    ctx.lineWidth = 1.5
-    drawRoundRect(ctx, valX, valY, valW, valH, 12)
-    ctx.fill()
-    ctx.stroke()
-
-    ctx.fillStyle = '#C2A57E'
-    ctx.font = `700 ${isMobile ? 11.5 : 13.5}px ui-monospace, SFMono-Regular, Menlo, monospace`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('98.4% TASK FLOW  •  L-20 HCI', cx, valY + valH / 2)
-    ctx.restore()
-
-    // Cursor clicking center Cognition node
-    const curX = lerp(nodes[0].x, nodes[1].x, easeInOutCubic(clamp(bt / 0.5)))
-    const curY = lerp(nodes[0].y + 20, nodes[1].y + 8, easeInOutCubic(clamp(bt / 0.5)))
-    drawCursor(ctx, curX, curY, isMobile ? 0.95 : 1.25, bt > 0.45 && bt < 0.7 ? (bt - 0.45) / 0.25 : 0)
-
-    ctx.restore()
-  }
-
-  // =========================================================
-  // BEAT 03: CREATIVE AI (Prompt -> Prototype Morphing)
-  // =========================================================
-  else if (beat === 2) {
-    ctx.save()
-    ctx.globalAlpha = alpha
-
-    // Top Prompt-to-Prototype morphing bar
-    const barW = isMobile ? 290 : 420
-    const barH = isMobile ? 40 : 48
-    const barX = cx - barW / 2
-    const barY = cy - (isMobile ? 120 : 158)
-
-    ctx.save()
-    ctx.fillStyle = 'rgba(16, 185, 129, 0.12)'
-    ctx.strokeStyle = '#34D399'
-    ctx.lineWidth = 1.5
-    drawRoundRect(ctx, barX, barY, barW, barH, 12)
-    ctx.fill()
-    ctx.stroke()
-
-    ctx.fillStyle = '#6EE7B7'
-    ctx.font = `600 ${isMobile ? 11.5 : 14}px ui-monospace, SFMono-Regular, Menlo, monospace`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('AI WORKFLOW // PROMPT  →  PROTOTYPE', cx, barY + barH / 2)
-    ctx.restore()
-
-    // Kinetic "CREATIVE" + Pulsing Dot-Matrix "AI"
-    const creY = cy - (isMobile ? 34 : 42)
-    const snap = easeOutBack(clamp(bt / 0.26))
-    ctx.save()
-    ctx.translate(cx, creY)
-    ctx.scale(0.9 + 0.1 * snap, 0.9 + 0.1 * snap)
-    ctx.fillStyle = '#F3F4F6'
-    ctx.font = `800 ${Math.round((isMobile ? 46 : 98) * clamp(w / 1200, 0.72, 1.08))}px "Inter Variable", Inter, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('CREATIVE', 0, 0)
-    ctx.restore()
-
-    const aiY = cy + (isMobile ? 36 : 56)
-    drawDotMatrixText(ctx, 'AI', cx, aiY, dotPitch * 1.1, clamp((bt - 0.05) / 0.35), '#34D399', '#F3F4F6')
-
-    // 3 Modular Wireframe Cards assembling below in sync
-    const cards = ['SYSTEM', 'TOKENS', 'LAYOUT']
-    const cardW = isMobile ? 86 : 124
-    const cardH = isMobile ? 46 : 58
-    const gap = isMobile ? 10 : 18
-    const totalCardsW = cards.length * cardW + (cards.length - 1) * gap
-    const startCardX = cx - totalCardsW / 2
-    const cardY = cy + (isMobile ? 96 : 136)
-
-    cards.forEach((lbl, idx) => {
-      const cProg = easeOutBack(clamp((bt - 0.18 - idx * 0.1) / 0.26))
-      const x = startCardX + idx * (cardW + gap)
-      const y = cardY + (1 - cProg) * 28
-
-      ctx.save()
-      ctx.globalAlpha = alpha * clamp(cProg)
-      ctx.fillStyle = '#13151A'
-      ctx.strokeStyle = idx === 1 ? '#34D399' : 'rgba(255,255,255,0.18)'
-      ctx.lineWidth = 1.5
-      drawRoundRect(ctx, x, y, cardW, cardH, 10)
-      ctx.fill()
-      ctx.stroke()
-
-      // Mini wireframe lines inside card
-      ctx.fillStyle = idx === 1 ? '#34D399' : '#C2A57E'
-      drawRoundRect(ctx, x + 10, y + 10, cardW * 0.45, 5, 2.5)
-      ctx.fill()
-
-      ctx.fillStyle = '#A1A7B3'
-      ctx.font = `600 ${isMobile ? 9.5 : 11}px ui-monospace, SFMono-Regular, Menlo, monospace`
-      ctx.textAlign = 'left'
-      ctx.fillText(lbl, x + 10, y + cardH - 12)
-      ctx.restore()
-    })
-
-    ctx.restore()
-  }
-
-  // =========================================================
-  // BEAT 04: MOTION & FRONT-END (Spring Physics & DOM Ready)
-  // =========================================================
-  else {
-    ctx.save()
-    ctx.globalAlpha = alpha
-
-    // Top Token Pill
-    const tokW = isMobile ? 250 : 340
-    const tokH = isMobile ? 38 : 44
-    const tokX = cx - tokW / 2
-    const tokY = cy - (isMobile ? 116 : 150)
-
-    ctx.save()
-    ctx.fillStyle = '#13151A'
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'
-    ctx.lineWidth = 1.5
-    drawRoundRect(ctx, tokX, tokY, tokW, tokH, tokH / 2)
-    ctx.fill()
-    ctx.stroke()
-
-    ctx.fillStyle = '#F3F4F6'
-    ctx.font = `600 ${isMobile ? 11.5 : 13.5}px ui-monospace, SFMono-Regular, Menlo, monospace`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('60FPS // DOM_READY  •  WCAG AA', cx, tokY + tokH / 2)
-    ctx.restore()
-
-    // Kinetic "MOTION &" + Bold "FRONT-END"
-    const mY = cy - (isMobile ? 32 : 42)
-    const snap = easeOutBack(clamp(bt / 0.25))
-    ctx.save()
-    ctx.translate(cx, mY)
-    ctx.scale(0.92 + 0.08 * snap, 0.92 + 0.08 * snap)
-    ctx.fillStyle = '#C2A57E'
-    ctx.font = `800 ${Math.round((isMobile ? 40 : 84) * clamp(w / 1200, 0.72, 1.08))}px "Inter Variable", Inter, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('MOTION &', 0, 0)
-    ctx.restore()
-
-    const feY = cy + (isMobile ? 32 : 52)
-    const snap2 = easeOutBack(clamp((bt - 0.1) / 0.28))
-    ctx.save()
-    ctx.translate(cx, feY)
-    ctx.scale(0.92 + 0.08 * snap2, 0.92 + 0.08 * snap2)
-    ctx.fillStyle = '#F3F4F6'
-    ctx.font = `800 ${Math.round((isMobile ? 42 : 94) * clamp(w / 1200, 0.72, 1.08))}px "Inter Variable", Inter, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('FRONT-END', 0, 0)
-    ctx.restore()
-
-    // Spring-physics bezier curve visualizer below
-    const curveW = isMobile ? 220 : 320
-    const curveY = cy + (isMobile ? 108 : 148)
-    const progress = clamp((bt - 0.15) / 0.55)
-
-    ctx.save()
-    ctx.strokeStyle = 'rgba(255,255,255,0.14)'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.moveTo(cx - curveW / 2, curveY + 18)
-    ctx.bezierCurveTo(cx - curveW * 0.25, curveY - 26, cx + curveW * 0.1, curveY - 22, cx + curveW / 2, curveY - 22)
-    ctx.stroke()
-
-    const dotX = lerp(cx - curveW / 2, cx + curveW / 2, easeOutExpo(progress))
-    const dotY = lerp(curveY + 18, curveY - 22, easeOutExpo(progress))
-    ctx.fillStyle = '#34D399'
-    ctx.shadowColor = '#34D399'
-    ctx.shadowBlur = 14
-    ctx.beginPath()
-    ctx.arc(dotX, dotY, 7, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.restore()
-
-    ctx.restore()
-  }
-}
-
-const syncCanvasSize = () => {
-  if (!canvasRef.value || !stageRef.value) return
-  const rect = stageRef.value.getBoundingClientRect()
-  const dpr = Math.min(window.devicePixelRatio || 1, 2)
-  viewW = Math.max(320, rect.width)
-  viewH = Math.max(480, rect.height)
-  canvasRef.value.width = Math.round(viewW * dpr)
-  canvasRef.value.height = Math.round(viewH * dpr)
-  ctx = canvasRef.value.getContext('2d')
-  if (ctx) {
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-  }
-  drawScene(elapsedMs.value)
-}
-
-const playTone = (freq = 520, duration = 0.06, type = 'sine') => {
-  if (isMuted.value || typeof window === 'undefined') return
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext
-    if (!AudioContextClass) return
-    if (!audioCtx) audioCtx = new AudioContextClass()
-    if (audioCtx.state === 'suspended') audioCtx.resume()
-    const osc = audioCtx.createOscillator()
-    const gain = audioCtx.createGain()
-    osc.type = type
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime)
-    gain.gain.setValueAtTime(0.032, audioCtx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration)
-    osc.connect(gain)
-    gain.connect(audioCtx.destination)
-    osc.start()
-    osc.stop(audioCtx.currentTime + duration)
-  } catch {
-    // Ignore audio errors when blocked by browser autoplay policy
-  }
-}
+// Ambient orb palette shifting smoothly per chapter
+const activeOrbTheme = computed(() => `theme-beat-${currentBeat.value + 1}`)
 
 const tick = (ts) => {
-  if (lastTs !== null && isPlaying.value) {
+  if (lastTs !== null && isAutoPlaying.value) {
     elapsedMs.value += ts - lastTs
-    const nextBeat = currentBeatIndex.value
-    if (nextBeat !== prevBeat) {
-      prevBeat = nextBeat
-      const toneMap = [587.33, 659.25, 783.99, 880.0]
-      playTone(toneMap[nextBeat] || 620, 0.055)
-    }
   }
   lastTs = ts
-  drawScene(elapsedMs.value)
   rafId = window.requestAnimationFrame(tick)
 }
 
-const togglePlay = () => {
-  isPlaying.value = !isPlaying.value
-  playTone(isPlaying.value ? 660 : 440, 0.05)
-}
-
-const toggleMute = () => {
-  isMuted.value = !isMuted.value
-  if (!isMuted.value) {
-    playTone(740, 0.08, 'triangle')
-  }
-}
-
-const jumpBeat = (idx) => {
-  elapsedMs.value = idx * BEAT_DURATION + 450
-  prevBeat = idx
-  drawScene(elapsedMs.value)
-  playTone(580 + idx * 55, 0.05)
-}
-
-const toggleExpand = () => {
-  isExpanded.value = !isExpanded.value
-  window.requestAnimationFrame(syncCanvasSize)
-}
-
-const handleKey = (e) => {
-  if (e.key === 'Escape' && isExpanded.value) {
-    isExpanded.value = false
-    window.requestAnimationFrame(syncCanvasSize)
-  }
+const jumpToBeat = (idx) => {
+  // Jump directly to the Hero Lock-Up moment of the selected beat
+  const lockOffsets = [1350, 1100, 1050, 950]
+  elapsedMs.value = idx * BEAT_DURATION + (lockOffsets[idx] || 1000)
 }
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      isPlaying.value = false
-      elapsedMs.value = 1850
-    }
-    syncCanvasSize()
-    if (window.ResizeObserver && stageRef.value) {
-      resizeObs = new ResizeObserver(syncCanvasSize)
-      resizeObs.observe(stageRef.value)
+      isAutoPlaying.value = false
+      elapsedMs.value = 1650
+    } else {
+      // Start at 0s for the rapid staccato intro
+      elapsedMs.value = 0
     }
     rafId = window.requestAnimationFrame(tick)
-    window.addEventListener('keydown', handleKey)
   }
 })
 
 onUnmounted(() => {
   if (rafId !== null) window.cancelAnimationFrame(rafId)
-  if (resizeObs) resizeObs.disconnect()
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('keydown', handleKey)
-  }
-  if (audioCtx) {
-    audioCtx.close().catch(() => {})
-  }
 })
 </script>
 
 <template>
-  <section class="hero-showreel-fullbleed" aria-label="Hero Showreel">
-    <div ref="stageRef" class="showreel-stage" :class="{ 'is-expanded': isExpanded }">
-      <!-- Full-Bleed 60fps Kinetic Motion Canvas -->
-      <canvas ref="canvasRef" class="showreel-canvas" aria-hidden="true" />
+  <section class="keynote-hero" aria-label="Hero Keynote Showcase">
+    <div class="keynote-stage" :class="activeOrbTheme">
+      <!-- Subtle Breathing Ambient Radial Light Blooms (No Grid, No Checkerboard) -->
+      <div class="ambient-blooms" aria-hidden="true">
+        <div class="bloom bloom-primary" />
+        <div class="bloom bloom-secondary" />
+      </div>
 
-      <!-- Top HUD Bar (below floating navbar) -->
-      <div class="hud-container stage-top">
-        <div class="status-pill">
-          <span class="status-dot" :class="{ paused: !isPlaying }" aria-hidden="true" />
-          <span class="pill-play" aria-hidden="true">▶</span>
-          <span class="tabular-nums">{{ t('showreel.pill') }}</span>
+      <!-- Center Keynote Motion Stage -->
+      <div class="stage-viewport">
+        <!-- =========================================================
+             BEAT 01: UX/UI DESIGN (0.0s - 4.0s)
+             ========================================================= -->
+        <div v-if="currentBeat === 0" class="beat-layer beat-01">
+          <!-- Staccato Word Flashes (0.0s - 0.92s) -->
+          <div v-if="b1WordIndex >= 0 && b1WordIndex < 3" class="staccato-wrap">
+            <span v-if="b1WordIndex === 0" key="w0" class="staccato-word">Chiarezza.</span>
+            <span v-else-if="b1WordIndex === 1" key="w1" class="staccato-word">Gerarchia.</span>
+            <span v-else-if="b1WordIndex === 2" key="w2" class="staccato-word is-gold">Precisione.</span>
+          </div>
+
+          <!-- Hero Lock-Up + Glassmorphic UI Assembly (0.92s - 4.0s) -->
+          <div v-else class="lockup-composition">
+            <!-- Floating UI Prop 1: Token Card (Top-Left of stage) -->
+            <div class="glass-prop prop-tokens">
+              <span class="prop-dot is-gold" aria-hidden="true" />
+              <span class="tabular-nums">8pt Grid · WCAG AA · 60fps</span>
+            </div>
+
+            <!-- Floating UI Prop 2: Interactive Apple Pill Toggle (Top-Right of stage) -->
+            <div class="glass-prop prop-toggle" :class="{ 'is-on': b1ToggleActive }">
+              <span class="toggle-label">High-Contrast UI</span>
+              <span class="apple-switch" :class="{ active: b1ToggleActive }" aria-hidden="true">
+                <span class="switch-knob" />
+              </span>
+            </div>
+
+            <!-- Massive Two-Tone Display Lock-Up -->
+            <h1 class="keynote-headline">
+              <span class="mask-clip">
+                <span class="mask-rise tone-ice">UX/UI</span>
+              </span>
+              <span class="mask-clip">
+                <span class="mask-rise delay-1 tone-gold">DESIGN</span>
+              </span>
+            </h1>
+
+            <!-- Floating UI Prop 3: Mobile Viewport Wireframe Card -->
+            <div class="glass-prop prop-wireframe" aria-hidden="true">
+              <div class="wf-notch" />
+              <div class="wf-row-lg" />
+              <div class="wf-row-sm" />
+              <div class="wf-pill-accent" />
+            </div>
+          </div>
         </div>
 
-        <div class="scene-dots" role="tablist" aria-label="Showreel chapters">
-          <button
-            v-for="(b, idx) in beats"
-            :key="b.id"
-            type="button"
-            role="tab"
-            :aria-selected="currentBeatIndex === idx"
-            :aria-label="`Beat ${idx + 1}: ${b.label}`"
-            class="scene-dot-btn"
-            :class="{ active: currentBeatIndex === idx }"
-            @click="jumpBeat(idx)"
-          >
-            <span class="tabular-nums">0{{ idx + 1 }}</span>
-          </button>
+        <!-- =========================================================
+             BEAT 02: USER RESEARCH (4.0s - 8.0s)
+             ========================================================= -->
+        <div v-else-if="currentBeat === 1" class="beat-layer beat-02">
+          <!-- Animated SVG Bezier Node Paths -->
+          <svg class="research-svg" viewBox="0 0 800 300" fill="none" aria-hidden="true">
+            <path
+              class="bezier-draw"
+              d="M110 190 C 230 60, 350 60, 400 150 C 450 240, 570 240, 690 110"
+              stroke="url(#researchGrad)"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <circle class="node-pulse" cx="110" cy="190" r="6" fill="#34D399" />
+            <circle class="node-pulse delay-n1" cx="400" cy="150" r="7" fill="#E2B878" />
+            <circle class="node-pulse delay-n2" cx="690" cy="110" r="6" fill="#34D399" />
+            <defs>
+              <linearGradient id="researchGrad" x1="110" y1="190" x2="690" y2="110" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#34D399" stop-opacity="0.2" />
+                <stop offset="0.5" stop-color="#34D399" stop-opacity="0.9" />
+                <stop offset="1" stop-color="#E2B878" stop-opacity="0.4" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <div class="lockup-composition">
+            <div class="sub-pill is-emerald">
+              <span>Ergonomia Cognitiva &amp; Usabilità</span>
+            </div>
+
+            <h1 class="keynote-headline">
+              <span class="mask-clip">
+                <span class="mask-rise tone-ice">USER</span>
+              </span>
+              <span class="mask-clip">
+                <span class="mask-rise delay-1 tone-emerald">RESEARCH</span>
+              </span>
+            </h1>
+
+            <div class="insight-row">
+              <div class="glass-prop insight-badge">
+                <span class="insight-metric tabular-nums">-{{ b2Counter }}%</span>
+                <span class="insight-text">Attrito Cognitivo</span>
+              </div>
+
+              <div class="glass-prop insight-badge delay-b1">
+                <svg class="check-svg" viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+                  <path class="check-draw" d="M4 10.5L8 14.5L16 6.5" stroke="#34D399" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="insight-text">User Flow Validato</span>
+              </div>
+
+              <div class="glass-prop insight-badge delay-b2">
+                <span class="orbit-cluster" aria-hidden="true">
+                  <span class="orbit-dot d1" />
+                  <span class="orbit-dot d2" />
+                </span>
+                <span class="insight-text">Architettura Intuitiva</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             BEAT 03: CREATIVE AI (8.0s - 12.0s)
+             ========================================================= -->
+        <div v-else-if="currentBeat === 2" class="beat-layer beat-03">
+          <div class="lockup-composition">
+            <!-- Prompt-to-UI Glassmorphic Input Bar -->
+            <div class="glass-prop prompt-bar">
+              <span class="prompt-sparkle" aria-hidden="true">✦</span>
+              <span class="prompt-text">{{ b3TypedPrompt }}</span>
+              <span class="prompt-caret" aria-hidden="true" />
+            </div>
+
+            <h1 class="keynote-headline">
+              <span class="mask-clip">
+                <span class="mask-rise tone-ice">CREATIVE</span>
+              </span>
+              <span class="mask-clip">
+                <span class="mask-rise delay-1 tone-iridescent">AI</span>
+              </span>
+            </h1>
+
+            <!-- Generative Component Matrix -->
+            <div class="matrix-row">
+              <div class="glass-prop matrix-card">
+                <span class="matrix-step">01</span>
+                <span class="matrix-label">Prompt</span>
+              </div>
+              <span class="matrix-arrow" aria-hidden="true">→</span>
+              <div class="glass-prop matrix-card delay-b1 is-highlighted">
+                <span class="matrix-step">02</span>
+                <span class="matrix-label">Prototipo</span>
+              </div>
+              <span class="matrix-arrow" aria-hidden="true">→</span>
+              <div class="glass-prop matrix-card delay-b2">
+                <span class="matrix-step">03</span>
+                <span class="matrix-label">Iterazione</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             BEAT 04: MOTION & FRONT-END (12.0s - 16.0s)
+             ========================================================= -->
+        <div v-else class="beat-layer beat-04">
+          <div class="lockup-composition">
+            <div class="sub-pill is-gold">
+              <span>60fps GPU-Accelerated Execution</span>
+            </div>
+
+            <h1 class="keynote-headline is-compact">
+              <span class="mask-clip">
+                <span class="mask-rise tone-gold">MOTION &amp;</span>
+              </span>
+              <span class="mask-clip">
+                <span class="mask-rise delay-1 tone-ice">FRONT-END</span>
+              </span>
+            </h1>
+
+            <!-- Spring Curve & Semantic Code Parity Dock -->
+            <div class="dock-row">
+              <div class="glass-prop dock-curve-card">
+                <svg viewBox="0 0 120 44" width="108" height="38" fill="none" aria-hidden="true">
+                  <path d="M8 36 C 28 36, 36 8, 112 8" stroke="#E2B878" stroke-width="2.2" stroke-linecap="round" />
+                  <circle class="curve-runner" cx="112" cy="8" r="4" fill="#34D399" />
+                </svg>
+                <span class="dock-mono">cubic-bezier(0.16, 1, 0.3, 1)</span>
+              </div>
+
+              <div class="glass-prop dock-parity-card delay-b1">
+                <span class="parity-tag">Design ↔ Code Parity</span>
+                <span class="parity-sub">Vue 3 · TypeScript · Zero CLS</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Bottom HUD Bar: Identity + CTAs (Left) & Timecode + Controls (Right) -->
-      <div class="hud-container stage-bottom">
+      <!-- Bottom Safe-Zone Anchor: Identity & CTAs (Left) + Minimalist Chapter Pills (Right) -->
+      <div class="hud-container stage-footer">
         <div class="identity-cta-block">
           <div class="identity-line">
             <span class="identity-name">{{ t('showreel.identity') }}</span>
@@ -766,35 +298,31 @@ onUnmounted(() => {
           </div>
 
           <div class="hero-ctas">
-            <BaseButton to="/progetti" variant="primary" class="hero-cta-btn">
+            <BaseButton to="/progetti" variant="primary" class="cta-gold">
               <span>{{ t('showreel.ctaPrimary') }}</span>
               <AppIcon name="arrow-right" :size="15" />
             </BaseButton>
-            <BaseButton :to="{ path: '/', hash: '#contatti' }" variant="secondary" class="hero-cta-btn">
+            <BaseButton :to="{ path: '/', hash: '#contatti' }" variant="secondary" class="cta-glass">
               <span>{{ t('showreel.ctaSecondary') }}</span>
             </BaseButton>
           </div>
         </div>
 
-        <div class="hud-right-stack">
-          <div class="timecode-wrap">
-            <span class="timecode tabular-nums">{{ formattedTimecode }}</span>
-            <div class="progress-track" aria-hidden="true">
-              <div class="progress-fill" :style="{ width: `${totalProgress}%` }" />
-            </div>
-          </div>
-
-          <div class="hud-controls">
-            <button type="button" class="hud-btn" @click="togglePlay">
-              [{{ isPlaying ? t('showreel.pause') : t('showreel.play') }}]
-            </button>
-            <button type="button" class="hud-btn" @click="toggleMute">
-              [{{ isMuted ? t('showreel.unmute') : t('showreel.mute') }}]
-            </button>
-            <button type="button" class="hud-btn" @click="toggleExpand">
-              [{{ isExpanded ? t('showreel.close') : t('showreel.expand') }}]
-            </button>
-          </div>
+        <!-- Ultra-Minimalist Interactive Chapter Pills -->
+        <div class="chapter-pills" role="tablist" aria-label="Keynote chapters">
+          <button
+            v-for="(ch, idx) in chapters"
+            :key="ch.id"
+            type="button"
+            role="tab"
+            :aria-selected="currentBeat === idx"
+            :aria-label="`${ch.num} ${ch.label}`"
+            class="chapter-pill"
+            :class="{ active: currentBeat === idx }"
+            @click="jumpToBeat(idx)"
+          >
+            <span class="tabular-nums">{{ ch.num }}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -802,55 +330,590 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.hero-showreel-fullbleed {
+.keynote-hero {
   width: 100%;
   margin: 0;
   padding: 0;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.showreel-stage {
+.keynote-stage {
   position: relative;
   width: 100%;
   min-height: 94vh;
   min-height: 94svh;
-  background-color: #0B0C0E;
+  background-color: #050507;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 5.25rem 0 1.5rem;
+  padding: 5.5rem 0 1.75rem;
 }
 
 @media (min-width: 768px) {
-  .showreel-stage {
-    min-height: 96vh;
-    padding: 5.75rem 0 2rem;
+  .keynote-stage {
+    min-height: 95vh;
+    padding: 6rem 0 2.25rem;
   }
 }
 
-.showreel-stage.is-expanded {
-  position: fixed;
-  inset: 0;
-  z-index: 250;
-  width: 100vw;
-  height: 100vh;
-  min-height: 100vh;
-  padding: 1.5rem 0;
-}
-
-.showreel-canvas {
+/* Subtle Ambient Radial Blooms (Zero Grid, Zero Checkerboard) */
+.ambient-blooms {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
   pointer-events: none;
+  overflow: hidden;
 }
 
-.hud-container {
+.bloom {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform, opacity;
+  transition: background 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bloom-primary {
+  width: 58vw;
+  height: 58vw;
+  max-width: 780px;
+  max-height: 780px;
+  top: 10%;
+  left: 22%;
+  opacity: 0.09;
+  animation: breatheSlow 9s ease-in-out infinite alternate;
+}
+
+.bloom-secondary {
+  width: 44vw;
+  height: 44vw;
+  max-width: 600px;
+  max-height: 600px;
+  bottom: 8%;
+  right: 14%;
+  opacity: 0.07;
+  animation: breatheSlow 11s ease-in-out infinite alternate-reverse;
+}
+
+.theme-beat-1 .bloom-primary {
+  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
+}
+.theme-beat-1 .bloom-secondary {
+  background: radial-gradient(circle, #F5F5F7 0%, transparent 70%);
+}
+
+.theme-beat-2 .bloom-primary {
+  background: radial-gradient(circle, #34D399 0%, transparent 70%);
+  transform: translate3d(-4%, 4%, 0);
+}
+.theme-beat-2 .bloom-secondary {
+  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
+}
+
+.theme-beat-3 .bloom-primary {
+  background: radial-gradient(circle, #6366F1 0%, transparent 70%);
+  transform: translate3d(5%, -3%, 0);
+}
+.theme-beat-3 .bloom-secondary {
+  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
+}
+
+.theme-beat-4 .bloom-primary {
+  background: radial-gradient(circle, #E2B878 0%, transparent 70%);
+  transform: translate3d(0, 2%, 0);
+}
+.theme-beat-4 .bloom-secondary {
+  background: radial-gradient(circle, #34D399 0%, transparent 70%);
+}
+
+@keyframes breatheSlow {
+  0% { transform: scale(0.96) translate3d(0, 0, 0); }
+  100% { transform: scale(1.06) translate3d(2%, -2%, 0); }
+}
+
+/* Center Stage Viewport */
+.stage-viewport {
   position: relative;
   z-index: 2;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .stage-viewport {
+    padding: 2rem 2.5rem;
+  }
+}
+
+.beat-layer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Staccato Flash Words */
+.staccato-wrap {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+}
+
+.staccato-word {
+  font-size: clamp(3rem, 8.5vw, 6.8rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #F5F5F7;
+  animation: scalePunch 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.staccato-word.is-gold {
+  color: #E2B878;
+}
+
+@keyframes scalePunch {
+  0% {
+    opacity: 0.92;
+    transform: scale(1.1);
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Hero Lock-Up Typography */
+.lockup-composition {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.35rem;
+  width: 100%;
+}
+
+.keynote-headline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.9rem;
+  font-size: clamp(3.1rem, 7.6vw, 6.9rem);
+  font-weight: 800;
+  letter-spacing: -0.038em;
+  line-height: 0.96;
+}
+
+.keynote-headline.is-compact {
+  font-size: clamp(2.55rem, 6.6vw, 6rem);
+}
+
+.mask-clip {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+
+.mask-rise {
+  display: inline-block;
+  animation: maskRise 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mask-rise.delay-1 {
+  animation-delay: 90ms;
+}
+
+@keyframes maskRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 108%, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.tone-ice {
+  color: #F5F5F7;
+}
+
+.tone-gold {
+  color: #E2B878;
+}
+
+.tone-emerald {
+  color: #34D399;
+}
+
+.tone-iridescent {
+  background: linear-gradient(110deg, #F5F5F7 10%, #E2B878 55%, #F5F5F7 90%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: maskRise 560ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both, shimmerText 3.2s linear infinite;
+}
+
+@keyframes shimmerText {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Glassmorphic Apple-Grade UI Props */
+.glass-prop {
+  background: rgba(18, 19, 24, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 20px 44px -18px rgba(0, 0, 0, 0.7);
+  animation: springPop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes springPop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Beat 01 Props */
+.prop-tokens {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: #D1D5DB;
+  animation-delay: 140ms;
+}
+
+.prop-dot.is-gold {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #E2B878;
+}
+
+.prop-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #F5F5F7;
+  animation-delay: 240ms;
+  transition: border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.prop-toggle.is-on {
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 28px -6px rgba(52, 211, 153, 0.35);
+}
+
+.apple-switch {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: background-color 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.apple-switch.active {
+  background: #34D399;
+}
+
+.switch-knob {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #F5F5F7;
+  transform: translate3d(0, 0, 0);
+  transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.apple-switch.active .switch-knob {
+  transform: translate3d(16px, 0, 0);
+}
+
+.prop-wireframe {
+  width: 120px;
+  padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+  animation-delay: 320ms;
+}
+
+.wf-notch {
+  width: 32px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  margin: 0 auto 0.2rem;
+}
+
+.wf-row-lg {
+  width: 100%;
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.wf-row-sm {
+  width: 68%;
+  height: 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.wf-pill-accent {
+  width: 52%;
+  height: 10px;
+  border-radius: 999px;
+  background: #E2B878;
+  margin-top: 0.2rem;
+}
+
+@media (min-width: 900px) {
+  .prop-tokens {
+    position: absolute;
+    left: 4%;
+    top: -18%;
+  }
+  .prop-toggle {
+    position: absolute;
+    right: 4%;
+    top: -12%;
+  }
+  .prop-wireframe {
+    position: absolute;
+    right: 8%;
+    bottom: -48%;
+  }
+}
+
+/* Beat 02: User Research */
+.research-svg {
+  position: absolute;
+  width: min(820px, 95vw);
+  height: auto;
+  pointer-events: none;
+  opacity: 0.72;
+}
+
+.bezier-draw {
+  stroke-dasharray: 920;
+  stroke-dashoffset: 920;
+  animation: drawStroke 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes drawStroke {
+  to { stroke-dashoffset: 0; }
+}
+
+.node-pulse {
+  animation: pulseScale 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.sub-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  animation: springPop 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sub-pill.is-emerald {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #6EE7B7;
+}
+
+.sub-pill.is-gold {
+  background: rgba(226, 184, 120, 0.12);
+  border: 1px solid rgba(226, 184, 120, 0.38);
+  color: #E2B878;
+}
+
+.insight-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.insight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8rem;
+  color: #F5F5F7;
+}
+
+.insight-metric {
+  font-weight: 700;
+  color: #34D399;
+}
+
+.delay-b1 { animation-delay: 140ms; }
+.delay-b2 { animation-delay: 260ms; }
+
+.check-draw {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawStroke 550ms cubic-bezier(0.16, 1, 0.3, 1) 240ms forwards;
+}
+
+.orbit-cluster {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+}
+
+.orbit-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #E2B878;
+}
+
+.orbit-dot.d1 { top: 0; left: 4px; }
+.orbit-dot.d2 { bottom: 0; right: 2px; background: #34D399; }
+
+/* Beat 03: Creative AI */
+.prompt-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.52rem 1rem;
+  max-width: 92vw;
+  font-family: var(--font-mono);
+  font-size: clamp(0.7rem, 1.4vw, 0.82rem);
+  color: #E5E7EB;
+}
+
+.prompt-sparkle {
+  color: #E2B878;
+}
+
+.prompt-caret {
+  width: 2px;
+  height: 1em;
+  background: #E2B878;
+  animation: blinkCaret 0.8s step-end infinite;
+}
+
+@keyframes blinkCaret {
+  50% { opacity: 0; }
+}
+
+.matrix-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+}
+
+.matrix-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.95rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #F5F5F7;
+}
+
+.matrix-card.is-highlighted {
+  border-color: rgba(226, 184, 120, 0.45);
+}
+
+.matrix-step {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #E2B878;
+}
+
+.matrix-arrow {
+  color: rgba(255, 255, 255, 0.35);
+  font-family: var(--font-mono);
+}
+
+/* Beat 04: Motion & Front-End */
+.dock-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.dock-curve-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+}
+
+.dock-mono {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #D1D5DB;
+}
+
+.dock-parity-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0.55rem 1rem;
+}
+
+.parity-tag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #F5F5F7;
+}
+
+.parity-sub {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #9CA3AF;
+}
+
+/* Bottom Safe-Zone Footer */
+.hud-container {
+  position: relative;
+  z-index: 3;
   width: 100%;
   max-width: 1320px;
   margin: 0 auto;
@@ -863,87 +926,14 @@ onUnmounted(() => {
   }
 }
 
-.stage-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: rgba(19, 21, 26, 0.86);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border-subtle);
-  border-radius: 999px;
-  padding: 0.36rem 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: 0.05em;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--status-live);
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.65);
-}
-
-.status-dot.paused {
-  background: var(--accent);
-  box-shadow: none;
-}
-
-.pill-play {
-  color: var(--status-live);
-  font-size: 0.65rem;
-}
-
-.scene-dots {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.scene-dot-btn {
-  background: rgba(19, 21, 26, 0.86);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.scene-dot-btn:hover {
-  color: var(--text-primary);
-  border-color: var(--accent-border);
-}
-
-.scene-dot-btn.active {
-  background: var(--accent-soft);
-  border-color: var(--accent-border);
-  color: var(--accent);
-}
-
-/* Bottom Identity + HUD Bar */
-.stage-bottom {
+.stage-footer {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding-top: 1rem;
 }
 
-@media (min-width: 960px) {
-  .stage-bottom {
+@media (min-width: 768px) {
+  .stage-footer {
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
@@ -954,25 +944,25 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.65rem;
+  gap: 0.7rem;
 }
 
 .identity-line {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.15rem;
-  font-size: 0.9rem;
+  gap: 0.12rem;
+  font-size: 0.92rem;
 }
 
 .identity-name {
   font-weight: 700;
-  color: var(--text-primary);
+  color: #F5F5F7;
 }
 
 .identity-sep {
   display: none;
-  color: var(--text-tertiary);
+  color: #6B7280;
 }
 
 @media (min-width: 520px) {
@@ -988,7 +978,7 @@ onUnmounted(() => {
 }
 
 .identity-role {
-  color: var(--text-secondary);
+  color: #A1A7B3;
 }
 
 .hero-ctas {
@@ -997,73 +987,62 @@ onUnmounted(() => {
   gap: 0.6rem;
 }
 
-.hero-cta-btn {
-  padding: 0.55rem 1rem !important;
+.cta-gold {
+  background-color: #E2B878 !important;
+  color: #050507 !important;
+  border-color: #E2B878 !important;
+  padding: 0.58rem 1.05rem !important;
   font-size: 0.85rem !important;
 }
 
-.hud-right-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.6rem;
+.cta-glass {
+  background-color: #121318 !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  padding: 0.58rem 1.05rem !important;
+  font-size: 0.85rem !important;
 }
 
-@media (min-width: 960px) {
-  .hud-right-stack {
-    align-items: flex-end;
-  }
-}
-
-.timecode-wrap {
+/* Minimalist Chapter Pills (01 02 03 04) */
+.chapter-pills {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.timecode {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.04em;
-}
-
-.progress-track {
-  width: 108px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--border-subtle);
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--status-live);
-  transition: width 80ms linear;
-}
-
-.hud-controls {
-  display: flex;
-  flex-wrap: wrap;
   gap: 0.4rem;
 }
 
-.hud-btn {
-  background: rgba(19, 21, 26, 0.9);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+.chapter-pill {
+  background: rgba(18, 19, 24, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #737986;
   font-family: var(--font-mono);
-  font-size: 0.71rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 0.4rem 0.65rem;
-  border-radius: 8px;
+  padding: 0.34rem 0.62rem;
+  border-radius: 999px;
   cursor: pointer;
-  transition: color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast);
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hud-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
+.chapter-pill:hover {
+  color: #F5F5F7;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.chapter-pill.active {
+  background: rgba(226, 184, 120, 0.16);
+  border-color: rgba(226, 184, 120, 0.5);
+  color: #E2B878;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bloom,
+  .staccato-word,
+  .mask-rise,
+  .glass-prop,
+  .bezier-draw,
+  .check-draw,
+  .prompt-caret {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
 }
 </style>
