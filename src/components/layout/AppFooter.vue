@@ -1,14 +1,23 @@
 <script setup>
 import { useI18n } from '../../i18n/useI18n'
 
-const { t } = useI18n()
+const { lang, t } = useI18n()
 const emit = defineEmits(['open-privacy'])
 </script>
 
 <template>
   <footer class="site-footer">
     <div class="container footer-inner">
-      <span class="tabular-nums">© 2026 Samuel Tavonatti — Trento, IT</span>
+      <div class="footer-left">
+        <span class="tabular-nums">© 2026 Samuel Tavonatti — Trento, IT</span>
+        <span class="gdpr-pill">
+          {{
+            lang === 'it'
+              ? 'Solo preferenze tecniche locali (IT/EN) • Zero cookie di profilazione'
+              : 'Local technical preferences only (IT/EN) • Zero tracking cookies'
+          }}
+        </span>
+      </div>
       <div class="footer-links">
         <button type="button" class="privacy-trigger" @click="emit('open-privacy')">
           {{ t('footer.privacy') }}
@@ -28,17 +37,35 @@ const emit = defineEmits(['open-privacy'])
 .footer-inner {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.85rem;
   font-size: 0.85rem;
   color: var(--text-tertiary);
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .footer-inner {
     flex-direction: row;
+    align-items: center;
   }
+}
+
+.footer-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.gdpr-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
 }
 
 .privacy-trigger {

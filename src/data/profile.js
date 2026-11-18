@@ -10,27 +10,25 @@ export const profileData = {
   hero: {
     it: {
       badge: 'Disponibile per collaborazioni & stage',
-      title: 'UI/UX Designer focalizzato su ergonomia cognitiva e interfacce pulite.',
+      title: 'Interfacce essenziali. Zero rumore.',
       titleLines: [
-        'UI/UX Designer focalizzato',
-        'su ergonomia cognitiva e',
-        'interfacce pulite.',
+        'Interfacce essenziali.',
+        'Zero rumore.',
       ],
       subtitle:
-        'Studente in Interfacce e Tecnologie della Comunicazione (UniTrento). Progetto esperienze digitali essenziali, accessibili e orientate all’usabilità, unendo design system, prototipazione su Figma e sviluppo front-end.',
+        'Samuel Tavonatti — Studente ITC (UniTrento) & UI/UX Designer. Progetto prodotti digitali fondati sull’ergonomia cognitiva, sistemi visivi puliti e sviluppo front-end ad alte prestazioni.',
       ctaPrimary: 'Esplora i Case Study',
       ctaSecondary: 'Contattami',
     },
     en: {
       badge: 'Open to collaborations & internships',
-      title: 'UI/UX Designer focused on cognitive ergonomics and clean interfaces.',
+      title: 'Essential interfaces. Zero noise.',
       titleLines: [
-        'UI/UX Designer focused',
-        'on cognitive ergonomics',
-        'and clean interfaces.',
+        'Essential interfaces.',
+        'Zero noise.',
       ],
       subtitle:
-        'Interfaces and Communication Technologies student (UniTrento). I design essential, accessible, usability-driven digital products bridging design systems, Figma prototyping, and front-end foundations.',
+        'Samuel Tavonatti — ITC Student (UniTrento) & UI/UX Designer. Crafting digital products grounded in cognitive ergonomics, clean visual systems, and high-performance front-end engineering.',
       ctaPrimary: 'Explore Case Studies',
       ctaSecondary: 'Get in Touch',
     },

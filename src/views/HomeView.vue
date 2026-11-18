@@ -1,10 +1,13 @@
 <script setup>
 import { profileData } from '../data/profile'
+import { experiences } from '../data/experience'
 import { useI18n } from '../i18n/useI18n'
 import { useScrollReveal } from '../composables/useScrollReveal'
 import HeroEditorial from '../components/sections/HeroEditorial.vue'
+import ShowreelStage from '../components/sections/ShowreelStage.vue'
 import FeaturedWork from '../components/sections/FeaturedWork.vue'
 import ContactBento from '../components/sections/ContactBento.vue'
+import BaseBadge from '../components/ui/BaseBadge.vue'
 import AppIcon from '../components/ui/AppIcon.vue'
 
 const { lang, t } = useI18n()
@@ -15,6 +18,8 @@ useScrollReveal()
 <template>
   <div>
     <HeroEditorial />
+
+    <ShowreelStage />
 
     <FeaturedWork />
 
@@ -46,22 +51,61 @@ useScrollReveal()
       </div>
     </section>
 
-    <!-- 03. COMPETENZE -->
+    <!-- 03. METODO & COMPETENZE (3-STEP UX PROCESS) -->
     <section id="competenze" class="section-block">
       <div class="container grid-layout scroll-reveal">
         <div class="col-left">
-          <span class="section-kicker tabular-nums">{{ t('sections.skillsKicker') }}</span>
-          <h2 class="section-heading">{{ t('sections.skillsTitle') }}</h2>
+          <span class="section-kicker tabular-nums">{{ t('sections.processKicker') }}</span>
+          <h2 class="section-heading">{{ t('sections.processTitle') }}</h2>
         </div>
 
         <div class="col-right skills-grid">
-          <article v-for="skill in profileData.skills" :key="skill.icon" class="skill-card">
-            <div class="skill-icon-box">
-              <AppIcon :name="skill.icon" :size="20" />
+          <article v-for="(skill, idx) in profileData.skills" :key="skill.icon" class="skill-card">
+            <div class="skill-top-row">
+              <div class="skill-icon-box">
+                <AppIcon :name="skill.icon" :size="20" />
+              </div>
+              <span class="step-num tabular-nums">0{{ idx + 1 }}</span>
             </div>
             <h3 class="skill-title">{{ skill[lang].title }}</h3>
             <p class="skill-desc">{{ skill[lang].desc }}</p>
             <span class="skill-context">{{ skill[lang].context }}</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04. PERCORSO & ESPERIENZE -->
+    <section id="percorso" class="section-block">
+      <div class="container grid-layout scroll-reveal">
+        <div class="col-left">
+          <span class="section-kicker tabular-nums">{{ t('sections.timelineKicker') }}</span>
+          <h2 class="section-heading">{{ t('sections.timelineTitle') }}</h2>
+        </div>
+
+        <div class="col-right timeline-stack">
+          <article v-for="exp in experiences.slice(0, 1)" :key="exp.id" class="timeline-card is-featured">
+            <div class="tl-head">
+              <div>
+                <h3 class="tl-role">{{ exp.role[lang] }}</h3>
+                <p class="tl-org">{{ exp.company }} • {{ exp.location }}</p>
+              </div>
+              <BaseBadge variant="accent">{{ exp.period[lang] }}</BaseBadge>
+            </div>
+            <ul class="tl-list">
+              <li v-for="(item, i) in exp.highlights[lang]" :key="i">{{ item }}</li>
+            </ul>
+          </article>
+
+          <article v-for="edu in profileData.education" :key="edu.degree.it" class="timeline-card">
+            <div class="tl-head">
+              <div>
+                <h3 class="tl-role">{{ edu.institution[lang] }}</h3>
+                <p class="tl-org">{{ edu.degree[lang] }}</p>
+              </div>
+              <BaseBadge variant="neutral">{{ lang === 'it' ? edu.period : edu.periodEn }}</BaseBadge>
+            </div>
+            <p class="tl-detail">{{ edu.detail[lang] }}</p>
           </article>
         </div>
       </div>
@@ -170,6 +214,12 @@ useScrollReveal()
   border-color: var(--accent-border);
 }
 
+.skill-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .skill-icon-box {
   width: 38px;
   height: 38px;
@@ -178,6 +228,12 @@ useScrollReveal()
   color: var(--accent);
   display: grid;
   place-items: center;
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
 }
 
 .skill-title {
@@ -200,5 +256,79 @@ useScrollReveal()
   color: var(--text-tertiary);
   padding-top: 0.65rem;
   border-top: 1px solid var(--border-subtle);
+}
+
+.timeline-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.timeline-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: 1.5rem 1.75rem;
+}
+
+.timeline-card.is-featured {
+  border-color: var(--accent-border);
+}
+
+.tl-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+@media (min-width: 640px) {
+  .tl-head {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+}
+
+.tl-role {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tl-org {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-top: 0.2rem;
+}
+
+.tl-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.tl-list li {
+  position: relative;
+  padding-left: 1.2rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.tl-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.tl-detail {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
 }
 </style>

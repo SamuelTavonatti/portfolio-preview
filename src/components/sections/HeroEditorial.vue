@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue'
 import { profileData } from '../../data/profile'
 import { useI18n } from '../../i18n/useI18n'
 import BaseBadge from '../ui/BaseBadge.vue'
@@ -6,6 +7,20 @@ import BaseButton from '../ui/BaseButton.vue'
 import AppIcon from '../ui/AppIcon.vue'
 
 const { lang } = useI18n()
+
+const magStyle = ref({ transform: 'translate3d(0, 0, 0)' })
+
+const onMagMove = (e) => {
+  if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const rect = e.currentTarget.getBoundingClientRect()
+  const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8
+  const y = ((e.clientY - rect.top) / rect.height - 0.5) * 6
+  magStyle.value = { transform: `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)` }
+}
+
+const onMagLeave = () => {
+  magStyle.value = { transform: 'translate3d(0, 0, 0)' }
+}
 </script>
 
 <template>
@@ -13,70 +28,50 @@ const { lang } = useI18n()
     <div class="hero-ambient" aria-hidden="true" />
 
     <div class="container hero-wrapper">
-      <div class="hero-grid">
-        <!-- Columns 1–8: Left-Aligned Editorial Typography -->
-        <div class="hero-main">
-          <div class="reveal">
-            <BaseBadge variant="live">
-              <span class="pulse-dot" aria-hidden="true" />
-              {{ profileData.hero[lang].badge }}
-            </BaseBadge>
-          </div>
+      <div class="hero-main">
+        <div class="reveal">
+          <BaseBadge variant="live">
+            <span class="pulse-dot" aria-hidden="true" />
+            {{ profileData.hero[lang].badge }}
+          </BaseBadge>
+        </div>
 
-          <h1 class="hero-title">
+        <h1 class="hero-title">
+          <span
+            v-for="(line, index) in profileData.hero[lang].titleLines"
+            :key="`${lang}-${index}`"
+            class="mask-line"
+          >
             <span
-              v-for="(line, index) in profileData.hero[lang].titleLines"
-              :key="`${lang}-${index}`"
-              class="mask-line"
+              class="mask-line-inner"
+              :class="{ 'accent-line': index === 1 }"
+              :style="{ animationDelay: `${index * 95}ms` }"
             >
-              <span
-                class="mask-line-inner"
-                :style="{ animationDelay: `${index * 85}ms` }"
-              >
-                {{ line }}
-              </span>
+              {{ line }}
             </span>
-          </h1>
+          </span>
+        </h1>
 
-          <p class="hero-subtitle reveal reveal-d2">
-            {{ profileData.hero[lang].subtitle }}
-          </p>
+        <p class="hero-subtitle reveal reveal-d2">
+          {{ profileData.hero[lang].subtitle }}
+        </p>
 
-          <div class="hero-actions reveal reveal-d3">
+        <div class="hero-actions reveal reveal-d3">
+          <div
+            class="magnetic-wrap"
+            :style="magStyle"
+            @mousemove="onMagMove"
+            @mouseleave="onMagLeave"
+          >
             <BaseButton to="/progetti" variant="primary" class="cta-primary">
               <span>{{ profileData.hero[lang].ctaPrimary }}</span>
               <AppIcon name="arrow-right" :size="17" class="cta-arrow" />
             </BaseButton>
-            <BaseButton :to="{ path: '/', hash: '#contatti' }" variant="secondary">
-              <span>{{ profileData.hero[lang].ctaSecondary }}</span>
-            </BaseButton>
           </div>
+          <BaseButton :to="{ path: '/', hash: '#contatti' }" variant="secondary">
+            <span>{{ profileData.hero[lang].ctaSecondary }}</span>
+          </BaseButton>
         </div>
-
-        <!-- Columns 9–12: Subtle Architectural Geometric Anchor -->
-        <aside class="hero-anchor reveal reveal-d3" aria-hidden="true">
-          <div class="anchor-card">
-            <svg viewBox="0 0 260 220" fill="none" class="anchor-svg">
-              <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
-                <line x1="0" y1="55" x2="260" y2="55" />
-                <line x1="0" y1="110" x2="260" y2="110" />
-                <line x1="0" y1="165" x2="260" y2="165" />
-                <line x1="65" y1="0" x2="65" y2="220" />
-                <line x1="130" y1="0" x2="130" y2="220" />
-                <line x1="195" y1="0" x2="195" y2="220" />
-              </g>
-              <circle cx="130" cy="110" r="54" stroke="rgba(194,165,126,0.28)" stroke-width="1" stroke-dasharray="4 4" class="orbit-ring" />
-              <circle cx="130" cy="110" r="24" stroke="rgba(194,165,126,0.45)" stroke-width="1.2" />
-              <circle cx="130" cy="110" r="3.5" fill="#C2A57E" />
-              <line x1="130" y1="40" x2="130" y2="180" stroke="rgba(194,165,126,0.18)" stroke-width="1" />
-              <line x1="60" y1="110" x2="200" y2="110" stroke="rgba(194,165,126,0.18)" stroke-width="1" />
-            </svg>
-            <div class="anchor-meta tabular-nums">
-              <span>46.07° N · 11.12° E</span>
-              <span>HCI / UI SYSTEM</span>
-            </div>
-          </div>
-        </aside>
       </div>
 
       <!-- Full-Width Left-Aligned Divider & Metrics Strip -->
@@ -95,14 +90,13 @@ const { lang } = useI18n()
 <style scoped>
 .hero {
   position: relative;
-  padding: 8.5rem 0 4.5rem;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 8.5rem 0 3.75rem;
   overflow: hidden;
 }
 
 @media (min-width: 768px) {
   .hero {
-    padding: 10.25rem 0 5.5rem;
+    padding: 10.25rem 0 4.25rem;
   }
 }
 
@@ -124,28 +118,9 @@ const { lang } = useI18n()
   z-index: 1;
 }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2.5rem;
-  align-items: end;
-}
-
-@media (min-width: 960px) {
-  .hero-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 2rem;
-  }
-}
-
 .hero-main {
   text-align: left;
-}
-
-@media (min-width: 960px) {
-  .hero-main {
-    grid-column: 1 / 9;
-  }
+  max-width: 900px;
 }
 
 .pulse-dot {
@@ -157,16 +132,20 @@ const { lang } = useI18n()
 
 .hero-title {
   margin-top: 1.5rem;
-  font-size: clamp(2.1rem, 4.6vw, 3.85rem);
+  font-size: clamp(2.5rem, 6vw, 4.65rem);
   font-weight: 700;
-  line-height: 1.07;
-  letter-spacing: -0.035em;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
   color: var(--text-primary);
 }
 
+.accent-line {
+  color: var(--accent);
+}
+
 .hero-subtitle {
-  margin-top: 1.35rem;
-  font-size: clamp(1rem, 1.55vw, 1.16rem);
+  margin-top: 1.45rem;
+  font-size: clamp(1.02rem, 1.55vw, 1.18rem);
   line-height: 1.65;
   color: var(--text-secondary);
   max-width: 62ch;
@@ -176,7 +155,14 @@ const { lang } = useI18n()
   margin-top: 2.25rem;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.85rem;
+}
+
+.magnetic-wrap {
+  display: inline-block;
+  transition: transform 0.25s var(--ease-out-expo);
+  will-change: transform;
 }
 
 .cta-arrow {
@@ -187,64 +173,16 @@ const { lang } = useI18n()
   transform: translateX(3px);
 }
 
-/* Columns 9–12: Architectural Anchor */
-.hero-anchor {
-  display: none;
-}
-
-@media (min-width: 960px) {
-  .hero-anchor {
-    display: block;
-    grid-column: 9 / 13;
-  }
-}
-
-.anchor-card {
-  background: rgba(19, 21, 26, 0.72);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-2xl);
-  padding: 1rem;
-  backdrop-filter: blur(8px);
-}
-
-.anchor-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-@keyframes slowSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.orbit-ring {
-  transform-origin: 130px 110px;
-  animation: slowSpin 42s linear infinite;
-}
-
-.anchor-meta {
-  margin-top: 0.75rem;
-  padding-top: 0.65rem;
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
-  letter-spacing: 0.04em;
-}
-
 /* Full-width left-aligned divider & metrics */
 .hero-divider {
-  margin-top: 3.5rem;
+  margin-top: 3.25rem;
   height: 1px;
   width: 100%;
   background: var(--border-subtle);
 }
 
 .hero-metrics {
-  margin-top: 1.85rem;
+  margin-top: 1.75rem;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
@@ -266,11 +204,5 @@ const { lang } = useI18n()
 .metric-label {
   font-size: 0.84rem;
   color: var(--text-secondary);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .orbit-ring {
-    animation: none;
-  }
 }
 </style>

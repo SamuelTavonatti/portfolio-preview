@@ -1,11 +1,14 @@
 <script setup>
+import { ref } from 'vue'
 import { projects } from '../../data/projects'
 import { useI18n } from '../../i18n/useI18n'
 import BaseBadge from '../ui/BaseBadge.vue'
 import AppIcon from '../ui/AppIcon.vue'
+import CaseStudyDrawer from '../modals/CaseStudyDrawer.vue'
 
 const { lang, t } = useI18n()
 const featured = projects.filter((p) => p.featured)
+const activeProject = ref(null)
 </script>
 
 <template>
@@ -24,7 +27,11 @@ const featured = projects.filter((p) => p.featured)
 
       <div class="work-grid">
         <article v-for="project in featured" :key="project.slug" class="work-card">
-          <router-link :to="`/progetti/${project.slug}`" class="work-card-link">
+          <button
+            type="button"
+            class="work-card-btn"
+            @click="activeProject = project"
+          >
             <div class="card-top">
               <BaseBadge variant="accent">{{ project.category }}</BaseBadge>
               <span class="year tabular-nums">{{ project.year }}</span>
@@ -45,10 +52,12 @@ const featured = projects.filter((p) => p.featured)
               <span class="read-more">{{ t('sections.readCaseStudy') }}</span>
               <AppIcon name="arrow-up-right" :size="18" class="card-arrow" />
             </div>
-          </router-link>
+          </button>
         </article>
       </div>
     </div>
+
+    <CaseStudyDrawer :project="activeProject" @close="activeProject = null" />
   </section>
 </template>
 
@@ -122,16 +131,22 @@ const featured = projects.filter((p) => p.featured)
   background: var(--surface-2);
 }
 
-.work-card-link {
+.work-card-btn {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
   padding: 1.75rem;
-  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: inherit;
   color: inherit;
+  cursor: pointer;
 }
 
 .card-top {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -170,6 +185,7 @@ const featured = projects.filter((p) => p.featured)
 }
 
 .card-metrics {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
@@ -197,6 +213,7 @@ const featured = projects.filter((p) => p.featured)
 }
 
 .card-footer {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
