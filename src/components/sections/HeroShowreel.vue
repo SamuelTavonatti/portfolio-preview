@@ -1,37 +1,49 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import BaseButton from '../ui/BaseButton.vue'
 import AppIcon from '../ui/AppIcon.vue'
 
-// 26.0s Bespoke Architectural Hero Showreel
-// Strictly ZERO Google/Gemini symbols (no 4-point sparkles, no color-wheel halos, no "Welcome to...").
-// Strictly ZERO clunky connecting lines between phases.
-// Strictly ZERO overlapping elements between phases and ZERO 3D card tilts (flat 2D architectural precision).
-// Opens immediately with UX/UI DESIGN (Phase 01).
+// 17.0s Energetic App-Presentation Hero Showreel (~4.25s per phase)
+// - Full 100vw peripheral viewport choreography (left, right, upper, lower-right spatial widgets)
+// - Pixel-accurate getBoundingClientRect() cursor targeting landing dead-center on every interactive button
+// - True directional kinetic transitions (Split-Shutter Clip Wipe + Push, Implosion-to-Expansion Morph,
+//   Camera Zoom-Through 1.45x, Vertical Curtain Reveal) — ZERO plain opacity fades, ZERO overlaps,
+//   ZERO 3D tilts, ZERO connecting lines, ZERO Gemini/Google sparkles or logos.
 //
-// PHASE 01 (0.00s – 6.50s) — UX/UI DESIGN (Immediate Hero Opener)
-//   Transition 1 (5.80s – 6.50s): Masked Curtain Wipe (clip-path: inset) + Glassmorphic Scanner Bar
-// PHASE 02 (6.50s – 13.00s) — USER RESEARCH (Cognitive Ergonomics & Validation)
-//   Transition 2 (12.25s – 13.25s): Center Pill Collapse -> Horizontal Expansion into AI Prompt Composer
-// PHASE 03 (13.00s – 19.50s) — CREATIVE AI (AI-Augmented Product Workflows)
-//   Transition 3 (18.85s – 19.85s): Soft Radial Light Pulse + Synchronized Horizontal Kinetic Push
-// PHASE 04 (19.50s – 26.00s) — MOTION & FRONT-END (Living Portfolio & Voltrep)
-//   Transition 4 (25.30s – 26.00s): Center-Outward Curtain Reveal back to UX/UI DESIGN
+// PHASE 01 (0.00s – 4.20s): UX/UI DESIGN (Full-Stage Design System)
+// PHASE 02 (4.20s – 8.50s): USER RESEARCH (Full-Stage UX Telemetry & Flow)
+// PHASE 03 (8.50s – 12.80s): CREATIVE AI (Senior Prompt Engineering & Instant UI Synthesis)
+// PHASE 04 (12.80s – 17.00s): MOTION & FRONT-END (Living Voltrep & Portfolio Ecosystem)
 
-const LOOP_SEC = 26.0
+const LOOP_SEC = 17.0
 const LOOP_MS = LOOP_SEC * 1000
 
 const elapsedMs = ref(0)
 const isAutoPlaying = ref(true)
-const viewW = ref(1440)
 
 let rafId = null
 let lastTs = null
 
-const layerRef = ref(null)
-const boxRef = ref(null)
-const btnRef = ref(null)
-const camOrigin = ref('78% 66%')
+// DOM Refs for pixel-accurate getBoundingClientRect() cursor targeting
+const viewportRef = ref(null)
+const p1BtnRef = ref(null)
+const p2BtnRef = ref(null)
+const p3FieldRef = ref(null)
+const p3BtnRef = ref(null)
+const p4CheckRef = ref(null)
+const p4CaseRef = ref(null)
+
+// Measured target centers relative to viewportRef top-left (in px)
+const targets = reactive({
+  vpW: 1440,
+  vpH: 760,
+  p1Btn: { x: 720, y: 290 },
+  p2Btn: { x: 780, y: 260 },
+  p3Field: { x: 640, y: 390 },
+  p3Btn: { x: 910, y: 455 },
+  p4Check: { x: 645, y: 445 },
+  p4Case: { x: 880, y: 440 },
+})
 
 const clamp = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v))
 const lerp = (a, b, k) => a + (b - a) * k
@@ -43,237 +55,323 @@ const easeInOutCubic = (x) => {
 
 const sec = computed(() => (elapsedMs.value % LOOP_MS) / 1000)
 
-// =========================================================
-// PHASE 01 (0.00s – 6.42s) — UX/UI DESIGN (Immediate Hero Opener)
-// Exit: Masked Curtain Wipe (clip-path: inset(0 ${wipe}% 0 0)) driven by glassmorphic scanner bar
-// =========================================================
-const p1State = computed(() => {
-  const s = sec.value
-  if (s >= 6.42) return { visible: false, opacity: 0, clipPath: 'inset(0 100% 0 0)', scale: 1 }
-  // Seamless center-outward curtain arrival at 0.0s – 0.45s
-  const enterK = s < 0.45 ? easeOutExpo(s / 0.45) : 1
-  // Masked Curtain Wipe exit at 5.75s – 6.40s (wipes from right to left or left to right)
-  const wipeK = s > 5.75 ? easeInOutCubic((s - 5.75) / 0.65) : 0
-  const leftInset = (wipeK * 100).toFixed(2)
-  const enterSide = ((1 - enterK) * 48).toFixed(2)
-  const clipPath = s < 0.45
-    ? `inset(0 ${enterSide}% 0 ${enterSide}%)`
-    : `inset(0 0 0 ${leftInset}%)`
-  return {
-    visible: true,
-    opacity: clamp(1 - Math.max(0, (s - 6.28) / 0.14)),
-    clipPath,
-    scale: 0.985 + enterK * 0.015,
-  }
-})
-
-// Glassmorphic scanner bar sweeping across stage during Transition 1 (5.75s – 6.45s)
-const scannerBar = computed(() => {
-  const s = sec.value
-  if (s < 5.72 || s > 6.48) return { active: false, xPct: 0, opacity: 0 }
-  const k = easeInOutCubic((s - 5.75) / 0.65)
-  const env = Math.sin(clamp((s - 5.72) / 0.76) * Math.PI)
-  return {
-    active: true,
-    xPct: k * 100,
-    opacity: clamp(env * 1.35),
-  }
-})
-
-const p1HighContrast = computed(() => sec.value >= 1.85)
-const p1ToggleClick = computed(() => sec.value >= 1.72 && sec.value < 2.02)
-const p1CursorPos = computed(() => {
-  const s = sec.value
-  // Glides from lower-left onto "Production UI" pill toggle in header
-  const k = easeInOutCubic(clamp((s - 0.55) / 1.15))
-  return {
-    x: -115 + k * 172,
-    y: 34 - k * 110,
-  }
-})
+// Continuous ambient micro-drift so the stage never feels frozen during readable holds
+const driftY = (seed = 0, amp = 5) => Math.sin(sec.value * 2.2 + seed) * amp
+const driftX = (seed = 0, amp = 4) => Math.cos(sec.value * 1.8 + seed) * amp
 
 // =========================================================
-// PHASE 02 (6.45s – 12.62s) — USER RESEARCH (Cognitive Ergonomics & Validation)
-// Enter: Uncovered after Masked Curtain Wipe (6.45s – 7.00s)
-// Exit: Converges inward into a compact center pill (12.05s – 12.62s)
+// PIXEL-ACCURATE getBoundingClientRect() MEASUREMENT ENGINE
+// Converts any target element's bounding rect into unscaled stage coordinates
 // =========================================================
-const p2State = computed(() => {
-  const s = sec.value
-  if (s < 6.45 || s >= 12.62) {
-    return { visible: false, opacity: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0% round 18px)' }
-  }
-  const enterK = easeOutExpo((s - 6.45) / 0.55)
-  const collapseK = s > 12.05 ? easeInOutCubic((s - 12.05) / 0.55) : 0
-  const vInset = (collapseK * 43).toFixed(2)
-  const hInset = (collapseK * 36).toFixed(2)
-  const radius = Math.round(18 + collapseK * 32)
-  const scale = (0.98 + enterK * 0.02) * (1 - collapseK * 0.24)
+const centerOf = (el, vpRect, fallback) => {
+  if (!el || !vpRect || !vpRect.width) return fallback
+  const r = el.getBoundingClientRect()
+  if (!r.width && !r.height) return fallback
   return {
-    visible: true,
-    opacity: clamp(enterK * (1 - Math.pow(collapseK, 1.6))),
-    scale,
-    clipPath: `inset(${vInset}% ${hInset}% ${vInset}% ${hInset}% round ${radius}px)`,
+    x: r.left - vpRect.left + r.width / 2,
+    y: r.top - vpRect.top + r.height / 2,
   }
-})
+}
 
-// Transition 2 morphing center pill bridge (12.35s – 13.15s)
-const morphPillBridge = computed(() => {
+const measureTargets = () => {
+  const vp = viewportRef.value
+  if (!vp) return
+  const vpRect = vp.getBoundingClientRect()
+  if (!vpRect.width) return
+  targets.vpW = vpRect.width
+  targets.vpH = vpRect.height
+  // Only update a phase's button coordinates when that phase is at rest (scale = 1, translate = 0)
   const s = sec.value
-  if (s < 12.32 || s > 13.18) return { active: false, opacity: 0, widthPx: 220 }
-  const p = clamp((s - 12.32) / 0.86)
-  const env = Math.sin(p * Math.PI)
-  const expandK = easeInOutCubic(clamp((s - 12.55) / 0.55))
-  const targetW = Math.min(680, viewW.value * 0.9)
-  return {
-    active: true,
-    opacity: clamp(env * 1.25),
-    widthPx: lerp(190, targetW, expandK),
-    heightPx: lerp(44, 152, expandK),
+  if (s >= 0.36 && s <= 3.75) {
+    targets.p1Btn = centerOf(p1BtnRef.value, vpRect, targets.p1Btn)
   }
-})
-
-const rl = computed(() => Math.max(0, sec.value - 6.45))
-const mFriction = computed(() => Math.round(easeOutExpo((rl.value - 0.15) / 1.15) * 42))
-const mTask = computed(() => (easeOutExpo((rl.value - 0.2) / 1.2) * 98.4).toFixed(1))
-const mSus = computed(() => Math.round(easeOutExpo((rl.value - 0.25) / 1.25) * 91))
-const researchSimplified = computed(() => rl.value >= 1.85)
-const researchPillClick = computed(() => rl.value >= 1.72 && rl.value < 2.02)
-const researchCursorK = computed(() => easeInOutCubic(clamp((rl.value - 0.75) / 0.95)))
-
-// =========================================================
-// PHASE 03 (12.82s – 19.35s) — CREATIVE AI (AI-Augmented Product Workflows)
-// Enter: Expands horizontally out of the compact center pill (12.82s – 13.35s)
-// Exit: Soft radial light pulse + horizontal kinetic push left (18.80s – 19.35s)
-// =========================================================
-const FULL_PROMPT = 'Build an accessible workout tracker with zero friction'
-
-const p3State = computed(() => {
-  const s = sec.value
-  if (s < 12.82 || s >= 19.35) {
-    return { visible: false, opacity: 0, x: 0, scaleX: 1, scale: 1 }
+  if (s >= 4.6 && s <= 8.05) {
+    targets.p2Btn = centerOf(p2BtnRef.value, vpRect, targets.p2Btn)
   }
-  const enterK = easeOutExpo((s - 12.82) / 0.55)
-  const pushOutK = s > 18.8 ? easeInOutCubic((s - 18.8) / 0.55) : 0
-  return {
-    visible: true,
-    opacity: clamp(enterK * (1 - pushOutK)),
-    x: -pushOutK * 240,
-    scaleX: 0.42 + enterK * 0.58,
-    scale: 0.94 + enterK * 0.06,
+  if (s >= 8.95 && s <= 12.14) {
+    targets.p3Field = centerOf(p3FieldRef.value, vpRect, targets.p3Field)
+    targets.p3Btn = centerOf(p3BtnRef.value, vpRect, targets.p3Btn)
   }
-})
-
-// Soft radial light pulse on Generate click (Transition 3: 18.45s – 19.35s)
-const radialPulse = computed(() => {
-  const s = sec.value
-  if (s < 18.45 || s > 19.4) return { active: false, opacity: 0, scale: 0.5 }
-  const p = clamp((s - 18.45) / 0.95)
-  return {
-    active: true,
-    opacity: Math.sin(p * Math.PI) * 0.55,
-    scale: 0.6 + easeOutExpo(p) * 2.2,
+  if (s >= 13.25 && s <= 16.5) {
+    targets.p4Check = centerOf(p4CheckRef.value, vpRect, targets.p4Check)
+    targets.p4Case = centerOf(p4CaseRef.value, vpRect, targets.p4Case)
   }
-})
-
-const focused = computed(() => sec.value >= 13.35 && sec.value < 18.85)
-const typedText = computed(() => {
-  const p = clamp((sec.value - 13.45) / 2.65)
-  const count = Math.floor(p * FULL_PROMPT.length)
-  return FULL_PROMPT.slice(0, count)
-})
-const tokenCount = computed(() => Math.round(typedText.value.length * 1.8))
-const submitReady = computed(() => typedText.value.length >= FULL_PROMPT.length - 1)
-const submitPressed = computed(() => sec.value >= 18.35 && sec.value < 18.72)
-
-// Gentle 2D camera zoom (scale 1.18) locked onto Generate button
-const camZoom = computed(() => {
-  const s = sec.value
-  const zIn = easeInOutCubic(clamp((s - 17.75) / 0.65)) * 0.18
-  const zRelease = s > 18.8 ? easeInOutCubic((s - 18.8) / 0.5) * 0.18 : 0
-  return (1 + zIn - zRelease) * p3State.value.scale
-})
-
-const boxW = computed(() => Math.min(680, viewW.value * 0.9))
+}
 
 const bez = (p0, p1, p2, k) => ({
   x: (1 - k) * (1 - k) * p0.x + 2 * (1 - k) * k * p1.x + k * k * p2.x,
   y: (1 - k) * (1 - k) * p0.y + 2 * (1 - k) * k * p1.y + k * k * p2.y,
 })
 
-const promptCursor = computed(() => {
+// =========================================================
+// PHASE 01 (0.00s – 4.20s) — UX/UI DESIGN (Full-Stage Design System)
+// Entrance (0.00s – 0.36s): Vertical Curtain Reveal completes upward
+// Exit (3.82s – 4.20s): Split-Shutter Clip Wipe (clip-path: polygon) + Kinetic Horizontal Push Left
+// =========================================================
+const p1State = computed(() => {
   const s = sec.value
-  const w = boxW.value
-  const start = { x: -w * 0.28, y: 105 }
-  const input = { x: -w * 0.1, y: 2 }
-  const btn = { x: w / 2 - 64, y: 40 }
-  let pos
-  if (s < 13.4) {
-    pos = bez(start, { x: -w * 0.28, y: 20 }, input, easeInOutCubic(clamp((s - 12.9) / 0.5)))
-  } else if (s < 17.4) {
-    pos = { x: input.x + Math.sin(s * 1.5) * 3, y: input.y }
-  } else {
-    pos = bez(input, { x: w * 0.1, y: -16 }, btn, easeInOutCubic(clamp((s - 17.4) / 0.85)))
+  if (s >= 4.2) return { visible: false, clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)', transform: 'none' }
+  if (s < 0.36) {
+    const k = easeOutExpo(s / 0.36)
+    const topPct = ((1 - k) * 100).toFixed(2)
+    return {
+      visible: true,
+      clipPath: `inset(${topPct}% 0% 0% 0%)`,
+      transform: `translate3d(0, ${((1 - k) * 28).toFixed(1)}px, 0)`,
+    }
   }
-  const ibeam = s >= 13.35 && s < 17.4
-  const scale = submitPressed.value ? 0.94 : 1
-  return { x: pos.x, y: pos.y, ibeam, scale }
+  if (s > 3.82) {
+    const k = easeInOutCubic((s - 3.82) / 0.38)
+    const rightEdgeTop = (100 - k * 108).toFixed(2)
+    const rightEdgeBot = Math.max(0, 100 - k * 94).toFixed(2)
+    const pushX = (-k * 260).toFixed(1)
+    return {
+      visible: true,
+      clipPath: `polygon(0% 0%, ${Math.max(0, rightEdgeTop)}% 0%, ${rightEdgeBot}% 100%, 0% 100%)`,
+      transform: `translate3d(${pushX}px, 0, 0)`,
+    }
+  }
+  return {
+    visible: true,
+    clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+    transform: 'translate3d(0, 0, 0)',
+  }
 })
 
+const p1Hover = computed(() => sec.value >= 1.1 && sec.value < 3.8)
+const p1Pressed = computed(() => sec.value >= 1.32 && sec.value < 1.56)
+const p1ProdUI = computed(() => sec.value >= 1.42)
+const p1Ripple = computed(() => sec.value >= 1.36 && sec.value < 1.95)
+
 // =========================================================
-// PHASE 04 (19.38s – 26.00s) — MOTION & FRONT-END (Living Portfolio & Voltrep)
-// Enter: Synchronized horizontal kinetic push in from the right (19.38s – 19.95s)
-// Exit: Center-outward curtain wipe back to pure obsidian #050507 (25.35s – 26.00s)
+// PHASE 02 (4.20s – 8.50s) — USER RESEARCH (Full-Stage UX Telemetry & Flow)
+// Entrance (4.20s – 4.58s): Split-Shutter Clip Wipe + Kinetic Horizontal Push in from Right
+// Exit (8.12s – 8.50s): Implosion Collapse inward toward center stage
+// =========================================================
+const p2State = computed(() => {
+  const s = sec.value
+  if (s < 4.2 || s >= 8.5) return { visible: false, clipPath: 'inset(0% 0% 0% 0%)', transform: 'none' }
+  if (s < 4.58) {
+    const k = easeOutExpo((s - 4.2) / 0.38)
+    const leftTop = ((1 - k) * 96).toFixed(2)
+    const leftBot = ((1 - k) * 108).toFixed(2)
+    const pushX = ((1 - k) * 240).toFixed(1)
+    return {
+      visible: true,
+      clipPath: `polygon(${Math.max(0, leftTop)}% 0%, 100% 0%, 100% 100%, ${Math.max(0, leftBot)}% 100%)`,
+      transform: `translate3d(${pushX}px, 0, 0)`,
+    }
+  }
+  if (s > 8.12) {
+    const k = easeInOutCubic((s - 8.12) / 0.38)
+    const vIn = (k * 43).toFixed(2)
+    const hIn = (k * 36).toFixed(2)
+    const sc = (1 - k * 0.48).toFixed(3)
+    return {
+      visible: true,
+      clipPath: `inset(${vIn}% ${hIn}% ${vIn}% ${hIn}% round 24px)`,
+      transform: `scale(${sc})`,
+    }
+  }
+  return {
+    visible: true,
+    clipPath: 'inset(0% 0% 0% 0% round 0px)',
+    transform: 'scale(1)',
+  }
+})
+
+const rl = computed(() => Math.max(0, sec.value - 4.2))
+const mFriction = computed(() => Math.round(easeOutExpo((rl.value - 0.15) / 0.85) * 42))
+const mTask = computed(() => (easeOutExpo((rl.value - 0.2) / 0.9) * 98.4).toFixed(1))
+const mSus = computed(() => Math.round(easeOutExpo((rl.value - 0.25) / 0.95) * 91))
+const p2Hover = computed(() => sec.value >= 5.35 && sec.value < 8.1)
+const p2Pressed = computed(() => sec.value >= 5.58 && sec.value < 5.82)
+const p2Simplified = computed(() => sec.value >= 5.68)
+const p2Ripple = computed(() => sec.value >= 5.62 && sec.value < 6.2)
+
+// =========================================================
+// PHASE 03 (8.50s – 12.80s) — CREATIVE AI (Senior Prompt Engineering)
+// Entrance (8.50s – 8.90s): Expansion Morph outward (scaleX(0.2) -> scaleX(1.0)) with champagne-gold border pulse
+// Exit (12.25s – 12.80s): Camera Zoom-Through (scale(1.0) -> scale(1.45)) locked onto ↑ Generate button
+// =========================================================
+const FULL_PROMPT =
+  'Architect a low-friction workout logger with WCAG AA contrast, 8pt spatial rhythm, and 60fps micro-interactions.'
+
+const p3Origin = computed(() => `${targets.p3Btn.x.toFixed(0)}px ${targets.p3Btn.y.toFixed(0)}px`)
+
+const p3State = computed(() => {
+  const s = sec.value
+  if (s < 8.5 || s >= 12.8) {
+    return { visible: false, clipPath: 'inset(0% 0% 0% 0%)', transform: 'none', pulseBorder: false }
+  }
+  if (s < 8.92) {
+    const k = easeOutExpo((s - 8.5) / 0.42)
+    const sx = (0.2 + k * 0.8).toFixed(3)
+    const sy = (0.72 + k * 0.28).toFixed(3)
+    const hIn = ((1 - k) * 38).toFixed(2)
+    return {
+      visible: true,
+      clipPath: `inset(0% ${hIn}% 0% ${hIn}% round 22px)`,
+      transform: `scale3d(${sx}, ${sy}, 1)`,
+      pulseBorder: true,
+    }
+  }
+  if (s > 12.15) {
+    const k = easeInOutCubic((s - 12.15) / 0.65)
+    const zoom = (1 + k * 0.45).toFixed(3)
+    const iris = (k * 48).toFixed(2)
+    return {
+      visible: true,
+      clipPath: s > 12.48 ? `inset(${iris}% ${iris}% ${iris}% ${iris}% round 28px)` : 'inset(0% 0% 0% 0%)',
+      transform: `scale(${zoom})`,
+      pulseBorder: false,
+    }
+  }
+  return {
+    visible: true,
+    clipPath: 'inset(0% 0% 0% 0%)',
+    transform: 'scale(1)',
+    pulseBorder: s < 9.25,
+  }
+})
+
+const p3Focused = computed(() => sec.value >= 9.05 && sec.value < 12.6)
+const typedText = computed(() => {
+  const p = clamp((sec.value - 9.12) / 2.2)
+  const count = Math.floor(p * FULL_PROMPT.length)
+  return FULL_PROMPT.slice(0, count)
+})
+const tokenCount = computed(() => Math.round(typedText.value.length * 1.4))
+const p3SubmitReady = computed(() => typedText.value.length >= FULL_PROMPT.length - 1)
+const p3Hover = computed(() => sec.value >= 11.75 && sec.value < 12.75)
+const p3Pressed = computed(() => sec.value >= 11.98 && sec.value < 12.24)
+const p3Ripple = computed(() => sec.value >= 12.02 && sec.value < 12.65)
+
+// =========================================================
+// PHASE 04 (12.80s – 17.00s) — MOTION & FRONT-END (Living Voltrep & Portfolio Ecosystem)
+// Entrance (12.80s – 13.20s): Opens seamlessly from Camera Zoom-Through (scale(0.82) -> scale(1.0))
+// Exit (16.58s – 17.00s): Vertical Curtain Reveal (clip-path: inset(0 0 100% 0)) sweeps upward
 // =========================================================
 const p4State = computed(() => {
   const s = sec.value
-  if (s < 19.38) {
-    return { visible: false, opacity: 0, x: 220, clipPath: 'inset(0% 0% 0% 0%)' }
+  if (s < 12.8) return { visible: false, clipPath: 'inset(0% 0% 0% 0%)', transform: 'none' }
+  if (s < 13.22) {
+    const k = easeOutExpo((s - 12.8) / 0.42)
+    const sc = (0.82 + k * 0.18).toFixed(3)
+    const inset = ((1 - k) * 32).toFixed(2)
+    return {
+      visible: true,
+      clipPath: `inset(${inset}% ${inset}% ${inset}% ${inset}% round 24px)`,
+      transform: `scale(${sc})`,
+    }
   }
-  const enterK = easeOutExpo((s - 19.38) / 0.6)
-  const curtainOutK = s > 25.35 ? easeInOutCubic((s - 25.35) / 0.62) : 0
-  const sideInset = (curtainOutK * 50).toFixed(2)
+  if (s > 16.58) {
+    const k = easeInOutCubic((s - 16.58) / 0.42)
+    const bottomCut = (k * 100).toFixed(2)
+    return {
+      visible: true,
+      clipPath: `inset(0% 0% ${bottomCut}% 0%)`,
+      transform: `translate3d(0, ${(-k * 26).toFixed(1)}px, 0)`,
+    }
+  }
   return {
     visible: true,
-    opacity: clamp(enterK * (1 - curtainOutK)),
-    x: (1 - enterK) * 220,
-    clipPath: `inset(0% ${sideInset}% 0% ${sideInset}%)`,
+    clipPath: 'inset(0% 0% 0% 0%)',
+    transform: 'scale(1)',
   }
 })
 
-const pl = computed(() => Math.max(0, sec.value - 19.38))
-const voltCheckClick = computed(() => pl.value >= 1.55 && pl.value < 1.88)
-const voltDone = computed(() => pl.value >= 1.7)
-const navIdx = computed(() => (pl.value < 1.95 ? 0 : 1)) // Overview -> Case Studies
-const caseHover = computed(() => pl.value >= 2.15)
-const p4CursorPos = computed(() => {
-  const k = easeInOutCubic(clamp((pl.value - 1.75) / 0.9))
+const p4CheckHover = computed(() => sec.value >= 13.9 && sec.value < 15.1)
+const p4CheckPressed = computed(() => sec.value >= 14.18 && sec.value < 14.42)
+const p4VoltDone = computed(() => sec.value >= 14.28)
+const p4CheckRipple = computed(() => sec.value >= 14.22 && sec.value < 14.85)
+const p4NavIdx = computed(() => (sec.value < 14.85 ? 0 : 1))
+const p4CaseHover = computed(() => sec.value >= 15.1 && sec.value < 16.55)
+
+// =========================================================
+// UNIFIED STAGE CURSOR (Targeting Measured getBoundingClientRect() Coordinates)
+// =========================================================
+const stageCursor = computed(() => {
+  const s = sec.value
+  const b1 = targets.p1Btn
+  const b2 = targets.p2Btn
+  const f3 = targets.p3Field
+  const b3 = targets.p3Btn
+  const c4 = targets.p4Check
+  const k4 = targets.p4Case
+
+  let pos = { x: b1.x, y: b1.y }
+  let ibeam = false
+  let pressed = false
+
+  if (s < 4.2) {
+    // Phase 01: Approaches Production UI toggle and lands dead-center on b1
+    const start = { x: b1.x - 140, y: b1.y + 95 }
+    if (s < 1.15) {
+      const k = easeInOutCubic(clamp((s - 0.35) / 0.8))
+      pos = bez(start, { x: b1.x - 60, y: b1.y + 15 }, b1, k)
+    } else {
+      pos = { x: b1.x, y: b1.y }
+    }
+    pressed = p1Pressed.value
+  } else if (s < 8.5) {
+    // Phase 02: Glides from b1 to Simplify button (b2) and lands dead-center
+    if (s < 5.45) {
+      const k = easeInOutCubic(clamp((s - 4.45) / 1.0))
+      pos = bez(b1, { x: (b1.x + b2.x) / 2, y: Math.min(b1.y, b2.y) - 35 }, b2, k)
+    } else {
+      pos = { x: b2.x, y: b2.y }
+    }
+    pressed = p2Pressed.value
+  } else if (s < 12.8) {
+    // Phase 03: Glides into prompt input field (f3), types as I-beam, then glides dead-center onto ↑ Generate (b3)
+    if (s < 9.08) {
+      const k = easeInOutCubic(clamp((s - 8.55) / 0.53))
+      pos = bez(b2, { x: f3.x - 40, y: f3.y - 30 }, f3, k)
+    } else if (s < 11.25) {
+      pos = { x: f3.x + Math.sin(s * 3) * 4, y: f3.y }
+      ibeam = true
+    } else if (s < 11.88) {
+      const k = easeInOutCubic(clamp((s - 11.25) / 0.63))
+      pos = bez(f3, { x: (f3.x + b3.x) / 2, y: f3.y - 24 }, b3, k)
+    } else {
+      pos = { x: b3.x, y: b3.y }
+    }
+    pressed = p3Pressed.value
+  } else {
+    // Phase 04: Glides dead-center onto Voltrep Log Set ✓ button (c4), clicks, then glides onto Case Study Card (k4)
+    if (s < 14.05) {
+      const k = easeInOutCubic(clamp((s - 13.15) / 0.9))
+      pos = bez(b3, { x: (b3.x + c4.x) / 2, y: c4.y - 40 }, c4, k)
+    } else if (s < 14.75) {
+      pos = { x: c4.x, y: c4.y }
+    } else if (s < 15.35) {
+      const k = easeInOutCubic(clamp((s - 14.75) / 0.6))
+      pos = bez(c4, { x: (c4.x + k4.x) / 2, y: c4.y - 25 }, k4, k)
+    } else {
+      pos = { x: k4.x, y: k4.y }
+    }
+    pressed = p4CheckPressed.value
+  }
+
   return {
-    x: -48 + k * 225,
-    y: 16 + k * 18,
+    x: pos.x,
+    y: pos.y,
+    ibeam,
+    scale: pressed ? 0.86 : 1,
   }
 })
 
 const ambientTheme = computed(() => {
   const s = sec.value
-  if (s < 6.45) return 'ambient-design'
-  if (s < 12.8) return 'ambient-research'
-  if (s < 19.35) return 'ambient-ai'
+  if (s < 4.2) return 'ambient-design'
+  if (s < 8.5) return 'ambient-research'
+  if (s < 12.8) return 'ambient-ai'
   return 'ambient-frontend'
 })
 
-const measureOrigin = () => {
-  const layer = layerRef.value
-  const box = boxRef.value
-  const btn = btnRef.value
-  if (!layer || !box || !btn || !layer.offsetHeight) return
-  const x = box.offsetLeft + btn.offsetLeft + btn.offsetWidth / 2
-  const y = box.offsetTop + btn.offsetTop + btn.offsetHeight / 2
-  camOrigin.value = `${x}px ${y}px`
-}
-
 const onResize = () => {
-  viewW.value = window.innerWidth
-  nextTick(measureOrigin)
+  nextTick(measureTargets)
 }
 
 const tick = (ts) => {
@@ -281,12 +379,12 @@ const tick = (ts) => {
     elapsedMs.value += ts - lastTs
   }
   lastTs = ts
+  measureTargets()
   rafId = window.requestAnimationFrame(tick)
 }
 
 onMounted(() => {
   if (typeof window === 'undefined') return
-  viewW.value = window.innerWidth
   window.addEventListener('resize', onResize, { passive: true })
   const params = new URLSearchParams(window.location.search)
   const tParam = params.get('t')
@@ -295,13 +393,14 @@ onMounted(() => {
     elapsedMs.value = Number(tParam) * 1000
   } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     isAutoPlaying.value = false
-    elapsedMs.value = 2400 // static fallback showing UX/UI DESIGN immediately
+    elapsedMs.value = 2100
   } else {
-    elapsedMs.value = 600 // opens immediately on Phase 01: UX/UI DESIGN
+    elapsedMs.value = 1850 // opens immediately on Phase 01: UX/UI DESIGN with Production UI active
   }
   nextTick(() => {
-    measureOrigin()
-    window.setTimeout(measureOrigin, 350)
+    measureTargets()
+    window.setTimeout(measureTargets, 120)
+    window.setTimeout(measureTargets, 350)
   })
   rafId = window.requestAnimationFrame(tick)
 })
@@ -313,76 +412,69 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="film-hero" aria-label="UX/UI Design & Front-End Product Showreel">
+  <section class="film-hero" aria-label="UX/UI Design & Front-End App Presentation Showreel">
     <div class="film-stage" :class="ambientTheme">
-      <!-- Subtle bespoke ambient light blooms (Obsidian, Champagne Gold, Alabaster, Emerald) -->
+      <!-- Ambient Obsidian & Champagne Light Blooms -->
       <div class="ambient-layer" aria-hidden="true">
         <div class="bloom bloom-1" />
         <div class="bloom bloom-2" />
       </div>
 
-      <div class="camera-viewport">
+      <div ref="viewportRef" class="camera-viewport">
         <!-- =========================================================
-             TRANSITION 1 OVERLAY: Glassmorphic Curtain Scanner Bar
+             PHASE 01 (0.0s – 4.2s) — UX/UI DESIGN (FULL-STAGE DESIGN SYSTEM)
              ========================================================= -->
         <div
-          v-if="scannerBar.active"
-          class="curtain-scanner-wrap"
-          :style="{ opacity: scannerBar.opacity }"
-          aria-hidden="true"
-        >
-          <div
-            class="curtain-scanner-bar"
-            :style="{ transform: `translate3d(${scannerBar.xPct.toFixed(2)}%, 0, 0)` }"
-          >
-            <div class="scanner-line" />
-          </div>
-        </div>
-
-        <!-- =========================================================
-             TRANSITION 2 OVERLAY: Compact Center Pill Morphing into Prompt Box
-             ========================================================= -->
-        <div
-          v-if="morphPillBridge.active"
-          class="morph-pill-overlay"
-          :style="{ opacity: morphPillBridge.opacity }"
-          aria-hidden="true"
-        >
-          <div
-            class="morph-pill-shell"
-            :style="{
-              width: `${morphPillBridge.widthPx.toFixed(0)}px`,
-              height: `${morphPillBridge.heightPx.toFixed(0)}px`,
-            }"
-          />
-        </div>
-
-        <!-- =========================================================
-             TRANSITION 3 OVERLAY: Soft Radial Champagne Light Pulse
-             ========================================================= -->
-        <div
-          v-if="radialPulse.active"
-          class="radial-pulse-overlay"
-          :style="{
-            opacity: radialPulse.opacity,
-            transform: `scale(${radialPulse.scale.toFixed(2)})`,
-          }"
-          aria-hidden="true"
-        />
-
-        <!-- =========================================================
-             PHASE 01 (0.0s – 6.5s) — UX/UI DESIGN (IMMEDIATE HERO OPENER)
-             ========================================================= -->
-        <div
-          v-if="p1State.visible"
+          v-show="p1State.visible"
           class="camera-layer"
           :style="{
-            opacity: p1State.opacity,
             clipPath: p1State.clipPath,
-            transform: `scale(${p1State.scale.toFixed(3)})`,
+            transform: p1State.transform,
           }"
         >
-          <span class="seq-kicker is-gold">DESIGN SYSTEMS // FLAT 2D ARCHITECTURAL PRECISION</span>
+          <!-- PERIPHERAL FLOATING WIDGETS (Full-Canvas Spatial Depth) -->
+          <div
+            class="peri-card peri-top-left"
+            :style="{ transform: `translate3d(${driftX(0.4).toFixed(1)}px, ${driftY(0.4).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">TYPOGRAPHY SCALE</span>
+            <span class="peri-value tabular-nums">Inter · -0.03em · tabular-nums</span>
+          </div>
+
+          <div
+            class="peri-card peri-top-right"
+            :style="{ transform: `translate3d(${driftX(1.6).toFixed(1)}px, ${driftY(1.6).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">ACCESSIBILITY AUDIT</span>
+            <span class="peri-value is-emerald tabular-nums">WCAG AA 14.8:1 · Passed ✓</span>
+          </div>
+
+          <div
+            class="peri-card peri-mid-left"
+            :style="{ transform: `translate3d(${driftX(2.5).toFixed(1)}px, ${driftY(2.5).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">SPATIAL RHYTHM</span>
+            <span class="peri-value tabular-nums">8pt Grid · Auto Layout v4</span>
+          </div>
+
+          <div
+            class="peri-card peri-bottom-right"
+            :style="{ transform: `translate3d(${driftX(3.4).toFixed(1)}px, ${driftY(3.4).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">SEMANTIC COLOR TOKENS</span>
+            <div class="peri-swatches">
+              <span class="p-sw"><i style="background:#050507" />#050507</span>
+              <span class="p-sw"><i style="background:#E2B878" />#E2B878</span>
+              <span class="p-sw"><i style="background:#34D399" />#34D399</span>
+            </div>
+          </div>
+
+          <!-- CENTER CORE WORKSPACE -->
+          <span class="seq-kicker is-gold">Cognitive Ergonomics · 8pt Grid · WCAG AA Contrast · Design Tokens</span>
           <h1 class="seq-title">
             <span class="tone-ice">UX/UI</span>
             <span class="tone-gold">DESIGN</span>
@@ -392,25 +484,32 @@ onUnmounted(() => {
             <div class="figma-header">
               <div class="fh-left">
                 <span class="fh-dots" aria-hidden="true"><i /><i /><i /></span>
-                <span class="fh-file tabular-nums">Frame / Hero · 8pt Grid</span>
+                <span class="fh-file tabular-nums">Frame / Voltrep_System · 8pt Grid</span>
               </div>
 
-              <!-- Pill Toggle: Wireframe -> Production UI -->
+              <!-- Interactive Wireframe <-> Production UI Pill Toggle -->
               <div class="mode-pills">
-                <span class="mode-pill" :class="{ active: !p1HighContrast }">Wireframe</span>
-                <span
-                  class="mode-pill"
-                  :class="{ 'active-hc': p1HighContrast, pressed: p1ToggleClick }"
+                <span class="mode-pill" :class="{ active: !p1ProdUI }">Wireframe</span>
+                <button
+                  ref="p1BtnRef"
+                  type="button"
+                  tabindex="-1"
+                  class="mode-pill is-target-btn"
+                  :class="{
+                    'is-hover': p1Hover && !p1ProdUI,
+                    'active-hc': p1ProdUI,
+                    'is-pressed': p1Pressed,
+                  }"
                 >
-                  Production UI
-                </span>
+                  <span>Production UI</span>
+                  <span v-if="p1Ripple" class="click-ripple" aria-hidden="true" />
+                </button>
               </div>
 
-              <span class="fh-wcag">WCAG AA · 14.8:1</span>
+              <span class="fh-wcag tabular-nums">WCAG AA · 14.8:1</span>
             </div>
 
             <div class="figma-body">
-              <!-- Left Component Tree -->
               <div class="figma-panel" aria-hidden="true">
                 <div class="fp-title">COMPONENT TREE</div>
                 <div class="layer-item is-active"><span class="li-icon">#</span> Frame / Hero</div>
@@ -418,9 +517,8 @@ onUnmounted(() => {
                 <div class="layer-item"><span class="li-icon">⬡</span> 8pt Grid</div>
               </div>
 
-              <!-- Center Interactive Component Frame -->
               <div class="figma-stage-center">
-                <div class="selection-frame" :class="{ 'is-polished': p1HighContrast }">
+                <div class="selection-frame" :class="{ 'is-polished': p1ProdUI }">
                   <span class="handle h-tl" aria-hidden="true" />
                   <span class="handle h-tr" aria-hidden="true" />
                   <span class="handle h-bl" aria-hidden="true" />
@@ -428,90 +526,109 @@ onUnmounted(() => {
                   <span class="redline r-top tabular-nums" aria-hidden="true">24px</span>
                   <span class="redline r-side tabular-nums" aria-hidden="true">16px</span>
 
-                  <div class="ui-preview-card" :class="{ 'is-hc': p1HighContrast }">
+                  <div class="ui-preview-card" :class="{ 'is-hc': p1ProdUI }">
                     <div class="upc-row">
-                      <span class="upc-kicker">{{ p1HighContrast ? 'VOLTREP · PRODUCTION TOKEN' : 'WIREFRAME · LOW-FI SKELETON' }}</span>
-                      <span class="upc-chip tabular-nums">{{ p1HighContrast ? 'WCAG AA ✓' : 'Draft' }}</span>
+                      <span class="upc-kicker">{{ p1ProdUI ? 'VOLTREP · PRODUCTION TOKEN' : 'WIREFRAME · LOW-FI SKELETON' }}</span>
+                      <span class="upc-chip tabular-nums">{{ p1ProdUI ? 'WCAG AA ✓' : 'Draft' }}</span>
                     </div>
                     <div class="upc-title">Hack Squat · 120 kg × 6 reps</div>
                     <div class="upc-bar"><div class="upc-bar-fill" /></div>
                   </div>
                 </div>
-
-                <!-- Vector Cursor clicking Production UI toggle -->
-                <svg
-                  class="figma-cursor"
-                  :style="{ transform: `translate3d(${p1CursorPos.x.toFixed(1)}px, ${p1CursorPos.y.toFixed(1)}px, 0) scale(${p1ToggleClick ? 0.88 : 1})` }"
-                  viewBox="0 0 24 24"
-                  width="22"
-                  height="22"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path d="M4 3L19 11L12 13L9 20L4 3Z" fill="#E2B878" stroke="#050507" stroke-width="1.5" stroke-linejoin="round" />
-                </svg>
               </div>
 
-              <!-- Right Design Tokens Panel -->
               <div class="figma-panel" aria-hidden="true">
                 <div class="fp-title">UI TOKENS</div>
                 <div class="token-row"><i class="sw" style="background:#050507" /><span>#050507</span></div>
                 <div class="token-row"><i class="sw" style="background:#E2B878" /><span>#E2B878</span></div>
-                <div class="token-row"><i class="sw" style="background:#F5F5F7" /><span>#F5F5F7</span></div>
-                <div class="token-spec">WCAG AA · 8pt Grid</div>
+                <div class="token-row"><i class="sw" style="background:#34D399" /><span>#34D399</span></div>
+                <div class="token-spec">Inter · tabular-nums</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- =========================================================
-             PHASE 02 (6.5s – 13.0s) — USER RESEARCH (COGNITIVE ERGONOMICS)
+             PHASE 02 (4.2s – 8.5s) — USER RESEARCH (FULL-STAGE UX TELEMETRY)
              ========================================================= -->
         <div
-          v-if="p2State.visible"
+          v-show="p2State.visible"
           class="camera-layer"
           :style="{
-            opacity: p2State.opacity,
             clipPath: p2State.clipPath,
-            transform: `scale(${p2State.scale.toFixed(3)})`,
+            transform: p2State.transform,
           }"
         >
-          <span class="seq-kicker is-emerald">COGNITIVE ERGONOMICS // EMPIRICAL VALIDATION</span>
+          <!-- PERIPHERAL FLOATING WIDGETS -->
+          <div
+            class="peri-card peri-top-left"
+            :style="{ transform: `translate3d(${driftX(0.8).toFixed(1)}px, ${driftY(0.8).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">HEURISTIC EVALUATION</span>
+            <span class="peri-value is-emerald">Heuristic Audit Passed ✓</span>
+          </div>
+
+          <div
+            class="peri-card peri-top-right"
+            :style="{ transform: `translate3d(${driftX(1.9).toFixed(1)}px, ${driftY(1.9).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">DECISION LATENCY</span>
+            <span class="peri-value tabular-nums">1.2s Avg Interaction Time</span>
+          </div>
+
+          <div
+            class="peri-card peri-mid-left"
+            :style="{ transform: `translate3d(${driftX(2.7).toFixed(1)}px, ${driftY(2.7).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">SAMPLE COHORT</span>
+            <span class="peri-value tabular-nums">N = 48 Active Athletes</span>
+          </div>
+
+          <div
+            class="peri-card peri-bottom-right"
+            :style="{ transform: `translate3d(${driftX(3.8).toFixed(1)}px, ${driftY(3.8).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">ATTENTION TELEMETRY</span>
+            <span class="peri-value is-gold tabular-nums">94.2% Primary CTA Fixation</span>
+          </div>
+
+          <span class="seq-kicker is-emerald">-42% Cognitive Load · 98.4% Task Success · SUS Score 91/100 · Heuristic Audit Passed</span>
           <h1 class="seq-title">
             <span class="tone-ice">USER</span>
             <span class="tone-emerald">RESEARCH</span>
           </h1>
 
-          <!-- Interactive Flow Filter (Discover | Validate | Simplify) -->
+          <!-- Interactive Flow Filter Bar: Discover | Validate | Simplify -->
           <div class="filter-pill-bar">
             <span class="filter-pill">Discover</span>
-            <span class="filter-pill" :class="{ 'is-active-gold': !researchSimplified }">Validate</span>
-            <span
-              class="filter-pill"
-              :class="{ 'is-active-emerald': researchSimplified, 'is-pressed': researchPillClick }"
+            <span class="filter-pill" :class="{ 'is-active-gold': !p2Simplified }">Validate</span>
+            <button
+              ref="p2BtnRef"
+              type="button"
+              tabindex="-1"
+              class="filter-pill is-target-btn"
+              :class="{
+                'is-hover': p2Hover && !p2Simplified,
+                'is-active-emerald': p2Simplified,
+                'is-pressed': p2Pressed,
+              }"
             >
-              Simplify
-            </span>
-
-            <svg
-              class="pill-cursor"
-              :style="{ transform: `translate3d(${(-42 + researchCursorK * 98).toFixed(1)}px, ${(36 - researchCursorK * 24).toFixed(1)}px, 0) scale(${researchPillClick ? 0.9 : 1})` }"
-              viewBox="0 0 24 24"
-              width="21"
-              height="21"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path d="M4 3L19 11L12 13L9 20L4 3Z" fill="#F5F5F7" stroke="#050507" stroke-width="1.5" stroke-linejoin="round" />
-            </svg>
+              <span>Simplify</span>
+              <span v-if="p2Ripple" class="click-ripple is-emerald" aria-hidden="true" />
+            </button>
           </div>
 
-          <div class="bento-research">
-            <!-- Card 1: -42% Cognitive Friction -->
+          <!-- Wide 3-Column Bento Layout -->
+          <div class="bento-research-3col">
+            <!-- Col 1: -42% Cognitive Load -->
             <div class="glass-panel bento-card">
               <div class="bc-top">
-                <span class="bc-tag">COGNITIVE FRICTION</span>
-                <span class="bc-trend">↓ Validated</span>
+                <span class="bc-tag">COGNITIVE LOAD</span>
+                <span class="bc-trend">↓ Optimal</span>
               </div>
               <div class="bc-main-row">
                 <span class="bc-num is-emerald tabular-nums">-{{ mFriction }}%</span>
@@ -520,160 +637,220 @@ onUnmounted(() => {
                   <circle cx="106" cy="29" r="3.5" fill="#34D399" />
                 </svg>
               </div>
-              <span class="bc-sub">Decision latency across active workout logging</span>
+              <span class="bc-sub">Friction reduction across active set logging</span>
             </div>
 
-            <!-- Card 2: 98.4% Task Completion + SUS Score 91/100 -->
+            <!-- Col 2: 98.4% Task Completion + SUS 91/100 -->
             <div class="glass-panel bento-card">
               <div class="bc-top">
-                <span class="bc-tag">USABILITY BENCHMARK</span>
-                <span class="bc-sus tabular-nums">SUS Score {{ mSus }}/100</span>
+                <span class="bc-tag">TASK COMPLETION</span>
+                <span class="bc-sus tabular-nums">SUS {{ mSus }}/100</span>
               </div>
               <div class="bc-main-row">
                 <span class="bc-num is-ice tabular-nums">{{ mTask }}%</span>
-                <span class="bc-badge-gold">Task Completion</span>
+                <span class="bc-badge-gold">Benchmark</span>
               </div>
               <div class="sus-bar-track" aria-hidden="true">
                 <div class="sus-bar-fill" :style="{ width: `${mSus}%` }" />
               </div>
             </div>
 
-            <!-- Card 3: 6-node journey condensing into 3-step path on Simplify -->
-            <div class="glass-panel bento-card bento-wide">
+            <!-- Col 3: User Flow Architecture (6 messy steps -> 3 ergonomic nodes) -->
+            <div class="glass-panel bento-card">
               <div class="bc-top">
-                <span class="bc-tag">USER JOURNEY ARCHITECTURE</span>
-                <span class="bc-flow-status" :class="{ simplified: researchSimplified }">
-                  {{ researchSimplified ? 'Simplified · 3 Intuitive Steps ✓' : 'Unfiltered Journey · 6 Nodes' }}
+                <span class="bc-tag">USER FLOW PATH</span>
+                <span class="bc-flow-status" :class="{ simplified: p2Simplified }">
+                  {{ p2Simplified ? '3 Ergonomic Nodes ✓' : '6 Legacy Steps' }}
                 </span>
               </div>
 
-              <div v-if="!researchSimplified" class="flow-row is-cluttered">
+              <div v-if="!p2Simplified" class="flow-row is-cluttered">
                 <span class="f-chip">Splash</span>
-                <span class="f-arr">→</span>
                 <span class="f-chip">Menu</span>
-                <span class="f-arr">→</span>
-                <span class="f-chip">Category</span>
-                <span class="f-arr">→</span>
+                <span class="f-chip">List</span>
                 <span class="f-chip">Modal</span>
-                <span class="f-arr">→</span>
-                <span class="f-chip">Input</span>
-                <span class="f-arr">→</span>
+                <span class="f-chip">Edit</span>
                 <span class="f-chip">Save</span>
               </div>
 
               <div v-else class="flow-row is-clean">
-                <span class="f-node"><i class="f-dot ice" />1. Select Exercise</span>
+                <span class="f-node"><i class="f-dot ice" />Select</span>
                 <span class="f-connector" />
-                <span class="f-node is-gold"><i class="f-dot gold" />2. One-Tap Set Log</span>
+                <span class="f-node is-gold"><i class="f-dot gold" />Log Set</span>
                 <span class="f-connector" />
-                <span class="f-node is-emerald"><i class="f-dot emerald" />3. Instant Rest Sync ✓</span>
+                <span class="f-node is-emerald"><i class="f-dot emerald" />Sync ✓</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- =========================================================
-             PHASE 03 (13.0s – 19.5s) — CREATIVE AI (BESPOKE PROMPT COMPOSER)
+             PHASE 03 (8.5s – 12.8s) — CREATIVE AI (SENIOR PROMPT ENGINEERING)
              ========================================================= -->
         <div
           v-show="p3State.visible"
-          ref="layerRef"
-          class="camera-layer layer-prompt"
+          class="camera-layer"
           :style="{
-            opacity: p3State.opacity,
-            transform: `translate3d(${p3State.x.toFixed(1)}px, 0, 0) scaleX(${p3State.scaleX.toFixed(3)}) scale(${camZoom.toFixed(3)})`,
-            transformOrigin: camOrigin,
+            clipPath: p3State.clipPath,
+            transform: p3State.transform,
+            transformOrigin: p3Origin,
           }"
         >
-          <span class="seq-kicker is-gold">AI-AUGMENTED WORKFLOWS // BESPOKE INTERFACE ENGINE</span>
+          <!-- PERIPHERAL FLOATING CONTEXT CHIPS -->
+          <div
+            class="peri-card peri-top-left"
+            :style="{ transform: `translate3d(${driftX(1.1).toFixed(1)}px, ${driftY(1.1).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">CONTEXT ATTACHMENT 01</span>
+            <span class="peri-value is-gold">Design System v2 · 8pt Tokens</span>
+          </div>
+
+          <div
+            class="peri-card peri-top-right"
+            :style="{ transform: `translate3d(${driftX(2.1).toFixed(1)}px, ${driftY(2.1).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">CONTEXT ATTACHMENT 02</span>
+            <span class="peri-value is-emerald">User Flow Data · -42% Friction</span>
+          </div>
+
+          <div
+            class="peri-card peri-mid-left"
+            :style="{ transform: `translate3d(${driftX(3.0).toFixed(1)}px, ${driftY(3.0).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">ACCESSIBILITY CONSTRAINTS</span>
+            <span class="peri-value tabular-nums">A11y Rules · WCAG AA 14.8:1</span>
+          </div>
+
+          <div
+            class="peri-card peri-bottom-right"
+            :style="{ transform: `translate3d(${driftX(4.1).toFixed(1)}px, ${driftY(4.1).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">OUTPUT TARGET</span>
+            <span class="peri-value tabular-nums">Vue 3 SFC · 60fps GPU Transforms</span>
+          </div>
+
+          <span class="seq-kicker is-gold">System Prompt → Component Architecture → Token Validation</span>
           <h1 class="seq-title">
             <span class="tone-ice">CREATIVE</span>
             <span class="tone-gold">AI</span>
           </h1>
 
           <div
-            ref="boxRef"
             class="prompt-box"
-            :class="{ 'is-focus': focused }"
+            :class="{
+              'is-focus': p3Focused,
+              'is-pulse': p3State.pulseBorder,
+            }"
           >
             <div class="prompt-top">
-              <span class="model-pill"><span class="pill-dot" aria-hidden="true" />UI Architecture Agent</span>
+              <span class="model-pill"><span class="pill-dot" aria-hidden="true" />System Architecture Prompt</span>
               <span class="ctx-pill tabular-nums" :class="{ lit: typedText.length > 0 }">
-                {{ tokenCount }} tok · Ready
+                {{ tokenCount }} tok · Validated
               </span>
             </div>
 
-            <div class="prompt-field">
-              <span class="prompt-text">{{ typedText }}</span><span class="prompt-caret" :class="{ on: focused }" aria-hidden="true" />
-              <span v-if="!typedText && !focused" class="prompt-placeholder">Specify interface constraints and ergonomics…</span>
+            <div ref="p3FieldRef" class="prompt-field">
+              <span class="prompt-text">{{ typedText }}</span><span class="prompt-caret" :class="{ on: p3Focused }" aria-hidden="true" />
             </div>
 
             <div class="prompt-bottom">
               <div class="chip-group" aria-hidden="true">
-                <span class="attach-chip">8pt Grid</span>
-                <span class="attach-chip">WCAG AA</span>
+                <span class="attach-chip">Design System v2</span>
+                <span class="attach-chip">User Flow Data</span>
+                <span class="attach-chip">A11y Rules</span>
               </div>
               <button
-                ref="btnRef"
+                ref="p3BtnRef"
                 type="button"
                 tabindex="-1"
-                class="submit-btn"
-                :class="{ ready: submitReady, pressed: submitPressed }"
-                aria-hidden="true"
+                class="submit-btn is-target-btn"
+                :class="{
+                  ready: p3SubmitReady,
+                  'is-hover': p3Hover,
+                  pressed: p3Pressed,
+                }"
               >
-                <span aria-hidden="true">↑</span> Generate
+                <span aria-hidden="true">↑</span>
+                <span>Generate</span>
+                <span v-if="p3Ripple" class="click-ripple" aria-hidden="true" />
               </button>
-            </div>
-
-            <!-- High-DPI Vector Cursor -->
-            <div
-              class="cursor-anchor"
-              :style="{ transform: `translate3d(${promptCursor.x.toFixed(1)}px, ${promptCursor.y.toFixed(1)}px, 0) scale(${promptCursor.scale})` }"
-              aria-hidden="true"
-            >
-              <svg class="cur cur-arrow" :class="{ hide: promptCursor.ibeam }" viewBox="0 0 24 24" width="24" height="24" fill="none">
-                <path d="M4 3L19 11L12 13L9 20L4 3Z" fill="#F5F5F7" stroke="#050507" stroke-width="1.5" stroke-linejoin="round" />
-              </svg>
-              <svg class="cur cur-ibeam" :class="{ show: promptCursor.ibeam }" viewBox="0 0 24 24" width="24" height="24" fill="none">
-                <path d="M9 4h6M9 20h6M12 4v16" stroke="#F5F5F7" stroke-width="1.8" stroke-linecap="round" />
-              </svg>
             </div>
           </div>
         </div>
 
         <!-- =========================================================
-             PHASE 04 (19.5s – 26.0s) — MOTION & FRONT-END (LIVING PORTFOLIO & VOLTREP)
+             PHASE 04 (12.8s – 17.0s) — MOTION & FRONT-END (LIVING VOLTREP & PORTFOLIO)
              ========================================================= -->
         <div
-          v-if="p4State.visible"
+          v-show="p4State.visible"
           class="camera-layer"
           :style="{
-            opacity: p4State.opacity,
             clipPath: p4State.clipPath,
-            transform: `translate3d(${p4State.x.toFixed(1)}px, 0, 0)`,
+            transform: p4State.transform,
           }"
         >
-          <span class="seq-kicker is-gold">PRODUCTION ENGINEERING // 60FPS SEMANTIC FRONT-END</span>
+          <!-- PERIPHERAL FLOATING TELEMETRY -->
+          <div
+            class="peri-card peri-top-left"
+            :style="{ transform: `translate3d(${driftX(0.6).toFixed(1)}px, ${driftY(0.6).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">FRAME TIMING</span>
+            <span class="peri-value is-emerald tabular-nums">60 FPS · 16.6ms GPU Composited</span>
+          </div>
+
+          <div
+            class="peri-card peri-top-right"
+            :style="{ transform: `translate3d(${driftX(1.7).toFixed(1)}px, ${driftY(1.7).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">LAYOUT STABILITY</span>
+            <span class="peri-value tabular-nums">CLS 0.00 · Zero Layout Shift</span>
+          </div>
+
+          <div
+            class="peri-card peri-mid-left"
+            :style="{ transform: `translate3d(${driftX(2.9).toFixed(1)}px, ${driftY(2.9).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">PRODUCTION STACK</span>
+            <span class="peri-value tabular-nums">Vue 3 · Vite · Semantic HTML5</span>
+          </div>
+
+          <div
+            class="peri-card peri-bottom-right"
+            :style="{ transform: `translate3d(${driftX(3.6).toFixed(1)}px, ${driftY(3.6).toFixed(1)}px, 0)` }"
+            aria-hidden="true"
+          >
+            <span class="peri-label">SPRING PHYSICS</span>
+            <span class="peri-value is-gold tabular-nums">cubic-bezier(0.16, 1, 0.3, 1)</span>
+          </div>
+
+          <span class="seq-kicker is-gold">Voltrep Production UI · 60 FPS GPU Compositing · Zero Layout Shift</span>
           <h1 class="seq-title">
             <span class="tone-gold">MOTION &amp;</span>
             <span class="tone-ice">FRONT-END</span>
           </h1>
 
-          <!-- Elastic sliding pill tab: Overview | Case Studies | Journey -->
+          <!-- Elastic Sliding Pill Navbar: Overview | Case Studies | Journey -->
           <div class="live-navbar-pill" aria-hidden="true">
-            <span class="nav-thumb" :style="{ transform: `translate3d(${navIdx * 100}%, 0, 0)` }" />
-            <span class="nav-item" :class="{ active: navIdx === 0 }">Overview</span>
-            <span class="nav-item" :class="{ active: navIdx === 1 }">Case Studies</span>
+            <span class="nav-thumb" :style="{ transform: `translate3d(${p4NavIdx * 100}%, 0, 0)` }" />
+            <span class="nav-item" :class="{ active: p4NavIdx === 0 }">Overview</span>
+            <span class="nav-item" :class="{ active: p4NavIdx === 1 }">Case Studies</span>
             <span class="nav-item">Journey</span>
           </div>
 
           <div class="frontend-showcase">
-            <!-- Voltrep Workout Card (Hack Squat · 120 kg × 6 reps -> Set Logged) -->
-            <div class="glass-panel volt-card" :class="{ done: voltDone }">
+            <!-- Left/Center: Voltrep Workout Set Logger -->
+            <div class="glass-panel volt-card" :class="{ done: p4VoltDone }">
               <div class="vc-head">
-                <span class="vc-brand">VOLTREP · LIVE WORKOUT LOGGER</span>
-                <span class="vc-status tabular-nums" :class="{ done: voltDone }">
-                  {{ voltDone ? 'Set Logged' : 'Active Set' }}
+                <span class="vc-brand">VOLTREP · PRODUCTION WORKOUT LOGGER</span>
+                <span class="vc-status tabular-nums" :class="{ done: p4VoltDone }">
+                  {{ p4VoltDone ? 'Set Logged ✓' : 'Set 4 / 4' }}
                 </span>
               </div>
 
@@ -682,52 +859,89 @@ onUnmounted(() => {
               <div class="vc-logger-row">
                 <div class="vc-metric tabular-nums">
                   <span class="vc-val">120 kg × 6 reps</span>
-                  <span class="vc-sub">High-Contrast Ergonomic UI</span>
+                  <span class="vc-sub">RPE 8.5 · Cognitive Ergonomics</span>
                 </div>
                 <button
+                  ref="p4CheckRef"
                   type="button"
                   tabindex="-1"
-                  class="vc-check-btn"
-                  :class="{ clicked: voltCheckClick, done: voltDone }"
-                  aria-hidden="true"
+                  class="vc-check-btn is-target-btn"
+                  :class="{
+                    'is-hover': p4CheckHover && !p4VoltDone,
+                    clicked: p4CheckPressed,
+                    done: p4VoltDone,
+                  }"
                 >
-                  ✓
+                  <span>Log Set ✓</span>
+                  <span v-if="p4CheckRipple" class="click-ripple is-emerald" aria-hidden="true" />
                 </button>
               </div>
 
               <div class="vc-track" aria-hidden="true">
-                <div class="vc-fill" :style="{ width: voltDone ? '100%' : '72%' }" />
+                <div class="vc-fill" :style="{ width: p4VoltDone ? '100%' : '75%' }" />
               </div>
             </div>
 
-            <!-- Portfolio Case Study Preview Card (60 FPS · Semantic Code) -->
-            <div class="glass-panel case-card" :class="{ hover: caseHover }">
-              <div class="cc-top">
-                <span class="cc-tag">CASE STUDY PREVIEW</span>
-                <span class="cc-pill">Vue 3 · PWA</span>
-              </div>
-              <div class="cc-title">Voltrep — UX/UI &amp; Front-End Architecture</div>
-              <div class="cc-specs">60 FPS · Semantic Code · WCAG AA</div>
-              <div class="cc-cta">Explore Case Study →</div>
-            </div>
-
-            <!-- Shared cursor clicking Voltrep checkmark then lifting Case Study card -->
-            <svg
-              class="fe-cursor"
-              :style="{ transform: `translate3d(${p4CursorPos.x.toFixed(1)}px, ${p4CursorPos.y.toFixed(1)}px, 0) scale(${voltCheckClick ? 0.88 : 1})` }"
-              viewBox="0 0 24 24"
-              width="23"
-              height="23"
-              fill="none"
-              aria-hidden="true"
+            <!-- Right: Case Study Card (Voltrep Web App) -->
+            <div
+              ref="p4CaseRef"
+              class="glass-panel case-card"
+              :class="{ hover: p4CaseHover }"
             >
-              <path d="M4 3L19 11L12 13L9 20L4 3Z" fill="#E2B878" stroke="#050507" stroke-width="1.5" stroke-linejoin="round" />
-            </svg>
+              <div class="cc-top">
+                <span class="cc-tag">FEATURED CASE STUDY</span>
+                <span class="cc-pill">60 FPS · PWA</span>
+              </div>
+              <div class="cc-title">Voltrep Web App</div>
+              <div class="cc-specs">WCAG AA Contrast · 8pt Spatial Rhythm · Zero Paywall</div>
+              <div class="cc-cta">Explore Architecture →</div>
+            </div>
           </div>
+        </div>
+
+        <!-- =========================================================
+             GLOBAL PIXEL-ACCURATE VECTOR CURSOR (Dead-Center Targeting)
+             Tip of the arrow is at (0,0) in local coordinates so translate3d(x,y)
+             places the pointer tip directly on rect.left + width/2, rect.top + height/2
+             ========================================================= -->
+        <div
+          class="global-cursor"
+          :style="{
+            transform: `translate3d(${stageCursor.x.toFixed(1)}px, ${stageCursor.y.toFixed(1)}px, 0) scale(${stageCursor.scale})`,
+          }"
+          aria-hidden="true"
+        >
+          <svg
+            class="g-cur g-arrow"
+            :class="{ hide: stageCursor.ibeam }"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+          >
+            <!-- Tip anchored near (2,2) -->
+            <path
+              d="M2 2L19 10.5L11.5 13L8.5 20.5L2 2Z"
+              fill="#E2B878"
+              stroke="#050507"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <svg
+            class="g-cur g-ibeam"
+            :class="{ show: stageCursor.ibeam }"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+          >
+            <path d="M9 4h6M9 20h6M12 4v16" stroke="#F5F5F7" stroke-width="1.9" stroke-linecap="round" />
+          </svg>
         </div>
       </div>
 
-      <!-- Lower-left identity & CTA anchor -->
+      <!-- Lower-left identity & CTA anchor (Safe Zone) -->
       <div class="hud-container stage-footer">
         <div class="identity-cta-block">
           <div class="identity-line">
@@ -769,13 +983,13 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 4.8rem 0 1.45rem;
+  padding: 4.7rem 0 1.4rem;
 }
 
 @media (min-width: 768px) {
   .film-stage {
     min-height: 94vh;
-    padding: 5.4rem 0 2.1rem;
+    padding: 5.3rem 0 2.05rem;
   }
 }
 
@@ -794,35 +1008,35 @@ onUnmounted(() => {
   border-radius: 50%;
   filter: blur(110px);
   will-change: transform, opacity;
-  transition: background 1.4s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: breathe 10s ease-in-out infinite alternate;
+  transition: background 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: breathe 8s ease-in-out infinite alternate;
 }
 
 .bloom-1 {
   width: 56vw;
   height: 56vw;
-  max-width: 760px;
-  max-height: 760px;
-  top: 8%;
-  left: 20%;
-  opacity: 0.085;
+  max-width: 780px;
+  max-height: 780px;
+  top: 6%;
+  left: 18%;
+  opacity: 0.09;
 }
 
 .bloom-2 {
-  width: 44vw;
-  height: 44vw;
-  max-width: 580px;
-  max-height: 580px;
-  bottom: 6%;
-  right: 12%;
-  opacity: 0.07;
-  animation-duration: 12s;
+  width: 46vw;
+  height: 46vw;
+  max-width: 600px;
+  max-height: 600px;
+  bottom: 5%;
+  right: 10%;
+  opacity: 0.075;
+  animation-duration: 10s;
   animation-direction: alternate-reverse;
 }
 
 @keyframes breathe {
   0% { transform: scale(0.96) translate3d(0, 0, 0); }
-  100% { transform: scale(1.06) translate3d(2%, -2%, 0); }
+  100% { transform: scale(1.07) translate3d(2%, -2%, 0); }
 }
 
 .ambient-design .bloom-1 { background: radial-gradient(circle, #E2B878 0%, transparent 70%); }
@@ -834,21 +1048,24 @@ onUnmounted(() => {
 .ambient-frontend .bloom-1 { background: radial-gradient(circle, #E2B878 0%, transparent 70%); }
 .ambient-frontend .bloom-2 { background: radial-gradient(circle, #34D399 0%, transparent 70%); }
 
+/* =========================================================
+   FULL-BLEED 100VW VIEWPORT STAGE
+   ========================================================= */
 .camera-viewport {
   position: relative;
   z-index: 2;
   flex: 1;
   width: 100%;
-  max-width: 1320px;
+  max-width: 1440px;
   margin: 0 auto;
   display: grid;
   place-items: center;
-  padding: 0.65rem 1.25rem;
+  padding: 0.5rem 1.25rem;
 }
 
 @media (min-width: 768px) {
   .camera-viewport {
-    padding: 1.1rem 2.5rem;
+    padding: 0.85rem 2.5rem;
   }
 }
 
@@ -856,85 +1073,168 @@ onUnmounted(() => {
   position: relative;
   grid-area: 1 / 1;
   width: 100%;
+  min-height: 460px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 0.85rem;
-  will-change: transform, opacity, clip-path;
+  gap: 0.8rem;
+  will-change: transform, clip-path;
 }
 
 @media (min-width: 768px) {
   .camera-layer {
-    gap: 1.05rem;
+    min-height: 520px;
+    gap: 0.95rem;
   }
 }
 
 /* =========================================================
-   ARCHITECTURAL SPATIAL TRANSITION OVERLAYS (NO LINES)
+   PERIPHERAL FLOATING UI WIDGETS (LEFT, RIGHT, UPPER, LOWER-RIGHT)
    ========================================================= */
-.curtain-scanner-wrap {
-  position: relative;
-  grid-area: 1 / 1;
-  z-index: 12;
-  width: min(820px, calc(100vw - 2.5rem));
-  height: 340px;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.curtain-scanner-bar {
+.peri-card {
+  display: none;
   position: absolute;
-  inset: 0;
+  z-index: 1;
+  padding: 0.55rem 0.85rem;
+  border-radius: 14px;
+  background: rgba(15, 17, 23, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.85);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.18rem;
+  text-align: left;
+  pointer-events: none;
   will-change: transform;
 }
 
-.scanner-line {
-  width: 2px;
-  height: 100%;
-  background: linear-gradient(180deg, transparent 0%, #E2B878 22%, #F5F5F7 50%, #E2B878 78%, transparent 100%);
-  box-shadow:
-    0 0 24px 4px rgba(226, 184, 120, 0.55),
-    -18px 0 36px rgba(226, 184, 120, 0.18);
+@media (min-width: 1120px) {
+  .peri-card {
+    display: flex;
+  }
 }
 
-.morph-pill-overlay {
-  position: relative;
-  grid-area: 1 / 1;
-  z-index: 11;
+.peri-top-left {
+  top: 2%;
+  left: 1%;
+}
+
+.peri-top-right {
+  top: 2%;
+  right: 1%;
+}
+
+.peri-mid-left {
+  bottom: 14%;
+  left: 1%;
+}
+
+.peri-bottom-right {
+  bottom: 4%;
+  right: 1%;
+}
+
+.peri-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #8B92A0;
+}
+
+.peri-value {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #E5E7EB;
+}
+
+.peri-value.is-emerald { color: #6EE7B7; }
+.peri-value.is-gold { color: #E2B878; }
+
+.peri-swatches {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.45rem;
+}
+
+.p-sw {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: #D1D5DB;
+}
+
+.p-sw i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: inline-block;
+}
+
+/* =========================================================
+   GLOBAL PIXEL-ACCURATE VECTOR CURSOR & CLICK RIPPLES
+   ========================================================= */
+.global-cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  margin-left: -2px;
+  margin-top: -2px;
   pointer-events: none;
+  z-index: 30;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.85));
+  will-change: transform;
 }
 
-.morph-pill-shell {
-  border-radius: 24px;
-  background: #0F1117;
-  border: 1.5px solid rgba(226, 184, 120, 0.7);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 24px 56px -14px rgba(226, 184, 120, 0.25);
-  will-change: width, height;
+.g-cur {
+  position: absolute;
+  inset: 0;
+  transition: opacity 140ms ease, transform 140ms ease;
 }
 
-.radial-pulse-overlay {
+.g-arrow.hide { opacity: 0; transform: scale(0.7); }
+.g-ibeam { opacity: 0; transform: scale(0.7); margin-left: -10px; margin-top: -10px; }
+.g-ibeam.show { opacity: 1; transform: scale(1); }
+
+.is-target-btn {
   position: relative;
-  grid-area: 1 / 1;
-  z-index: 9;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(226, 184, 120, 0.36) 0%, rgba(226, 184, 120, 0.1) 45%, transparent 72%);
+  overflow: visible;
+}
+
+.click-ripple {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid #E2B878;
   pointer-events: none;
-  will-change: transform, opacity;
+  animation: rippleOut 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.click-ripple.is-emerald {
+  border-color: #34D399;
+}
+
+@keyframes rippleOut {
+  0% { transform: scale(0.95); opacity: 0.95; }
+  100% { transform: scale(1.75); opacity: 0; }
 }
 
 /* =========================================================
    SHARED TYPOGRAPHY & CARDS
    ========================================================= */
 .seq-kicker {
+  position: relative;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   padding: 0.3rem 0.85rem;
@@ -942,7 +1242,7 @@ onUnmounted(() => {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 .seq-kicker.is-gold {
@@ -958,11 +1258,13 @@ onUnmounted(() => {
 }
 
 .seq-title {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.2rem 0.65rem;
-  font-size: clamp(2.1rem, 5.1vw, 4.35rem);
+  font-size: clamp(2.1rem, 4.9vw, 4.2rem);
   font-weight: 800;
   letter-spacing: -0.036em;
   line-height: 1;
@@ -983,7 +1285,9 @@ onUnmounted(() => {
    PHASE 01: FLAT 2D UX/UI DESIGN & FIGMA WORKSPACE
    ========================================================= */
 .figma-workspace {
-  width: min(780px, calc(100vw - 2.5rem));
+  position: relative;
+  z-index: 2;
+  width: min(760px, calc(100vw - 2.5rem));
   border-radius: 18px;
   background: #0F1117;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -1039,13 +1343,15 @@ onUnmounted(() => {
 }
 
 .mode-pill {
-  padding: 0.22rem 0.7rem;
+  padding: 0.24rem 0.74rem;
   border-radius: 999px;
   border: 1px solid transparent;
-  font-size: 0.69rem;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.7rem;
   font-weight: 600;
   color: #9CA3AF;
-  transition: all 240ms ease;
+  transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
 .mode-pill.active {
@@ -1053,14 +1359,21 @@ onUnmounted(() => {
   color: #F5F5F7;
 }
 
-.mode-pill.active-hc {
-  background: rgba(226, 184, 120, 0.18);
-  border-color: #E2B878;
+.mode-pill.is-hover {
+  border-color: rgba(226, 184, 120, 0.55);
   color: #F5F5F7;
-  box-shadow: 0 0 16px rgba(226, 184, 120, 0.26);
 }
 
-.mode-pill.pressed { transform: scale(0.94); }
+.mode-pill.active-hc {
+  background: rgba(226, 184, 120, 0.2);
+  border-color: #E2B878;
+  color: #F5F5F7;
+  box-shadow: 0 0 18px rgba(226, 184, 120, 0.3);
+}
+
+.mode-pill.is-pressed {
+  transform: scale(0.92);
+}
 
 .fh-wcag {
   display: none;
@@ -1077,15 +1390,15 @@ onUnmounted(() => {
 .figma-body {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.7rem;
-  padding: 1rem 0.9rem;
+  gap: 0.68rem;
+  padding: 0.95rem 0.9rem;
   align-items: center;
 }
 
 @media (min-width: 720px) {
   .figma-body {
-    grid-template-columns: 152px 1fr 156px;
-    padding: 1.25rem 1.15rem;
+    grid-template-columns: 150px 1fr 154px;
+    padding: 1.15rem 1.1rem;
   }
 }
 
@@ -1095,7 +1408,7 @@ onUnmounted(() => {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.38rem;
-  padding: 0.45rem 0.6rem;
+  padding: 0.42rem 0.6rem;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -1105,8 +1418,8 @@ onUnmounted(() => {
   .figma-panel {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.42rem;
-    padding: 0.65rem 0.75rem;
+    gap: 0.4rem;
+    padding: 0.62rem 0.72rem;
     border-radius: 12px;
   }
 }
@@ -1121,16 +1434,16 @@ onUnmounted(() => {
 }
 
 @media (min-width: 720px) {
-  .fp-title { margin-right: 0; margin-bottom: 0.12rem; }
+  .fp-title { margin-right: 0; margin-bottom: 0.1rem; }
 }
 
 .layer-item {
   display: flex;
   align-items: center;
   gap: 0.34rem;
-  padding: 0.22rem 0.46rem;
+  padding: 0.2rem 0.44rem;
   border-radius: 6px;
-  font-size: 0.69rem;
+  font-size: 0.68rem;
   color: #9CA3AF;
 }
 
@@ -1150,7 +1463,6 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
   padding: 0.35rem 0.6rem 0.15rem;
 }
 
@@ -1158,9 +1470,9 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   max-width: 390px;
-  padding: 0.85rem 1rem;
+  padding: 0.82rem 0.95rem;
   border: 1.5px dashed rgba(255, 255, 255, 0.32);
-  transition: border-color 300ms ease, background-color 300ms ease;
+  transition: border-color 240ms ease, background-color 240ms ease;
 }
 
 .selection-frame.is-polished {
@@ -1202,12 +1514,12 @@ onUnmounted(() => {
 .ui-preview-card {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.7rem 0.85rem;
+  gap: 0.42rem;
+  padding: 0.68rem 0.82rem;
   border-radius: 12px;
   border: 1px dashed rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.03);
-  transition: all 300ms ease;
+  transition: all 240ms ease;
 }
 
 .ui-preview-card.is-hc {
@@ -1264,20 +1576,12 @@ onUnmounted(() => {
   width: 60%;
   height: 100%;
   background: rgba(255, 255, 255, 0.25);
-  transition: width 340ms ease;
+  transition: width 280ms ease;
 }
 
 .ui-preview-card.is-hc .upc-bar-fill {
   width: 100%;
   background: linear-gradient(90deg, #E2B878, #34D399);
-}
-
-.figma-cursor {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  pointer-events: none;
-  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.75));
 }
 
 .token-row {
@@ -1304,27 +1608,30 @@ onUnmounted(() => {
 }
 
 /* =========================================================
-   PHASE 02: USER RESEARCH & INTERACTIVE FLOW FILTER
+   PHASE 02: USER RESEARCH 3-COLUMN BENTO & FLOW FILTER
    ========================================================= */
 .filter-pill-bar {
   position: relative;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.32rem 0.45rem;
+  padding: 0.3rem 0.45rem;
   border-radius: 999px;
   background: #0F1117;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .filter-pill {
-  padding: 0.32rem 0.85rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 999px;
   border: 1px solid transparent;
+  background: transparent;
+  font-family: inherit;
   font-size: 0.74rem;
   font-weight: 600;
   color: #9CA3AF;
-  transition: all 240ms ease;
+  transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease, border-color 200ms ease, color 200ms ease;
 }
 
 .filter-pill.is-active-gold {
@@ -1333,59 +1640,56 @@ onUnmounted(() => {
   color: #F5F5F7;
 }
 
+.filter-pill.is-hover {
+  border-color: rgba(52, 211, 153, 0.55);
+  color: #F5F5F7;
+}
+
 .filter-pill.is-active-emerald {
-  background: rgba(52, 211, 153, 0.18);
+  background: rgba(52, 211, 153, 0.2);
   border-color: #34D399;
   color: #F5F5F7;
-  box-shadow: 0 0 20px rgba(52, 211, 153, 0.28);
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
 }
 
-.filter-pill.is-pressed { transform: scale(0.94); }
+.filter-pill.is-pressed { transform: scale(0.92); }
 
-.pill-cursor {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  pointer-events: none;
-  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.75));
-}
-
-.bento-research {
-  width: min(740px, calc(100vw - 2.5rem));
+.bento-research-3col {
+  position: relative;
+  z-index: 2;
+  width: min(880px, calc(100vw - 2.5rem));
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.62rem;
+  gap: 0.65rem;
   text-align: left;
 }
 
-@media (min-width: 640px) {
-  .bento-research {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-  .bento-wide {
-    grid-column: 1 / -1;
+@media (min-width: 768px) {
+  .bento-research-3col {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
   }
 }
 
 .bento-card {
-  padding: 0.8rem 1rem;
+  padding: 0.85rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.42rem;
+  justify-content: space-between;
+  gap: 0.45rem;
 }
 
 .bc-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
 }
 
 .bc-tag {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 700;
   color: #9CA3AF;
   letter-spacing: 0.05em;
@@ -1400,7 +1704,7 @@ onUnmounted(() => {
 
 .bc-sus {
   font-family: var(--font-mono);
-  font-size: 0.69rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #E2B878;
 }
@@ -1409,11 +1713,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .bc-num {
-  font-size: clamp(1.45rem, 2.5vw, 1.95rem);
+  font-size: clamp(1.45rem, 2.3vw, 1.9rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.05;
@@ -1423,21 +1727,21 @@ onUnmounted(() => {
 .bc-num.is-ice { color: #F5F5F7; }
 
 .sparkline-svg {
-  width: 94px;
+  width: 86px;
   height: 28px;
 }
 
 .bc-badge-gold {
-  font-size: 0.71rem;
+  font-size: 0.69rem;
   font-weight: 700;
-  padding: 0.18rem 0.54rem;
+  padding: 0.16rem 0.5rem;
   border-radius: 999px;
   background: rgba(226, 184, 120, 0.14);
   color: #E2B878;
 }
 
 .bc-sub {
-  font-size: 0.72rem;
+  font-size: 0.71rem;
   color: #A1A7B3;
 }
 
@@ -1457,7 +1761,7 @@ onUnmounted(() => {
 
 .bc-flow-status {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #9CA3AF;
 }
@@ -1470,34 +1774,28 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.32rem;
+  gap: 0.28rem;
   flex-wrap: wrap;
-  padding-top: 0.1rem;
 }
 
 .f-chip {
-  padding: 0.22rem 0.5rem;
+  padding: 0.2rem 0.42rem;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px dashed rgba(255, 255, 255, 0.16);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   color: #9CA3AF;
-}
-
-.f-arr {
-  font-size: 0.7rem;
-  color: #6B7280;
 }
 
 .f-node {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.28rem 0.68rem;
+  gap: 0.3rem;
+  padding: 0.24rem 0.52rem;
   border-radius: 999px;
   background: #08090D;
   border: 1px solid rgba(245, 245, 247, 0.28);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: #F5F5F7;
 }
@@ -1507,14 +1805,14 @@ onUnmounted(() => {
 
 .f-connector {
   flex: 1;
-  min-width: 14px;
+  min-width: 8px;
   height: 2px;
   background: linear-gradient(90deg, #E2B878, #34D399);
 }
 
 .f-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
 }
 .f-dot.ice { background: #F5F5F7; }
@@ -1522,15 +1820,16 @@ onUnmounted(() => {
 .f-dot.emerald { background: #34D399; }
 
 /* =========================================================
-   PHASE 03: BESPOKE AI PROMPT COMPOSER (#0F1117 + #E2B878)
+   PHASE 03: SENIOR AI PROMPT COMPOSER (#0F1117 + #E2B878)
    ========================================================= */
 .prompt-box {
   position: relative;
-  width: min(680px, calc(100vw - 2.5rem));
-  padding: 0.9rem 1rem 0.85rem 1.1rem;
+  z-index: 2;
+  width: min(720px, calc(100vw - 2.5rem));
+  padding: 0.9rem 1.05rem 0.85rem 1.15rem;
   border-radius: 20px;
   background: #0F1117;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 26px 60px -22px rgba(0, 0, 0, 0.88);
@@ -1538,15 +1837,16 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 0.68rem;
   text-align: left;
-  transition: box-shadow 300ms ease, border-color 300ms ease;
+  transition: box-shadow 220ms ease, border-color 220ms ease;
 }
 
-.prompt-box.is-focus {
-  border-color: rgba(226, 184, 120, 0.78);
+.prompt-box.is-focus,
+.prompt-box.is-pulse {
+  border-color: #E2B878;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 0 0 2px #E2B878,
-    0 20px 50px rgba(226, 184, 120, 0.16);
+    0 20px 52px rgba(226, 184, 120, 0.2);
 }
 
 .prompt-top,
@@ -1594,9 +1894,9 @@ onUnmounted(() => {
 
 .prompt-field {
   position: relative;
-  min-height: 2.95rem;
-  font-size: clamp(0.88rem, 1.65vw, 1.04rem);
-  line-height: 1.5;
+  min-height: 3.1rem;
+  font-size: clamp(0.86rem, 1.55vw, 1.02rem);
+  line-height: 1.48;
   color: #F5F5F7;
   word-break: break-word;
 }
@@ -1620,24 +1920,17 @@ onUnmounted(() => {
 
 @keyframes blinkCaret { 50% { opacity: 0; } }
 
-.prompt-placeholder {
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #6B7280;
-}
-
 .chip-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.38rem;
+  gap: 0.35rem;
 }
 
 .attach-chip {
-  font-size: 0.7rem;
+  font-size: 0.69rem;
   font-weight: 600;
   color: #D1D5DB;
-  padding: 0.24rem 0.56rem;
+  padding: 0.22rem 0.54rem;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.11);
@@ -1650,50 +1943,30 @@ onUnmounted(() => {
   gap: 0.35rem;
   padding: 0.48rem 1rem;
   border-radius: 999px;
-  border: none;
+  border: 1px solid transparent;
   background: rgba(226, 184, 120, 0.28);
-  color: rgba(5, 5, 7, 0.75);
+  color: rgba(5, 5, 7, 0.78);
   font-family: inherit;
   font-size: 0.81rem;
   font-weight: 700;
-  transition: background-color 240ms ease, color 240ms ease, transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: background-color 200ms ease, color 200ms ease, transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease;
 }
 
-.submit-btn.ready {
+.submit-btn.ready,
+.submit-btn.is-hover {
   background: #E2B878;
   color: #050507;
+  box-shadow: 0 0 20px rgba(226, 184, 120, 0.38);
 }
 
-.submit-btn.pressed { transform: scale(0.94); }
-
-.cursor-anchor {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 24px;
-  height: 24px;
-  margin: -4px 0 0 -4px;
-  pointer-events: none;
-  z-index: 5;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.7));
-  will-change: transform;
-}
-
-.cur {
-  position: absolute;
-  inset: 0;
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.cur-arrow.hide { opacity: 0; transform: scale(0.7); }
-.cur-ibeam { opacity: 0; transform: scale(0.7); }
-.cur-ibeam.show { opacity: 1; transform: scale(1); }
+.submit-btn.pressed { transform: scale(0.92); }
 
 /* =========================================================
-   PHASE 04: MOTION & FRONT-END (LIVING PORTFOLIO & VOLTREP)
+   PHASE 04: MOTION & FRONT-END (VOLTREP & PORTFOLIO ECOSYSTEM)
    ========================================================= */
 .live-navbar-pill {
   position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, 102px);
   padding: 4px;
@@ -1711,23 +1984,24 @@ onUnmounted(() => {
   border-radius: 999px;
   background: rgba(226, 184, 120, 0.22);
   border: 1px solid rgba(226, 184, 120, 0.55);
-  transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .nav-item {
   position: relative;
   z-index: 1;
-  padding: 0.36rem 0;
+  padding: 0.34rem 0;
   font-size: 0.73rem;
   font-weight: 600;
   color: #9CA3AF;
-  transition: color 220ms ease;
+  transition: color 200ms ease;
 }
 
 .nav-item.active { color: #F5F5F7; }
 
 .frontend-showcase {
   position: relative;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1738,18 +2012,18 @@ onUnmounted(() => {
 .volt-card,
 .case-card {
   position: relative;
-  width: min(330px, calc(100vw - 2.5rem));
+  width: min(345px, calc(100vw - 2.5rem));
   padding: 0.9rem 1.05rem;
   text-align: left;
   display: flex;
   flex-direction: column;
   gap: 0.42rem;
-  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), border-color 300ms ease, box-shadow 300ms ease;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), border-color 260ms ease, box-shadow 260ms ease;
 }
 
 .volt-card.done {
-  border-color: rgba(52, 211, 153, 0.62);
-  box-shadow: 0 24px 52px -18px rgba(52, 211, 153, 0.26);
+  border-color: rgba(52, 211, 153, 0.65);
+  box-shadow: 0 24px 52px -18px rgba(52, 211, 153, 0.28);
 }
 
 .vc-head,
@@ -1763,7 +2037,7 @@ onUnmounted(() => {
 .vc-brand,
 .cc-tag {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 700;
   color: #E2B878;
   letter-spacing: 0.05em;
@@ -1776,6 +2050,8 @@ onUnmounted(() => {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.07);
   color: #D1D5DB;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .vc-status.done {
@@ -1786,7 +2062,7 @@ onUnmounted(() => {
 
 .vc-exercise,
 .cc-title {
-  font-size: 0.94rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #F5F5F7;
 }
@@ -1815,25 +2091,31 @@ onUnmounted(() => {
 }
 
 .vc-check-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0.38rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.06);
-  color: #9CA3AF;
-  font-weight: 800;
+  color: #E5E7EB;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 180ms ease, background-color 240ms ease, color 240ms ease, border-color 240ms ease;
+  transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 
-.vc-check-btn.clicked { transform: scale(0.9); }
+.vc-check-btn.is-hover {
+  border-color: #34D399;
+  color: #F5F5F7;
+}
+
+.vc-check-btn.clicked { transform: scale(0.92); }
 .vc-check-btn.done {
   background: #34D399;
   border-color: #34D399;
   color: #050507;
-  box-shadow: 0 0 16px rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 18px rgba(52, 211, 153, 0.45);
 }
 
 .vc-track {
@@ -1848,13 +2130,13 @@ onUnmounted(() => {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, #E2B878, #34D399);
-  transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 360ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .case-card.hover {
-  transform: translate3d(0, -4px, 0);
-  border-color: rgba(226, 184, 120, 0.65);
-  box-shadow: 0 28px 58px -18px rgba(226, 184, 120, 0.28);
+  transform: translate3d(0, -5px, 0);
+  border-color: rgba(226, 184, 120, 0.68);
+  box-shadow: 0 28px 58px -18px rgba(226, 184, 120, 0.3);
 }
 
 .cc-pill {
@@ -1868,7 +2150,7 @@ onUnmounted(() => {
 
 .cc-specs {
   font-family: var(--font-mono);
-  font-size: 0.71rem;
+  font-size: 0.7rem;
   color: #6EE7B7;
 }
 
@@ -1879,16 +2161,8 @@ onUnmounted(() => {
   color: #E2B878;
 }
 
-.fe-cursor {
-  position: absolute;
-  left: 50%;
-  top: 52%;
-  pointer-events: none;
-  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.75));
-}
-
 /* =========================================================
-   LOWER-LEFT IDENTITY & CTA
+   LOWER-LEFT IDENTITY & CTA SAFE ZONE
    ========================================================= */
 .hud-container {
   position: relative;
@@ -1913,7 +2187,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.62rem;
+  gap: 0.6rem;
 }
 
 .identity-line {
@@ -1953,7 +2227,8 @@ onUnmounted(() => {
 
 @media (prefers-reduced-motion: reduce) {
   .bloom,
-  .prompt-caret.on {
+  .prompt-caret.on,
+  .click-ripple {
     animation: none !important;
   }
 }
