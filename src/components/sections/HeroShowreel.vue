@@ -3,16 +3,12 @@ import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import BaseButton from '../ui/BaseButton.vue'
 import AppIcon from '../ui/AppIcon.vue'
 
-// 18.0s Studio-Grade App-Presentation Hero Showreel (4.50s per pillar)
-// - Full 100vw peripheral viewport choreography (left, right, upper, lower-right spatial widgets)
-// - Pixel-accurate getBoundingClientRect() cursor targeting landing dead-center on every active button
-// - 4 FLIP / Shared-Element Match-Cut Transitions:
-//   1. UX/UI DESIGN -> USER RESEARCH: Selection Frame FLIP Expansion & Radial Bento Grid Unfold
-//   2. USER RESEARCH -> CREATIVE AI: 3-Node Horizontal Baseline Convergence into AI Command Composer
-//   3. CREATIVE AI -> MOTION & FRONT-END: Screen-Studio 1.55x Camera Zoom-Through & Midline Aperture Open
-//   4. MOTION & FRONT-END -> UX/UI DESIGN: Architectural Auto-Layout Dock Collapse & Handle Lock Loop
-// - Strictly zero grid/checkerboard, zero player controls, zero chapter numbers, zero 3D tilts,
-//   zero connecting lines, zero Gemini/Google icons, 100% senior English copy.
+// 18.0s Unified Cause-and-Effect Hero Showreel (4.50s per Act)
+// Every single transition is physically triggered by a visible cursor click that unleashes
+// a continuous motion chain (camera dive + SVG curve, fluid SVG energy ribbon, pulse + zoom-through
+// aperture split, or card-to-Figma-frame morph) that directly constructs the next act.
+// - ZERO background grid/checkerboard, ZERO player controls, ZERO chapter numbers,
+//   ZERO Gemini/Google sparkles, ZERO 3D card tilts, 100% senior English copy.
 
 const LOOP_SEC = 18.0
 const LOOP_MS = LOOP_SEC * 1000
@@ -30,18 +26,18 @@ const p2BtnRef = ref(null)
 const p3FieldRef = ref(null)
 const p3BtnRef = ref(null)
 const p4CheckRef = ref(null)
-const p4CaseRef = ref(null)
+const p4CaseBtnRef = ref(null)
 
 // Measured target centers relative to viewportRef top-left (in px)
 const targets = reactive({
   vpW: 1440,
   vpH: 760,
-  p1Btn: { x: 720, y: 290 },
-  p2Btn: { x: 780, y: 260 },
+  p1Btn: { x: 720, y: 295 },
+  p2Btn: { x: 720, y: 270 },
   p3Field: { x: 640, y: 390 },
   p3Btn: { x: 910, y: 455 },
   p4Check: { x: 645, y: 445 },
-  p4Case: { x: 880, y: 440 },
+  p4CaseBtn: { x: 860, y: 495 },
 })
 
 const clamp = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v))
@@ -77,21 +73,21 @@ const measureTargets = () => {
   if (!vpRect.width) return
   targets.vpW = vpRect.width
   targets.vpH = vpRect.height
-  // Only update a phase's button coordinates when that phase is at rest (scale = 1, translate = 0)
   const s = sec.value
-  if (s >= 0.46 && s <= 4.02) {
+  // Measure only while each act is at rest (scale = 1, translate = 0)
+  if (s >= 0.45 && s <= 3.16) {
     targets.p1Btn = centerOf(p1BtnRef.value, vpRect, targets.p1Btn)
   }
-  if (s >= 4.96 && s <= 8.52) {
+  if (s >= 4.55 && s <= 7.56) {
     targets.p2Btn = centerOf(p2BtnRef.value, vpRect, targets.p2Btn)
   }
-  if (s >= 9.46 && s <= 13.02) {
+  if (s >= 9.05 && s <= 12.36) {
     targets.p3Field = centerOf(p3FieldRef.value, vpRect, targets.p3Field)
     targets.p3Btn = centerOf(p3BtnRef.value, vpRect, targets.p3Btn)
   }
-  if (s >= 13.96 && s <= 17.52) {
+  if (s >= 13.55 && s <= 16.96) {
     targets.p4Check = centerOf(p4CheckRef.value, vpRect, targets.p4Check)
-    targets.p4Case = centerOf(p4CaseRef.value, vpRect, targets.p4Case)
+    targets.p4CaseBtn = centerOf(p4CaseBtnRef.value, vpRect, targets.p4CaseBtn)
   }
 }
 
@@ -101,282 +97,291 @@ const bez = (p0, p1, p2, k) => ({
 })
 
 // =========================================================
-// PHASE 01 (0.00s – 4.50s) — UX/UI DESIGN (Full-Stage Design System)
-// Entrance (0.00s – 0.45s): Completes Transition 4 Architectural Auto-Layout Dock Expansion
-// Exit (4.05s – 4.50s): Transition 1 — Selection Frame FLIP Expansion (scale 1 -> 2.65) while
-//   Figma layers slide cleanly off the left edge (translateX(-120%))
+// ACT 01 (0.00s – 4.50s) — UX/UI DESIGN
+// Click Trigger at 2.95s on `Validate with Users →`
+// Transition 1 (3.18s – 4.50s): Camera Zoom-In (scale 1.0 -> 1.85) locked on clicked button,
+//   peripheral Figma layers rush outward (±140%), luminous gold SVG curve draws & unfolds Act 02.
 // =========================================================
+const p1Origin = computed(() => `${targets.p1Btn.x.toFixed(0)}px ${targets.p1Btn.y.toFixed(0)}px`)
+
 const p1State = computed(() => {
   const s = sec.value
-  if (s >= 4.5) {
+  if (s >= 3.92) {
     return {
       visible: false,
-      clipPath: 'inset(0% 0% 0% 0%)',
       transform: 'none',
-      slideLeftTransform: 'none',
-      frameFlipTransform: 'none',
-      isDockingIn: false,
-    }
-  }
-  if (s < 0.45) {
-    const k = easeOutExpo(s / 0.45)
-    const vIn = ((1 - k) * 15).toFixed(2)
-    const hIn = ((1 - k) * 18).toFixed(2)
-    const rad = ((1 - k) * 18).toFixed(1)
-    const sc = (0.88 + k * 0.12).toFixed(3)
-    return {
-      visible: true,
-      clipPath: `inset(${vIn}% ${hIn}% ${vIn}% ${hIn}% round ${rad}px)`,
-      transform: `scale(${sc})`,
-      slideLeftTransform: 'translate3d(0, 0, 0)',
-      frameFlipTransform: 'scale3d(1, 1, 1)',
-      isDockingIn: true,
-    }
-  }
-  if (s > 4.05) {
-    const k = easeInOutCubic((s - 4.05) / 0.45)
-    const slideX = (-k * 122).toFixed(2)
-    const fx = (1 + k * 2.25).toFixed(3)
-    const fy = (1 + k * 1.95).toFixed(3)
-    return {
-      visible: true,
       clipPath: 'inset(0% 0% 0% 0%)',
-      transform: 'scale(1)',
-      slideLeftTransform: `translate3d(${slideX}%, 0, 0)`,
-      frameFlipTransform: `scale3d(${fx}, ${fy}, 1)`,
-      isDockingIn: false,
+      periLeft: 'none',
+      periRight: 'none',
+    }
+  }
+  if (s < 0.42) {
+    // Completes Act 04's card-to-Figma-frame morph seamlessly
+    const k = easeOutExpo(s / 0.42)
+    const sc = (0.86 + k * 0.14).toFixed(3)
+    const vIn = ((1 - k) * 14).toFixed(2)
+    const hIn = ((1 - k) * 16).toFixed(2)
+    const rad = ((1 - k) * 18).toFixed(1)
+    return {
+      visible: true,
+      transform: `scale(${sc})`,
+      clipPath: `inset(${vIn}% ${hIn}% ${vIn}% ${hIn}% round ${rad}px)`,
+      periLeft: `translate3d(${((1 - k) * -40).toFixed(1)}px, 0, 0)`,
+      periRight: `translate3d(${((1 - k) * 40).toFixed(1)}px, 0, 0)`,
+    }
+  }
+  if (s > 3.18) {
+    // Camera dives into clicked `Validate with Users →` button (scale 1.0 -> 1.85)
+    const k = easeInOutCubic((s - 3.18) / 0.74)
+    const zoom = (1 + k * 0.85).toFixed(3)
+    const iris = s > 3.55 ? ((s - 3.55) / 0.37) * 46 : 0
+    return {
+      visible: true,
+      transform: `scale(${zoom})`,
+      clipPath: iris > 0 ? `inset(${iris.toFixed(2)}% ${iris.toFixed(2)}% ${iris.toFixed(2)}% ${iris.toFixed(2)}% round 28px)` : 'inset(0% 0% 0% 0%)',
+      periLeft: `translate3d(${(-k * 140).toFixed(1)}%, 0, 0)`,
+      periRight: `translate3d(${(k * 140).toFixed(1)}%, 0, 0)`,
     }
   }
   return {
     visible: true,
-    clipPath: 'inset(0% 0% 0% 0%)',
     transform: 'scale(1)',
-    slideLeftTransform: 'translate3d(0, 0, 0)',
-    frameFlipTransform: 'scale3d(1, 1, 1)',
-    isDockingIn: false,
+    clipPath: 'inset(0% 0% 0% 0%)',
+    periLeft: 'translate3d(0, 0, 0)',
+    periRight: 'translate3d(0, 0, 0)',
   }
 })
 
-const p1Hover = computed(() => sec.value >= 1.15 && sec.value < 4.0)
-const p1Pressed = computed(() => sec.value >= 1.38 && sec.value < 1.62)
-const p1ProdUI = computed(() => sec.value >= 1.48)
-const p1Ripple = computed(() => sec.value >= 1.42 && sec.value < 2.05)
+const p1Hover = computed(() => sec.value >= 2.25 && sec.value < 3.4)
+const p1Pressed = computed(() => sec.value >= 2.95 && sec.value < 3.18)
+const p1Validated = computed(() => sec.value >= 3.05)
+const p1Ripple = computed(() => sec.value >= 3.0 && sec.value < 3.65)
+
+// Luminous SVG Energy Curve bridging Act 01 Zoom Portal -> Act 02 Bento Dashboard (3.45s – 4.35s)
+const tr1Curve = computed(() => {
+  const s = sec.value
+  if (s < 3.45 || s > 4.35) return { active: false, dashOffset: 1200, scale: 1 }
+  const k = easeInOutCubic((s - 3.45) / 0.65)
+  const dashOffset = Math.round((1 - k) * 1200)
+  const fadeOut = s > 4.05 ? 1 - clamp((s - 4.05) / 0.3) : 1
+  return { active: true, dashOffset, opacity: fadeOut.toFixed(2) }
+})
 
 // =========================================================
-// PHASE 02 (4.50s – 9.00s) — USER RESEARCH (Full-Stage UX Telemetry & Flow)
-// Entrance (4.50s – 4.95s): Transition 1 — Bento grid unfolds radially from the expanded
-//   selection frame (clip-path: inset(12% 18% round 24px) -> inset(0% 0% round 0px))
-// Exit (8.55s – 9.00s): Transition 2 — The 3 glowing ergonomic nodes glide horizontally
-//   along a single baseline and magnetically snap together into the center AI Prompt Composer
+// ACT 02 (4.50s – 9.00s) — USER RESEARCH
+// Entrance (3.92s – 4.50s): Unfolds directly from the luminous SVG portal
+// Click Trigger at 7.35s on `Synthesize with AI →`
+// Transition 2 (7.58s – 9.00s): 3 journey nodes collapse into a fluid horizontal SVG energy
+//   ribbon sweeping left-to-right across stage, wiping research cards and springing into Act 03.
 // =========================================================
 const p2State = computed(() => {
   const s = sec.value
-  if (s < 4.5 || s >= 9.0) {
+  if (s < 3.92 || s >= 8.45) {
     return {
       visible: false,
-      clipPath: 'inset(0% 0% 0% 0%)',
       transform: 'none',
-      convergeK: 0,
-      outerSlideLeft: 'none',
-      outerSlideRight: 'none',
-      nodeLeftX: 0,
-      nodeRightX: 0,
-      morphBoxScaleX: 1,
+      clipPath: 'inset(0% 0% 0% 0%)',
+      periLeft: 'none',
+      periRight: 'none',
+      nodeCollapse: 0,
     }
   }
-  if (s < 4.95) {
-    const k = easeOutExpo((s - 4.5) / 0.45)
-    const vIn = ((1 - k) * 12).toFixed(2)
+  if (s < 4.5) {
+    const k = easeOutExpo((s - 3.92) / 0.58)
+    const vIn = ((1 - k) * 14).toFixed(2)
     const hIn = ((1 - k) * 18).toFixed(2)
     const rad = ((1 - k) * 24).toFixed(1)
-    const sc = (0.92 + k * 0.08).toFixed(3)
+    const sc = (1.14 - k * 0.14).toFixed(3)
     return {
       visible: true,
-      clipPath: `inset(${vIn}% ${hIn}% ${vIn}% ${hIn}% round ${rad}px)`,
       transform: `scale(${sc})`,
-      convergeK: 0,
-      outerSlideLeft: 'translate3d(0, 0, 0)',
-      outerSlideRight: 'translate3d(0, 0, 0)',
-      nodeLeftX: 0,
-      nodeRightX: 0,
-      morphBoxScaleX: 1,
+      clipPath: `inset(${vIn}% ${hIn}% ${vIn}% ${hIn}% round ${rad}px)`,
+      periLeft: 'translate3d(0, 0, 0)',
+      periRight: 'translate3d(0, 0, 0)',
+      nodeCollapse: 0,
     }
   }
-  if (s > 8.55) {
-    const k = easeInOutCubic((s - 8.55) / 0.45)
+  if (s > 7.58) {
+    const k = easeInOutCubic((s - 7.58) / 0.87)
+    const wipeLeft = Math.min(100, k * 118).toFixed(2)
     return {
       visible: true,
-      clipPath: 'inset(0% 0% 0% 0% round 0px)',
       transform: 'scale(1)',
-      convergeK: k,
-      outerSlideLeft: `translate3d(${(-k * 125).toFixed(1)}%, 0, 0)`,
-      outerSlideRight: `translate3d(${(k * 125).toFixed(1)}%, 0, 0)`,
-      nodeLeftX: k * 78,
-      nodeRightX: -k * 78,
-      morphBoxScaleX: 1 + k * 0.45,
+      clipPath: `inset(0% 0% 0% ${wipeLeft}%)`,
+      periLeft: `translate3d(${(-k * 135).toFixed(1)}%, 0, 0)`,
+      periRight: `translate3d(${(k * 135).toFixed(1)}%, 0, 0)`,
+      nodeCollapse: k,
     }
   }
   return {
     visible: true,
-    clipPath: 'inset(0% 0% 0% 0% round 0px)',
     transform: 'scale(1)',
-    convergeK: 0,
-    outerSlideLeft: 'translate3d(0, 0, 0)',
-    outerSlideRight: 'translate3d(0, 0, 0)',
-    nodeLeftX: 0,
-    nodeRightX: 0,
-    morphBoxScaleX: 1,
+    clipPath: 'inset(0% 0% 0% 0%)',
+    periLeft: 'translate3d(0, 0, 0)',
+    periRight: 'translate3d(0, 0, 0)',
+    nodeCollapse: 0,
   }
 })
 
-const rl = computed(() => Math.max(0, sec.value - 4.5))
+const rl = computed(() => Math.max(0, sec.value - 3.92))
 const mFriction = computed(() => Math.round(easeOutExpo((rl.value - 0.15) / 0.85) * 42))
 const mTask = computed(() => (easeOutExpo((rl.value - 0.2) / 0.9) * 98.4).toFixed(1))
 const mSus = computed(() => Math.round(easeOutExpo((rl.value - 0.25) / 0.95) * 91))
-const p2Hover = computed(() => sec.value >= 5.65 && sec.value < 8.5)
-const p2Pressed = computed(() => sec.value >= 5.88 && sec.value < 6.12)
-const p2Simplified = computed(() => sec.value >= 5.96)
-const p2Ripple = computed(() => sec.value >= 5.92 && sec.value < 6.55)
+const p2Hover = computed(() => sec.value >= 6.65 && sec.value < 7.8)
+const p2Pressed = computed(() => sec.value >= 7.35 && sec.value < 7.58)
+const p2Triggered = computed(() => sec.value >= 7.45)
+const p2Ripple = computed(() => sec.value >= 7.4 && sec.value < 8.05)
+
+// Fluid Horizontal SVG Energy Ribbon sweeping across center stage (7.62s – 8.65s)
+const tr2Ribbon = computed(() => {
+  const s = sec.value
+  if (s < 7.62 || s > 8.65) return { active: false, dashOffset: 1400, opacity: 0 }
+  const k = easeInOutCubic((s - 7.62) / 0.68)
+  const dashOffset = Math.round((1 - k) * 1400)
+  const fadeOut = s > 8.38 ? 1 - clamp((s - 8.38) / 0.27) : 1
+  return { active: true, dashOffset, opacity: fadeOut.toFixed(2) }
+})
 
 // =========================================================
-// PHASE 03 (9.00s – 13.50s) — CREATIVE AI (Senior Prompt Engineering)
-// Entrance (9.00s – 9.45s): Transition 2 — The converged 3-node capsule springs open
-//   (border-radius & width/height spring interpolation) into the dark glass AI Prompt Composer
-// Exit (13.05s – 13.50s): Transition 3 — Screen-Studio Camera Zoom-Through (scale 1.0 -> 1.55
-//   centered on prompt box) while prompt input bar splits horizontally at its midline (aperture open)
+// ACT 03 (9.00s – 13.50s) — CREATIVE AI
+// Entrance (8.45s – 9.00s): Fluid ribbon springs open (scaleX / scaleY) into AI Prompt Composer
+// Click Trigger at 12.15s on `↑ Generate`
+// Transition 3 (12.38s – 13.50s): High-velocity luminous pulse + Camera Zoom-Through (scale 1.0 -> 1.60)
+//   splitting the prompt box open horizontally (aperture wipe) to reveal Act 04.
 // =========================================================
 const FULL_PROMPT =
   'Architect a low-friction workout logger with WCAG AA contrast, 8pt spatial rhythm, and 60fps micro-interactions.'
 
+const p3Origin = computed(() => `${targets.p3Btn.x.toFixed(0)}px ${targets.p3Btn.y.toFixed(0)}px`)
+
 const p3State = computed(() => {
   const s = sec.value
-  if (s < 9.0 || s >= 13.5) {
+  if (s < 8.45 || s >= 13.08) {
     return {
       visible: false,
-      clipPath: 'inset(0% 0% 0% 0%)',
       transform: 'none',
-      pulseBorder: false,
-      apertureTopTransform: 'none',
-      apertureBotTransform: 'none',
-    }
-  }
-  if (s < 9.45) {
-    const k = easeOutExpo((s - 9.0) / 0.45)
-    const sx = (0.34 + k * 0.66).toFixed(3)
-    const sy = (0.68 + k * 0.32).toFixed(3)
-    const hIn = ((1 - k) * 34).toFixed(2)
-    const rad = (48 - k * 28).toFixed(1)
-    return {
-      visible: true,
-      clipPath: `inset(0% ${hIn}% 0% ${hIn}% round ${rad}px)`,
-      transform: `scale3d(${sx}, ${sy}, 1)`,
-      pulseBorder: true,
-      apertureTopTransform: 'translate3d(0, 0, 0)',
-      apertureBotTransform: 'translate3d(0, 0, 0)',
-    }
-  }
-  if (s > 13.05) {
-    const k = easeInOutCubic((s - 13.05) / 0.45)
-    const zoom = (1 + k * 0.55).toFixed(3)
-    const splitY = (k * 165).toFixed(1)
-    return {
-      visible: true,
       clipPath: 'inset(0% 0% 0% 0%)',
-      transform: `scale(${zoom})`,
       pulseBorder: false,
-      apertureTopTransform: `translate3d(0, -${splitY}px, 0)`,
-      apertureBotTransform: `translate3d(0, ${splitY}px, 0)`,
+      apertureTop: 'none',
+      apertureBot: 'none',
+    }
+  }
+  if (s < 9.0) {
+    const k = easeOutExpo((s - 8.45) / 0.55)
+    const sx = (0.28 + k * 0.72).toFixed(3)
+    const sy = (0.22 + k * 0.78).toFixed(3)
+    const hIn = ((1 - k) * 34).toFixed(2)
+    const rad = (44 - k * 24).toFixed(1)
+    return {
+      visible: true,
+      transform: `scale3d(${sx}, ${sy}, 1)`,
+      clipPath: `inset(0% ${hIn}% 0% ${hIn}% round ${rad}px)`,
+      pulseBorder: true,
+      apertureTop: 'translate3d(0, 0, 0)',
+      apertureBot: 'translate3d(0, 0, 0)',
+    }
+  }
+  if (s > 12.38) {
+    const k = easeInOutCubic((s - 12.38) / 0.7)
+    const zoom = (1 + k * 0.6).toFixed(3)
+    const splitY = (k * 175).toFixed(1)
+    return {
+      visible: true,
+      transform: `scale(${zoom})`,
+      clipPath: 'inset(0% 0% 0% 0%)',
+      pulseBorder: false,
+      apertureTop: `translate3d(0, -${splitY}px, 0)`,
+      apertureBot: `translate3d(0, ${splitY}px, 0)`,
     }
   }
   return {
     visible: true,
-    clipPath: 'inset(0% 0% 0% 0%)',
     transform: 'scale(1)',
-    pulseBorder: s < 9.8,
-    apertureTopTransform: 'translate3d(0, 0, 0)',
-    apertureBotTransform: 'translate3d(0, 0, 0)',
+    clipPath: 'inset(0% 0% 0% 0%)',
+    pulseBorder: s < 9.35,
+    apertureTop: 'translate3d(0, 0, 0)',
+    apertureBot: 'translate3d(0, 0, 0)',
   }
 })
 
-const p3Focused = computed(() => sec.value >= 9.55 && sec.value < 13.05)
+const p3Focused = computed(() => sec.value >= 9.2 && sec.value < 12.38)
 const typedText = computed(() => {
-  const p = clamp((sec.value - 9.62) / 2.25)
+  const p = clamp((sec.value - 9.32) / 2.1)
   const count = Math.floor(p * FULL_PROMPT.length)
   return FULL_PROMPT.slice(0, count)
 })
 const tokenCount = computed(() => Math.round(typedText.value.length * 1.4))
 const p3SubmitReady = computed(() => typedText.value.length >= FULL_PROMPT.length - 1)
-const p3Hover = computed(() => sec.value >= 12.25 && sec.value < 13.15)
-const p3Pressed = computed(() => sec.value >= 12.48 && sec.value < 12.74)
-const p3Ripple = computed(() => sec.value >= 12.52 && sec.value < 13.15)
+const p3Hover = computed(() => sec.value >= 11.85 && sec.value < 12.6)
+const p3Pressed = computed(() => sec.value >= 12.15 && sec.value < 12.38)
+const p3Ripple = computed(() => sec.value >= 12.2 && sec.value < 12.95)
 
 // =========================================================
-// PHASE 04 (13.50s – 18.00s) — MOTION & FRONT-END (Living Voltrep & Portfolio Ecosystem)
-// Entrance (13.50s – 13.95s): Transition 3 — Revealed through the horizontal midline aperture
-//   (clip-path: inset(44% 0% 44% 0%) -> inset(0% 0% 0% 0%)) as camera settles from scale(1.18) -> 1.0
-// Exit (17.55s – 18.00s): Transition 4 — Architectural Dock Collapse: floating cards snap into
-//   a unified Figma Auto-Layout component frame as corner selection handles lock in for 0.0s loop
+// ACT 04 (13.50s – 18.00s) — MOTION & FRONT-END
+// Entrance (13.08s – 13.55s): Revealed through the horizontal midline aperture as camera settles 1.18 -> 1.0
+// Click Trigger 1 at 14.55s: Voltrep `Log Set ✓` button -> emerald `Set Logged ✓`
+// Click Trigger 2 at 16.75s: `Inspect Design System ↗` on Portfolio Case Study Card
+// Transition 4 (16.98s – 18.00s): Portfolio card zooms & morphs its border into a Figma
+//   selection frame with corner handles, looping seamlessly back into Act 01 at 0.00s.
 // =========================================================
 const p4State = computed(() => {
   const s = sec.value
-  if (s < 13.5) {
+  if (s < 13.08) {
     return {
       visible: false,
-      clipPath: 'inset(0% 0% 0% 0%)',
       transform: 'none',
-      dockK: 0,
-      leftCardDock: 'none',
-      rightCardDock: 'none',
+      clipPath: 'inset(0% 0% 0% 0%)',
+      morphK: 0,
+      otherSlideLeft: 'none',
     }
   }
-  if (s < 13.95) {
-    const k = easeOutExpo((s - 13.5) / 0.45)
+  if (s < 13.55) {
+    const k = easeOutExpo((s - 13.08) / 0.47)
     const sc = (1.18 - k * 0.18).toFixed(3)
-    const vAperture = ((1 - k) * 44).toFixed(2)
+    const vAp = ((1 - k) * 44).toFixed(2)
     const rad = ((1 - k) * 20).toFixed(1)
     return {
       visible: true,
-      clipPath: `inset(${vAperture}% 0% ${vAperture}% 0% round ${rad}px)`,
       transform: `scale(${sc})`,
-      dockK: 0,
-      leftCardDock: 'translate3d(0, 0, 0)',
-      rightCardDock: 'translate3d(0, 0, 0)',
+      clipPath: `inset(${vAp}% 0% ${vAp}% 0% round ${rad}px)`,
+      morphK: 0,
+      otherSlideLeft: 'translate3d(0, 0, 0)',
     }
   }
-  if (s > 17.55) {
-    const k = easeInOutCubic((s - 17.55) / 0.45)
-    const vIn = (k * 15).toFixed(2)
-    const hIn = (k * 18).toFixed(2)
+  if (s > 16.98) {
+    const k = easeInOutCubic((s - 16.98) / 1.02)
+    const vIn = (k * 14).toFixed(2)
+    const hIn = (k * 16).toFixed(2)
     const rad = (k * 18).toFixed(1)
-    const sc = (1 - k * 0.12).toFixed(3)
+    const sc = (1 - k * 0.14).toFixed(3)
     return {
       visible: true,
-      clipPath: `inset(${vIn}% ${hIn}% ${vIn}% ${hIn}% round ${rad}px)`,
       transform: `scale(${sc})`,
-      dockK: k,
-      leftCardDock: `translate3d(${(k * 52).toFixed(1)}px, 0, 0) scale(${(1 - k * 0.06).toFixed(3)})`,
-      rightCardDock: `translate3d(${(-k * 52).toFixed(1)}px, 0, 0) scale(${(1 - k * 0.06).toFixed(3)})`,
+      clipPath: `inset(${vIn}% ${hIn}% ${vIn}% ${hIn}% round ${rad}px)`,
+      morphK: k,
+      otherSlideLeft: `translate3d(${(-k * 125).toFixed(1)}%, 0, 0)`,
     }
   }
   return {
     visible: true,
-    clipPath: 'inset(0% 0% 0% 0%)',
     transform: 'scale(1)',
-    dockK: 0,
-    leftCardDock: 'translate3d(0, 0, 0)',
-    rightCardDock: 'translate3d(0, 0, 0)',
+    clipPath: 'inset(0% 0% 0% 0%)',
+    morphK: 0,
+    otherSlideLeft: 'translate3d(0, 0, 0)',
   }
 })
 
-const p4CheckHover = computed(() => sec.value >= 14.55 && sec.value < 15.65)
-const p4CheckPressed = computed(() => sec.value >= 14.85 && sec.value < 15.1)
-const p4VoltDone = computed(() => sec.value >= 14.95)
-const p4CheckRipple = computed(() => sec.value >= 14.9 && sec.value < 15.55)
-const p4NavIdx = computed(() => (sec.value < 15.65 ? 0 : 1))
-const p4CaseHover = computed(() => sec.value >= 15.85 && sec.value < 17.5)
+const p4CheckHover = computed(() => sec.value >= 14.25 && sec.value < 15.2)
+const p4CheckPressed = computed(() => sec.value >= 14.55 && sec.value < 14.78)
+const p4VoltDone = computed(() => sec.value >= 14.65)
+const p4CheckRipple = computed(() => sec.value >= 14.6 && sec.value < 15.2)
+const p4NavIdx = computed(() => (sec.value < 15.3 ? 0 : 1))
+const p4CaseHover = computed(() => sec.value >= 16.05 && sec.value < 17.2)
+const p4CasePressed = computed(() => sec.value >= 16.75 && sec.value < 16.98)
+const p4CaseRipple = computed(() => sec.value >= 16.8 && sec.value < 17.45)
 
 // =========================================================
-// UNIFIED STAGE CURSOR (Targeting Measured getBoundingClientRect() Coordinates)
+// UNIFIED STAGE CURSOR (Pixel-Accurate getBoundingClientRect() Targeting)
 // =========================================================
 const stageCursor = computed(() => {
   const s = sec.value
@@ -385,60 +390,60 @@ const stageCursor = computed(() => {
   const f3 = targets.p3Field
   const b3 = targets.p3Btn
   const c4 = targets.p4Check
-  const k4 = targets.p4Case
+  const k4 = targets.p4CaseBtn
 
   let pos = { x: b1.x, y: b1.y }
   let ibeam = false
   let pressed = false
 
-  if (s < 4.5) {
-    // Phase 01: Approaches Production UI toggle and lands dead-center on b1
-    const start = { x: b1.x - 140, y: b1.y + 95 }
-    if (s < 1.2) {
-      const k = easeInOutCubic(clamp((s - 0.4) / 0.8))
-      pos = bez(start, { x: b1.x - 60, y: b1.y + 15 }, b1, k)
+  if (s < 3.92) {
+    // Act 01: Approaches `Validate with Users →` and clicks at 2.95s
+    const start = { x: b1.x - 150, y: b1.y + 85 }
+    if (s < 2.2) {
+      const k = easeInOutCubic(clamp((s - 0.5) / 1.7))
+      pos = bez(start, { x: b1.x - 65, y: b1.y + 15 }, b1, k)
     } else {
       pos = { x: b1.x, y: b1.y }
     }
     pressed = p1Pressed.value
-  } else if (s < 9.0) {
-    // Phase 02: Glides from b1 to Simplify button (b2) and lands dead-center
-    if (s < 5.75) {
-      const k = easeInOutCubic(clamp((s - 4.75) / 1.0))
-      pos = bez(b1, { x: (b1.x + b2.x) / 2, y: Math.min(b1.y, b2.y) - 35 }, b2, k)
+  } else if (s < 8.45) {
+    // Act 02: Glides dead-center onto `Synthesize with AI →` and clicks at 7.35s
+    if (s < 6.6) {
+      const k = easeInOutCubic(clamp((s - 4.7) / 1.9))
+      pos = bez(b1, { x: (b1.x + b2.x) / 2, y: Math.min(b1.y, b2.y) - 36 }, b2, k)
     } else {
       pos = { x: b2.x, y: b2.y }
     }
     pressed = p2Pressed.value
-  } else if (s < 13.5) {
-    // Phase 03: Glides into prompt input field (f3), types as I-beam, then glides dead-center onto ↑ Generate (b3)
-    if (s < 9.58) {
-      const k = easeInOutCubic(clamp((s - 9.05) / 0.53))
+  } else if (s < 13.08) {
+    // Act 03: Glides into prompt input (I-beam), types, then glides dead-center onto `↑ Generate`
+    if (s < 9.25) {
+      const k = easeInOutCubic(clamp((s - 8.6) / 0.65))
       pos = bez(b2, { x: f3.x - 40, y: f3.y - 30 }, f3, k)
-    } else if (s < 11.75) {
+    } else if (s < 11.45) {
       pos = { x: f3.x + Math.sin(s * 3) * 4, y: f3.y }
       ibeam = true
-    } else if (s < 12.38) {
-      const k = easeInOutCubic(clamp((s - 11.75) / 0.63))
+    } else if (s < 11.95) {
+      const k = easeInOutCubic(clamp((s - 11.45) / 0.5))
       pos = bez(f3, { x: (f3.x + b3.x) / 2, y: f3.y - 24 }, b3, k)
     } else {
       pos = { x: b3.x, y: b3.y }
     }
     pressed = p3Pressed.value
   } else {
-    // Phase 04: Glides dead-center onto Voltrep Log Set ✓ button (c4), clicks, then glides onto Case Study Card (k4)
-    if (s < 14.7) {
-      const k = easeInOutCubic(clamp((s - 13.85) / 0.85))
+    // Act 04: Clicks Voltrep `Log Set ✓`, then glides dead-center onto `Inspect Design System ↗`
+    if (s < 14.3) {
+      const k = easeInOutCubic(clamp((s - 13.35) / 0.95))
       pos = bez(b3, { x: (b3.x + c4.x) / 2, y: c4.y - 40 }, c4, k)
-    } else if (s < 15.45) {
+    } else if (s < 15.2) {
       pos = { x: c4.x, y: c4.y }
     } else if (s < 16.05) {
-      const k = easeInOutCubic(clamp((s - 15.45) / 0.6))
-      pos = bez(c4, { x: (c4.x + k4.x) / 2, y: c4.y - 25 }, k4, k)
+      const k = easeInOutCubic(clamp((s - 15.2) / 0.85))
+      pos = bez(c4, { x: (c4.x + k4.x) / 2, y: c4.y - 28 }, k4, k)
     } else {
       pos = { x: k4.x, y: k4.y }
     }
-    pressed = p4CheckPressed.value
+    pressed = p4CheckPressed.value || p4CasePressed.value
   }
 
   return {
@@ -451,9 +456,9 @@ const stageCursor = computed(() => {
 
 const ambientTheme = computed(() => {
   const s = sec.value
-  if (s < 4.5) return 'ambient-design'
-  if (s < 9.0) return 'ambient-research'
-  if (s < 13.5) return 'ambient-ai'
+  if (s < 3.92) return 'ambient-design'
+  if (s < 8.45) return 'ambient-research'
+  if (s < 13.08) return 'ambient-ai'
   return 'ambient-frontend'
 })
 
@@ -480,9 +485,9 @@ onMounted(() => {
     elapsedMs.value = Number(tParam) * 1000
   } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     isAutoPlaying.value = false
-    elapsedMs.value = 2100
+    elapsedMs.value = 1800
   } else {
-    elapsedMs.value = 1950 // opens immediately on Phase 01: UX/UI DESIGN with Production UI active
+    elapsedMs.value = 1200 // opens cleanly on Act 01: UX/UI DESIGN
   }
   nextTick(() => {
     measureTargets()
@@ -509,7 +514,8 @@ onUnmounted(() => {
 
       <div ref="viewportRef" class="camera-viewport">
         <!-- =========================================================
-             PHASE 01 (0.0s – 4.5s) — UX/UI DESIGN (FULL-STAGE DESIGN SYSTEM)
+             ACT 01 (0.0s – 4.5s) — UX/UI DESIGN
+             Click Trigger: `Validate with Users →` -> Camera Dive + Luminous SVG Curve
              ========================================================= -->
         <div
           v-show="p1State.visible"
@@ -517,12 +523,13 @@ onUnmounted(() => {
           :style="{
             clipPath: p1State.clipPath,
             transform: p1State.transform,
+            transformOrigin: p1Origin,
           }"
         >
-          <!-- PERIPHERAL FLOATING WIDGETS (Full-Canvas Spatial Depth) -->
+          <!-- PERIPHERAL FLOATING WIDGETS -->
           <div
             class="peri-card peri-top-left"
-            :style="{ transform: `${p1State.slideLeftTransform} translate3d(${driftX(0.4).toFixed(1)}px, ${driftY(0.4).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p1State.periLeft} translate3d(${driftX(0.4).toFixed(1)}px, ${driftY(0.4).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">TYPOGRAPHY SCALE</span>
@@ -531,16 +538,16 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-top-right"
-            :style="{ transform: `${p1State.slideLeftTransform} translate3d(${driftX(1.6).toFixed(1)}px, ${driftY(1.6).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p1State.periRight} translate3d(${driftX(1.6).toFixed(1)}px, ${driftY(1.6).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
-            <span class="peri-label">ACCESSIBILITY AUDIT</span>
-            <span class="peri-value is-emerald tabular-nums">WCAG AA 14.8:1 · Passed ✓</span>
+            <span class="peri-label">CONTRAST TOKEN</span>
+            <span class="peri-value is-emerald tabular-nums">14.8:1 AAA · Passed ✓</span>
           </div>
 
           <div
             class="peri-card peri-mid-left"
-            :style="{ transform: `${p1State.slideLeftTransform} translate3d(${driftX(2.5).toFixed(1)}px, ${driftY(2.5).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p1State.periLeft} translate3d(${driftX(2.5).toFixed(1)}px, ${driftY(2.5).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">SPATIAL RHYTHM</span>
@@ -549,7 +556,7 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-bottom-right"
-            :style="{ transform: `${p1State.slideLeftTransform} translate3d(${driftX(3.4).toFixed(1)}px, ${driftY(3.4).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p1State.periRight} translate3d(${driftX(3.4).toFixed(1)}px, ${driftY(3.4).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">SEMANTIC COLOR TOKENS</span>
@@ -560,46 +567,38 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- CENTER CORE WORKSPACE -->
-          <span class="seq-kicker is-gold" :style="{ transform: p1State.slideLeftTransform }">
-            Cognitive Ergonomics · 8pt Grid · WCAG AA Contrast · Design Tokens
-          </span>
-          <h1 class="seq-title" :style="{ transform: p1State.slideLeftTransform }">
+          <span class="seq-kicker is-gold">8pt Grid · WCAG AA Contrast · Design Tokens</span>
+          <h1 class="seq-title">
             <span class="tone-ice">UX/UI</span>
             <span class="tone-gold">DESIGN</span>
           </h1>
 
           <div class="figma-workspace">
-            <div class="figma-header" :style="{ transform: p1State.slideLeftTransform }">
+            <div class="figma-header">
               <div class="fh-left">
                 <span class="fh-dots" aria-hidden="true"><i /><i /><i /></span>
-                <span class="fh-file tabular-nums">Frame / Voltrep_System · 8pt Grid</span>
+                <span class="fh-file tabular-nums">Frame / Voltrep_System · 8pt Grid · WCAG AA</span>
               </div>
 
-              <!-- Interactive Wireframe <-> Production UI Pill Toggle -->
-              <div class="mode-pills">
-                <span class="mode-pill" :class="{ active: !p1ProdUI }">Wireframe</span>
-                <button
-                  ref="p1BtnRef"
-                  type="button"
-                  tabindex="-1"
-                  class="mode-pill is-target-btn"
-                  :class="{
-                    'is-hover': p1Hover && !p1ProdUI,
-                    'active-hc': p1ProdUI,
-                    'is-pressed': p1Pressed,
-                  }"
-                >
-                  <span>Production UI</span>
-                  <span v-if="p1Ripple" class="click-ripple" aria-hidden="true" />
-                </button>
-              </div>
-
-              <span class="fh-wcag tabular-nums">WCAG AA · 14.8:1</span>
+              <!-- Cause-and-Effect Trigger Button -->
+              <button
+                ref="p1BtnRef"
+                type="button"
+                tabindex="-1"
+                class="trigger-pill is-gold-trigger is-target-btn"
+                :class="{
+                  'is-hover': p1Hover,
+                  'is-active': p1Validated,
+                  'is-pressed': p1Pressed,
+                }"
+              >
+                <span>Validate with Users →</span>
+                <span v-if="p1Ripple" class="click-ripple" aria-hidden="true" />
+              </button>
             </div>
 
             <div class="figma-body">
-              <div class="figma-panel" :style="{ transform: p1State.slideLeftTransform }" aria-hidden="true">
+              <div class="figma-panel" aria-hidden="true">
                 <div class="fp-title">COMPONENT TREE</div>
                 <div class="layer-item is-active"><span class="li-icon">#</span> Frame / Hero</div>
                 <div class="layer-item"><span class="li-icon">⊞</span> Auto Layout</div>
@@ -607,12 +606,7 @@ onUnmounted(() => {
               </div>
 
               <div class="figma-stage-center">
-                <!-- Shared-Element FLIP Selection Bounding Box (expands outward in Transition 1) -->
-                <div
-                  class="selection-frame"
-                  :class="{ 'is-polished': p1ProdUI }"
-                  :style="{ transform: p1State.frameFlipTransform }"
-                >
+                <div class="selection-frame is-polished">
                   <span class="handle h-tl" aria-hidden="true" />
                   <span class="handle h-tr" aria-hidden="true" />
                   <span class="handle h-bl" aria-hidden="true" />
@@ -620,14 +614,10 @@ onUnmounted(() => {
                   <span class="redline r-top tabular-nums" aria-hidden="true">24px</span>
                   <span class="redline r-side tabular-nums" aria-hidden="true">16px</span>
 
-                  <div
-                    class="ui-preview-card"
-                    :class="{ 'is-hc': p1ProdUI }"
-                    :style="{ transform: p1State.slideLeftTransform }"
-                  >
+                  <div class="ui-preview-card is-hc">
                     <div class="upc-row">
-                      <span class="upc-kicker">{{ p1ProdUI ? 'VOLTREP · PRODUCTION TOKEN' : 'WIREFRAME · LOW-FI SKELETON' }}</span>
-                      <span class="upc-chip tabular-nums">{{ p1ProdUI ? 'WCAG AA ✓' : 'Draft' }}</span>
+                      <span class="upc-kicker">VOLTREP · PRODUCTION TOKEN</span>
+                      <span class="upc-chip tabular-nums">14.8:1 AAA ✓</span>
                     </div>
                     <div class="upc-title">Hack Squat · 120 kg × 6 reps</div>
                     <div class="upc-bar"><div class="upc-bar-fill" /></div>
@@ -635,7 +625,7 @@ onUnmounted(() => {
                 </div>
               </div>
 
-              <div class="figma-panel" :style="{ transform: p1State.slideLeftTransform }" aria-hidden="true">
+              <div class="figma-panel" aria-hidden="true">
                 <div class="fp-title">UI TOKENS</div>
                 <div class="token-row"><i class="sw" style="background:#050507" /><span>#050507</span></div>
                 <div class="token-row"><i class="sw" style="background:#E2B878" /><span>#E2B878</span></div>
@@ -646,8 +636,37 @@ onUnmounted(() => {
           </div>
         </div>
 
+        <!-- TRANSITION 1: LUMINOUS CHAMPAGNE-GOLD SVG PORTAL CURVE -->
+        <svg
+          v-if="tr1Curve.active"
+          class="transition-svg-overlay"
+          viewBox="0 0 1200 600"
+          preserveAspectRatio="none"
+          :style="{ opacity: tr1Curve.opacity }"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="goldCurveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#E2B878" stop-opacity="0.2" />
+              <stop offset="50%" stop-color="#E2B878" stop-opacity="1" />
+              <stop offset="100%" stop-color="#34D399" stop-opacity="0.95" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M 80 460 C 320 460, 420 120, 620 280 C 800 420, 920 160, 1140 140"
+            fill="none"
+            stroke="url(#goldCurveGrad)"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-dasharray="1200"
+            :stroke-dashoffset="tr1Curve.dashOffset"
+            style="filter: drop-shadow(0 0 14px rgba(226, 184, 120, 0.85));"
+          />
+        </svg>
+
         <!-- =========================================================
-             PHASE 02 (4.5s – 9.0s) — USER RESEARCH (FULL-STAGE UX TELEMETRY)
+             ACT 02 (4.5s – 9.0s) — USER RESEARCH
+             Click Trigger: `Synthesize with AI →` -> Fluid SVG Energy Ribbon
              ========================================================= -->
         <div
           v-show="p2State.visible"
@@ -660,7 +679,7 @@ onUnmounted(() => {
           <!-- PERIPHERAL FLOATING WIDGETS -->
           <div
             class="peri-card peri-top-left"
-            :style="{ transform: `${p2State.outerSlideLeft} translate3d(${driftX(0.8).toFixed(1)}px, ${driftY(0.8).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p2State.periLeft} translate3d(${driftX(0.8).toFixed(1)}px, ${driftY(0.8).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">HEURISTIC EVALUATION</span>
@@ -669,7 +688,7 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-top-right"
-            :style="{ transform: `${p2State.outerSlideRight} translate3d(${driftX(1.9).toFixed(1)}px, ${driftY(1.9).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p2State.periRight} translate3d(${driftX(1.9).toFixed(1)}px, ${driftY(1.9).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">DECISION LATENCY</span>
@@ -678,7 +697,7 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-mid-left"
-            :style="{ transform: `${p2State.outerSlideLeft} translate3d(${driftX(2.7).toFixed(1)}px, ${driftY(2.7).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p2State.periLeft} translate3d(${driftX(2.7).toFixed(1)}px, ${driftY(2.7).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">SAMPLE COHORT</span>
@@ -687,47 +706,43 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-bottom-right"
-            :style="{ transform: `${p2State.outerSlideRight} translate3d(${driftX(3.8).toFixed(1)}px, ${driftY(3.8).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p2State.periRight} translate3d(${driftX(3.8).toFixed(1)}px, ${driftY(3.8).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">ATTENTION TELEMETRY</span>
             <span class="peri-value is-gold tabular-nums">94.2% Primary CTA Fixation</span>
           </div>
 
-          <span class="seq-kicker is-emerald" :style="{ transform: p2State.outerSlideLeft }">
-            -42% Cognitive Load · 98.4% Task Success · SUS Score 91/100 · Heuristic Audit Passed
-          </span>
-          <h1 class="seq-title" :style="{ transform: p2State.outerSlideRight }">
+          <span class="seq-kicker is-emerald">-42% Cognitive Friction · 98.4% Task Completion · SUS Score 91/100</span>
+          <h1 class="seq-title">
             <span class="tone-ice">USER</span>
             <span class="tone-emerald">RESEARCH</span>
           </h1>
 
-          <!-- Interactive Flow Filter Bar: Discover | Validate | Simplify -->
-          <div class="filter-pill-bar" :style="{ transform: p2State.outerSlideLeft }">
-            <span class="filter-pill">Discover</span>
-            <span class="filter-pill" :class="{ 'is-active-gold': !p2Simplified }">Validate</span>
+          <!-- Cause-and-Effect Trigger Pill on Validated Flow -->
+          <div class="research-action-bar">
+            <span class="ra-journey" aria-hidden="true">Discover → Validate → Simplify</span>
             <button
               ref="p2BtnRef"
               type="button"
               tabindex="-1"
-              class="filter-pill is-target-btn"
+              class="trigger-pill is-emerald-trigger is-target-btn"
               :class="{
-                'is-hover': p2Hover && !p2Simplified,
-                'is-active-emerald': p2Simplified,
+                'is-hover': p2Hover,
+                'is-active': p2Triggered,
                 'is-pressed': p2Pressed,
               }"
             >
-              <span>Simplify</span>
+              <span>Synthesize with AI →</span>
               <span v-if="p2Ripple" class="click-ripple is-emerald" aria-hidden="true" />
             </button>
           </div>
 
           <!-- Wide 3-Column Bento Layout -->
           <div class="bento-research-3col">
-            <!-- Col 1: -42% Cognitive Load -->
-            <div class="glass-panel bento-card" :style="{ transform: p2State.outerSlideLeft }">
+            <div class="glass-panel bento-card">
               <div class="bc-top">
-                <span class="bc-tag">COGNITIVE LOAD</span>
+                <span class="bc-tag">COGNITIVE FRICTION</span>
                 <span class="bc-trend">↓ Optimal</span>
               </div>
               <div class="bc-main-row">
@@ -740,8 +755,7 @@ onUnmounted(() => {
               <span class="bc-sub">Friction reduction across active set logging</span>
             </div>
 
-            <!-- Col 2: 98.4% Task Completion + SUS 91/100 -->
-            <div class="glass-panel bento-card" :style="{ transform: p2State.outerSlideLeft }">
+            <div class="glass-panel bento-card">
               <div class="bc-top">
                 <span class="bc-tag">TASK COMPLETION</span>
                 <span class="bc-sus tabular-nums">SUS {{ mSus }}/100</span>
@@ -755,55 +769,56 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <!-- Col 3: User Flow Architecture (3 glowing nodes converge along baseline into AI Prompt Composer in Transition 2) -->
-            <div
-              class="glass-panel bento-card"
-              :class="{ 'is-converging-composer': p2State.convergeK > 0.1 }"
-              :style="{
-                transform: p2State.convergeK > 0
-                  ? `translate3d(${(-p2State.convergeK * 290).toFixed(1)}px, 0, 0) scaleX(${p2State.morphBoxScaleX.toFixed(3)})`
-                  : 'none',
-              }"
-            >
+            <div class="glass-panel bento-card">
               <div class="bc-top">
-                <span class="bc-tag">USER FLOW PATH</span>
-                <span class="bc-flow-status" :class="{ simplified: p2Simplified }">
-                  {{ p2Simplified ? '3 Ergonomic Nodes ✓' : '6 Legacy Steps' }}
-                </span>
+                <span class="bc-tag">VALIDATED JOURNEY</span>
+                <span class="bc-flow-status simplified">3 Ergonomic Nodes ✓</span>
               </div>
-
-              <div v-if="!p2Simplified" class="flow-row is-cluttered">
-                <span class="f-chip">Splash</span>
-                <span class="f-chip">Menu</span>
-                <span class="f-chip">List</span>
-                <span class="f-chip">Modal</span>
-                <span class="f-chip">Edit</span>
-                <span class="f-chip">Save</span>
-              </div>
-
-              <div v-else class="flow-row is-clean">
-                <span
-                  class="f-node"
-                  :style="{ transform: `translate3d(${p2State.nodeLeftX.toFixed(1)}px, 0, 0)` }"
-                >
-                  <i class="f-dot ice" />Select
-                </span>
-                <span class="f-connector" :style="{ transform: `scaleX(${(1 - p2State.convergeK).toFixed(2)})` }" />
-                <span class="f-node is-gold"><i class="f-dot gold" />Log Set</span>
-                <span class="f-connector" :style="{ transform: `scaleX(${(1 - p2State.convergeK).toFixed(2)})` }" />
-                <span
-                  class="f-node is-emerald"
-                  :style="{ transform: `translate3d(${p2State.nodeRightX.toFixed(1)}px, 0, 0)` }"
-                >
-                  <i class="f-dot emerald" />Sync ✓
-                </span>
+              <div
+                class="flow-row is-clean"
+                :style="{ transform: `scaleX(${(1 - p2State.nodeCollapse * 0.65).toFixed(3)})` }"
+              >
+                <span class="f-node"><i class="f-dot ice" />Discover</span>
+                <span class="f-connector" />
+                <span class="f-node is-gold"><i class="f-dot gold" />Validate</span>
+                <span class="f-connector" />
+                <span class="f-node is-emerald"><i class="f-dot emerald" />Simplify</span>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- TRANSITION 2: FLUID HORIZONTAL SVG ENERGY RIBBON -->
+        <svg
+          v-if="tr2Ribbon.active"
+          class="transition-svg-overlay"
+          viewBox="0 0 1200 600"
+          preserveAspectRatio="none"
+          :style="{ opacity: tr2Ribbon.opacity }"
+          aria-hidden="true"
+        >
+          <defs>
+            <linearGradient id="ribbonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#34D399" stop-opacity="0.3" />
+              <stop offset="50%" stop-color="#E2B878" stop-opacity="1" />
+              <stop offset="100%" stop-color="#F5F5F7" stop-opacity="0.9" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M -40 315 Q 300 265, 600 315 T 1240 315"
+            fill="none"
+            stroke="url(#ribbonGrad)"
+            stroke-width="6"
+            stroke-linecap="round"
+            stroke-dasharray="1400"
+            :stroke-dashoffset="tr2Ribbon.dashOffset"
+            style="filter: drop-shadow(0 0 18px rgba(226, 184, 120, 0.9));"
+          />
+        </svg>
+
         <!-- =========================================================
-             PHASE 03 (9.0s – 13.5s) — CREATIVE AI (SENIOR PROMPT ENGINEERING)
+             ACT 03 (9.0s – 13.5s) — CREATIVE AI
+             Click Trigger: `↑ Generate` -> High-Velocity Pulse + Zoom-Through Aperture
              ========================================================= -->
         <div
           v-show="p3State.visible"
@@ -811,12 +826,13 @@ onUnmounted(() => {
           :style="{
             clipPath: p3State.clipPath,
             transform: p3State.transform,
+            transformOrigin: p3Origin,
           }"
         >
           <!-- PERIPHERAL FLOATING CONTEXT CHIPS -->
           <div
             class="peri-card peri-top-left"
-            :style="{ transform: `${p3State.apertureTopTransform} translate3d(${driftX(1.1).toFixed(1)}px, ${driftY(1.1).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p3State.apertureTop} translate3d(${driftX(1.1).toFixed(1)}px, ${driftY(1.1).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">CONTEXT ATTACHMENT 01</span>
@@ -825,7 +841,7 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-top-right"
-            :style="{ transform: `${p3State.apertureTopTransform} translate3d(${driftX(2.1).toFixed(1)}px, ${driftY(2.1).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p3State.apertureTop} translate3d(${driftX(2.1).toFixed(1)}px, ${driftY(2.1).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">CONTEXT ATTACHMENT 02</span>
@@ -834,7 +850,7 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-mid-left"
-            :style="{ transform: `${p3State.apertureBotTransform} translate3d(${driftX(3.0).toFixed(1)}px, ${driftY(3.0).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p3State.apertureBot} translate3d(${driftX(3.0).toFixed(1)}px, ${driftY(3.0).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">ACCESSIBILITY CONSTRAINTS</span>
@@ -843,17 +859,17 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-bottom-right"
-            :style="{ transform: `${p3State.apertureBotTransform} translate3d(${driftX(4.1).toFixed(1)}px, ${driftY(4.1).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p3State.apertureBot} translate3d(${driftX(4.1).toFixed(1)}px, ${driftY(4.1).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">OUTPUT TARGET</span>
             <span class="peri-value tabular-nums">Vue 3 SFC · 60fps GPU Transforms</span>
           </div>
 
-          <span class="seq-kicker is-gold" :style="{ transform: p3State.apertureTopTransform }">
+          <span class="seq-kicker is-gold" :style="{ transform: p3State.apertureTop }">
             System Prompt → Component Architecture → Token Validation
           </span>
-          <h1 class="seq-title" :style="{ transform: p3State.apertureTopTransform }">
+          <h1 class="seq-title" :style="{ transform: p3State.apertureTop }">
             <span class="tone-ice">CREATIVE</span>
             <span class="tone-gold">AI</span>
           </h1>
@@ -865,20 +881,18 @@ onUnmounted(() => {
               'is-pulse': p3State.pulseBorder,
             }"
           >
-            <!-- Top half splits upward during Transition 3 Midline Aperture Open -->
-            <div class="prompt-top" :style="{ transform: p3State.apertureTopTransform }">
+            <div class="prompt-top" :style="{ transform: p3State.apertureTop }">
               <span class="model-pill"><span class="pill-dot" aria-hidden="true" />System Architecture Prompt</span>
               <span class="ctx-pill tabular-nums" :class="{ lit: typedText.length > 0 }">
                 {{ tokenCount }} tok · Validated
               </span>
             </div>
 
-            <div ref="p3FieldRef" class="prompt-field" :style="{ transform: p3State.apertureTopTransform }">
+            <div ref="p3FieldRef" class="prompt-field" :style="{ transform: p3State.apertureTop }">
               <span class="prompt-text">{{ typedText }}</span><span class="prompt-caret" :class="{ on: p3Focused }" aria-hidden="true" />
             </div>
 
-            <!-- Bottom half splits downward during Transition 3 Midline Aperture Open -->
-            <div class="prompt-bottom" :style="{ transform: p3State.apertureBotTransform }">
+            <div class="prompt-bottom" :style="{ transform: p3State.apertureBot }">
               <div class="chip-group" aria-hidden="true">
                 <span class="attach-chip">Design System v2</span>
                 <span class="attach-chip">User Flow Data</span>
@@ -904,7 +918,9 @@ onUnmounted(() => {
         </div>
 
         <!-- =========================================================
-             PHASE 04 (13.5s – 18.0s) — MOTION & FRONT-END (LIVING VOLTREP & PORTFOLIO)
+             ACT 04 (13.5s – 18.0s) — MOTION & FRONT-END
+             Click Trigger 1: Voltrep `Log Set ✓` -> emerald `Set Logged ✓`
+             Click Trigger 2: `Inspect Design System ↗` -> Morphs card into Figma Selection Frame
              ========================================================= -->
         <div
           v-show="p4State.visible"
@@ -917,7 +933,7 @@ onUnmounted(() => {
           <!-- PERIPHERAL FLOATING TELEMETRY -->
           <div
             class="peri-card peri-top-left"
-            :style="{ transform: `translate3d(${driftX(0.6).toFixed(1)}px, ${driftY(0.6).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p4State.otherSlideLeft} translate3d(${driftX(0.6).toFixed(1)}px, ${driftY(0.6).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">FRAME TIMING</span>
@@ -926,7 +942,7 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-top-right"
-            :style="{ transform: `translate3d(${driftX(1.7).toFixed(1)}px, ${driftY(1.7).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p4State.otherSlideLeft} translate3d(${driftX(1.7).toFixed(1)}px, ${driftY(1.7).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">LAYOUT STABILITY</span>
@@ -935,7 +951,7 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-mid-left"
-            :style="{ transform: `translate3d(${driftX(2.9).toFixed(1)}px, ${driftY(2.9).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p4State.otherSlideLeft} translate3d(${driftX(2.9).toFixed(1)}px, ${driftY(2.9).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">PRODUCTION STACK</span>
@@ -944,42 +960,35 @@ onUnmounted(() => {
 
           <div
             class="peri-card peri-bottom-right"
-            :style="{ transform: `translate3d(${driftX(3.6).toFixed(1)}px, ${driftY(3.6).toFixed(1)}px, 0)` }"
+            :style="{ transform: `${p4State.otherSlideLeft} translate3d(${driftX(3.6).toFixed(1)}px, ${driftY(3.6).toFixed(1)}px, 0)` }"
             aria-hidden="true"
           >
             <span class="peri-label">SPRING PHYSICS</span>
             <span class="peri-value is-gold tabular-nums">cubic-bezier(0.16, 1, 0.3, 1)</span>
           </div>
 
-          <span class="seq-kicker is-gold">Voltrep Production UI · 60 FPS GPU Compositing · Zero Layout Shift</span>
-          <h1 class="seq-title">
+          <span class="seq-kicker is-gold" :style="{ transform: p4State.otherSlideLeft }">
+            Voltrep Production UI · 60 FPS GPU Compositing · Zero Layout Shift
+          </span>
+          <h1 class="seq-title" :style="{ transform: p4State.otherSlideLeft }">
             <span class="tone-gold">MOTION &amp;</span>
             <span class="tone-ice">FRONT-END</span>
           </h1>
 
           <!-- Elastic Sliding Pill Navbar: Overview | Case Studies | Journey -->
-          <div class="live-navbar-pill" aria-hidden="true">
+          <div class="live-navbar-pill" :style="{ transform: p4State.otherSlideLeft }" aria-hidden="true">
             <span class="nav-thumb" :style="{ transform: `translate3d(${p4NavIdx * 100}%, 0, 0)` }" />
             <span class="nav-item" :class="{ active: p4NavIdx === 0 }">Overview</span>
             <span class="nav-item" :class="{ active: p4NavIdx === 1 }">Case Studies</span>
             <span class="nav-item">Journey</span>
           </div>
 
-          <div class="frontend-showcase" :class="{ 'is-dock-collapsing': p4State.dockK > 0.05 }">
-            <!-- Transition 4 Shared-Element Auto-Layout Selection Frame & Corner Handles -->
-            <div v-if="p4State.dockK > 0.05" class="dock-selection-frame" aria-hidden="true">
-              <span class="handle h-tl" />
-              <span class="handle h-tr" />
-              <span class="handle h-bl" />
-              <span class="handle h-br" />
-              <span class="redline r-top tabular-nums">Auto Layout · Frame / Hero</span>
-            </div>
-
+          <div class="frontend-showcase">
             <!-- Left/Center: Voltrep Workout Set Logger -->
             <div
               class="glass-panel volt-card"
               :class="{ done: p4VoltDone }"
-              :style="{ transform: p4State.leftCardDock }"
+              :style="{ transform: p4State.otherSlideLeft }"
             >
               <div class="vc-head">
                 <span class="vc-brand">VOLTREP · PRODUCTION WORKOUT LOGGER</span>
@@ -1016,20 +1025,46 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <!-- Right: Case Study Card (Voltrep Web App) -->
+            <!-- Right: Case Study Card (Morphs into Figma Selection Frame on click of Inspect Design System ↗) -->
             <div
-              ref="p4CaseRef"
               class="glass-panel case-card"
-              :class="{ hover: p4CaseHover }"
-              :style="{ transform: p4State.rightCardDock }"
+              :class="{
+                hover: p4CaseHover,
+                'is-figma-morph': p4State.morphK > 0.05,
+              }"
+              :style="{
+                transform: p4State.morphK > 0
+                  ? `translate3d(${(-p4State.morphK * 175).toFixed(1)}px, 0, 0) scale(${(1 + p4State.morphK * 0.14).toFixed(3)})`
+                  : 'none',
+              }"
             >
+              <template v-if="p4State.morphK > 0.08">
+                <span class="handle h-tl" aria-hidden="true" />
+                <span class="handle h-tr" aria-hidden="true" />
+                <span class="handle h-bl" aria-hidden="true" />
+                <span class="handle h-br" aria-hidden="true" />
+                <span class="redline r-top tabular-nums" aria-hidden="true">Frame / Voltrep_System</span>
+              </template>
+
               <div class="cc-top">
                 <span class="cc-tag">FEATURED CASE STUDY</span>
                 <span class="cc-pill">60 FPS · PWA</span>
               </div>
               <div class="cc-title">Voltrep Web App</div>
               <div class="cc-specs">WCAG AA Contrast · 8pt Spatial Rhythm · Zero Paywall</div>
-              <div class="cc-cta">Explore Architecture →</div>
+              <button
+                ref="p4CaseBtnRef"
+                type="button"
+                tabindex="-1"
+                class="cc-inspect-btn is-target-btn"
+                :class="{
+                  'is-hover': p4CaseHover,
+                  'is-pressed': p4CasePressed,
+                }"
+              >
+                <span>Inspect Design System ↗</span>
+                <span v-if="p4CaseRipple" class="click-ripple" aria-hidden="true" />
+              </button>
             </div>
           </div>
         </div>
@@ -1909,8 +1944,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.28rem;
-  flex-wrap: wrap;
+  gap: 0.24rem;
+  flex-wrap: nowrap;
 }
 
 .f-chip {
@@ -1925,14 +1960,16 @@ onUnmounted(() => {
 .f-node {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.24rem 0.52rem;
+  gap: 0.26rem;
+  padding: 0.22rem 0.46rem;
   border-radius: 999px;
   background: #08090D;
   border: 1px solid rgba(245, 245, 247, 0.28);
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #F5F5F7;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .f-node.is-gold { border-color: rgba(226, 184, 120, 0.6); }
@@ -2291,39 +2328,119 @@ onUnmounted(() => {
   color: #6EE7B7;
 }
 
-.cc-cta {
-  margin-top: 0.12rem;
-  font-size: 0.77rem;
-  font-weight: 700;
+.cc-inspect-btn {
+  align-self: flex-start;
+  margin-top: 0.14rem;
+  padding: 0.34rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(226, 184, 120, 0.45);
+  background: rgba(226, 184, 120, 0.12);
   color: #E2B878;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.cc-inspect-btn.is-hover {
+  background: #E2B878;
+  border-color: #E2B878;
+  color: #050507;
+}
+
+.cc-inspect-btn.is-pressed {
+  transform: scale(0.92);
+}
+
+.case-card.is-figma-morph {
+  border: 1.5px solid #E2B878 !important;
+  border-radius: 4px !important;
+  background: rgba(226, 184, 120, 0.04) !important;
+  box-shadow: 0 0 38px -8px rgba(226, 184, 120, 0.45) !important;
+  z-index: 16;
+}
+
+.case-card.is-figma-morph .handle {
+  border-color: #E2B878;
 }
 
 /* =========================================================
-   FLIP / SHARED-ELEMENT MATCH-CUT TRANSITION OVERLAYS
+   CAUSE-AND-EFFECT TRIGGER PILLS & SVG ENERGY OVERLAYS
    ========================================================= */
-.bento-card.is-converging-composer {
-  border-color: #E2B878 !important;
-  box-shadow:
-    0 28px 64px -18px rgba(0, 0, 0, 0.92),
-    0 0 36px -6px rgba(226, 184, 120, 0.45) !important;
-  z-index: 12;
+.trigger-pill {
+  padding: 0.34rem 0.85rem;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
-.frontend-showcase {
-  position: relative;
+.trigger-pill.is-gold-trigger {
+  border: 1px solid rgba(226, 184, 120, 0.55);
+  background: rgba(226, 184, 120, 0.14);
+  color: #E2B878;
 }
 
-.dock-selection-frame {
-  position: absolute;
-  inset: -10px;
-  border: 1.5px solid #E2B878;
-  background: rgba(226, 184, 120, 0.035);
-  pointer-events: none;
-  z-index: 15;
-}
-
-.dock-selection-frame .handle {
+.trigger-pill.is-gold-trigger.is-hover,
+.trigger-pill.is-gold-trigger.is-active {
+  background: #E2B878;
   border-color: #E2B878;
+  color: #050507;
+  box-shadow: 0 0 22px rgba(226, 184, 120, 0.45);
+}
+
+.trigger-pill.is-emerald-trigger {
+  border: 1px solid rgba(52, 211, 153, 0.55);
+  background: rgba(52, 211, 153, 0.14);
+  color: #6EE7B7;
+}
+
+.trigger-pill.is-emerald-trigger.is-hover,
+.trigger-pill.is-emerald-trigger.is-active {
+  background: #34D399;
+  border-color: #34D399;
+  color: #050507;
+  box-shadow: 0 0 22px rgba(52, 211, 153, 0.45);
+}
+
+.trigger-pill.is-pressed {
+  transform: scale(0.92);
+}
+
+.research-action-bar {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.28rem 0.36rem 0.28rem 0.85rem;
+  border-radius: 999px;
+  background: #0F1117;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ra-journey {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #9CA3AF;
+}
+
+.transition-svg-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 22;
 }
 
 /* =========================================================
