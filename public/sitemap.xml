@@ -17,6 +17,10 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://samueltavonatti.github.io/portfolio-preview/progetti/esu</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://samueltavonatti.github.io/portfolio-preview/esperienze</loc>
     <priority>0.7</priority>
   </url>

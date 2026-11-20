@@ -68,8 +68,9 @@ const filteredProjects = computed(() => {
                 loading="lazy"
               />
               <div class="media-badge">
-                <BaseBadge variant="live">
-                  {{ project.status === 'active' ? t('projectsPage.liveBadge') : project.status }}
+                <BaseBadge :variant="project.links.figma ? 'accent' : 'live'">
+                  <span v-if="!project.links.figma" class="live-dot" aria-hidden="true" />
+                  {{ project.links.figma ? 'Figma Design' : (project.status === 'active' ? t('projectsPage.liveBadge') : project.status) }}
                 </BaseBadge>
               </div>
             </div>

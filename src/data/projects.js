@@ -154,4 +154,117 @@ export const projects = [
       },
     },
   },
+  {
+    slug: 'esu',
+    status: 'active',
+    featured: true,
+    year: '2025',
+    category: 'HCI & Interaction Design',
+    coverImage: {
+      src: `${import.meta.env.BASE_URL}projects/esu/cover.webp`,
+      alt: {
+        it: 'Interfaccia e architettura flussi ESU — Progetto Human-Computer Interaction per fitness IoT',
+        en: 'ESU interface and user flows architecture — Human-Computer Interaction project for IoT fitness',
+      },
+    },
+    links: {
+      figma: 'https://www.figma.com/design/ySnTXOt5Qn8G0F5f0bsBy3/ESU?node-id=0-1&p=f&t=bueqQ8fIMVIzhgCO-0',
+    },
+    metrics: [
+      { value: 'IPM', label: { it: 'Interazione Persona-Macchina', en: 'Human-Computer Interaction' } },
+      { value: 'UniTN', label: { it: 'Università di Trento (DiPSCo)', en: 'University of Trento (DiPSCo)' } },
+      { value: 'Dual-Mode', label: { it: 'Solo Workout & Battle Mode', en: 'Solo Workout & Battle Mode' } },
+      { value: 'Figma', label: { it: 'Prototipo Interattivo', en: 'Interactive Prototype' } },
+    ],
+    gallery: [
+      {
+        src: `${import.meta.env.BASE_URL}projects/esu/gallery-hud.webp`,
+        caption: {
+          it: 'HUD di gara e telemetria live: frequenza cardiaca (BPM), conteggio serie, cadenza ripetizioni e intensità relativa a confronto.',
+          en: 'Race HUD & real-time telemetry: heart rate (BPM), set counter, rep cadence, and head-to-head intensity comparison.',
+        },
+      },
+      {
+        src: `${import.meta.env.BASE_URL}projects/esu/gallery-anatomy.webp`,
+        caption: {
+          it: 'Mappa anatomica di attivazione muscolare a colpo d’occhio e grafico di sovraccarico progressivo cumulativo per sessione.',
+          en: 'Glanceable anatomical muscle recruitment map and cumulative session overload progression curves.',
+        },
+      },
+      {
+        src: `${import.meta.env.BASE_URL}projects/esu/gallery-battle.webp`,
+        caption: {
+          it: 'Modalità competitiva Battle Mode: ricerca avversario tramite radar, classifica punteggi in tempo reale e inviti amici.',
+          en: 'Competitive Battle Mode: opponent radar matchmaking, real-time leaderboard scores, and friend challenges.',
+        },
+      },
+      {
+        src: `${import.meta.env.BASE_URL}projects/esu/gallery-pairing.webp`,
+        caption: {
+          it: 'Flusso di associazione sensori Bluetooth IoT (smart band, kettlebell telemetry) con fallback numerico a 6 cifre.',
+          en: 'IoT Bluetooth sensor pairing pipeline (smart bands, kettlebell sensors) with 6-digit numeric code fallback.',
+        },
+      },
+    ],
+    content: {
+      it: {
+        title: 'ESU — Smart Fitness & Battle Interface',
+        outcomeHeadline: 'Ergonomia cognitiva, telemetria in tempo reale e gamification competitiva per dispositivi fitness IoT.',
+        tldr: 'Progetto accademico per il corso di Interazione Persona-Macchina (UniTN, DiPSCo — L-20) focalizzato sulla progettazione end-to-end di un ecosistema di interfaccia per hardware fitness connesso: accoppiamento sensori Bluetooth, HUD di gara ad alta visibilità durante lo sforzo fisico e modalità Battle Mode per sfide tra atleti in tempo reale.',
+        problem:
+          'Durante l’allenamento ad alta intensità, la precisione motoria dell’atleta cala drasticamente a causa di sudore, affanno e movimento rapido degli occhi (saccadi). Le tradizionali interfacce fitness, concepite come dense tabelle da smartphone, causano continui errori di tap e sovraccarico cognitivo nel momento in cui l’utente ha bisogno di massima leggibilità e reattività istantanea.',
+        objectives: [
+          'Progettare touch target sovradimensionati (>= 48px) basati sulla Legge di Fitts per resistere al tremolio motorio in fase di sforzo fisico.',
+          'Sviluppare un flusso rapido di associazione per sensori Bluetooth (smart band, kettlebell telemetry, cardiofrequenzimetro) con fallback a codice numerico a 6 cifre.',
+          'Creare un HUD di telemetria in tempo reale leggibile a distanza di braccio con feedback cromatico immediato su battiti (BPM), serie, ripetizioni e intensità relativa.',
+          'Integrare una modalità competitiva Battle Mode con radar di ricerca avversario e sincronizzazione punteggi punto a punto.',
+        ],
+        designChoices: [
+          'Palette a contrasto elevato: fondo Midnight Obsidian (#0B0D12) accoppiato a un arancione fluorescente dinamico (#FF6600) per garantire la massima discriminazione percettiva anche sotto luci al neon da palestra o all’aperto.',
+          'Geometria poligonale ergonomica: bottoni e container sagomati con profili sfaccettati che guidano visivamente la presa del pollice nella thumb-zone.',
+          'Mappa muscolare anatomica a colpo d’occhio: feedback visivo immediato sui distretti attivati e grafico del sovraccarico cumulativo per sessione.',
+          'Separazione architetturale netta tra modalità Personale (diario, progressi, guida esercizi) e Battle Mode (sfida, inviti amici, radar avversario).',
+        ],
+        techArchitecture: {
+          stack: ['Figma Prototyping', 'Human-Computer Interaction (HCI)', 'Cognitive Ergonomics', 'IoT Telemetry Flows', 'Design System Architecture'],
+          details:
+            'Progettazione completa del design system, componenti atomici, stati interattivi e prototipazione avanzata dei micro-flussi su Figma per il corso universitario di Interazione Persona-Macchina (UniTN DiPSCo, L-20).',
+        },
+        results: [
+          'Validazione accademica positiva con lode per l’applicazione rigorosa dei principi di ergonomia cognitiva e usabilità d’interfaccia.',
+          'Architettura d’interazione completa: oltre 30 schermate ad alta fedeltà che coprono onboarding, pairing hardware, HUD di gara e post-workout analytics.',
+          'Prototipo interattivo e ispezionabile direttamente su Figma senza barriere.',
+        ],
+      },
+      en: {
+        title: 'ESU — Smart Fitness & Battle Interface',
+        outcomeHeadline: 'Cognitive ergonomics, real-time telemetry, and competitive gamification for IoT smart fitness devices.',
+        tldr: 'Academic interaction design project for the Human-Computer Interaction course (UniTN, DiPSCo — L-20) focused on designing an end-to-end interface ecosystem for connected fitness hardware: Bluetooth sensor pairing, high-exertion telemetry HUD, and a real-time multiplayer Battle Mode.',
+        problem:
+          'During high-intensity training, athletic motor accuracy degrades significantly due to sweat, exhaustion, and rapid eye saccades. Conventional fitness interfaces, structured like dense smartphone data tables, trigger frequent mis-taps and severe cognitive overload when athletes need instantaneous visual clarity.',
+        objectives: [
+          'Design oversized touch zones (>= 48px) governed by Fitts’s Law to tolerate motor tremors and physical exertion.',
+          'Architect a frictionless pairing pipeline for Bluetooth sensors (smart band, kettlebell telemetry, heart rate straps) with 6-digit numeric fallback.',
+          'Deliver an arm’s-length readable telemetry HUD with instant color-coded feedback on BPM, sets, rep cadence, and relative intensity.',
+          'Introduce a competitive Battle Mode featuring peer matchmaking radar and synchronized telemetry challenges.',
+        ],
+        designChoices: [
+          'High-contrast visual system: Midnight Obsidian (#0B0D12) paired with high-energy Electric Orange (#FF6600) ensuring peak perceptual discrimination under harsh gym lighting.',
+          'Ergonomic polygonal geometry: tactile faceted containers that direct thumb placement toward primary action zones in the thumb-zone.',
+          'Instant anatomical body map: glanceable visual feedback on recruited muscle groups and cumulative overload curves.',
+          'Strict architectural partition between Personal Training (logs, technique guides, volume charts) and Battle Mode (radar matchmaking, friend challenges).',
+        ],
+        techArchitecture: {
+          stack: ['Figma Prototyping', 'Human-Computer Interaction (HCI)', 'Cognitive Ergonomics', 'IoT Telemetry Flows', 'Design System Architecture'],
+          details:
+            'End-to-end design system creation, atomic components, interactive states, and micro-flow prototyping inside Figma for the university HCI course at UniTN (DiPSCo, L-20).',
+        },
+        results: [
+          'Academic distinction for rigorous application of cognitive ergonomics and human-centered design principles.',
+          'Comprehensive interface architecture: 30+ high-fidelity frames spanning onboarding, hardware pairing, race HUD, and post-workout analytics.',
+          'Fully inspectable interactive prototype accessible directly in Figma.',
+        ],
+      },
+    },
+  },
 ]

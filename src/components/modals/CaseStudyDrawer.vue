@@ -64,6 +64,17 @@ onUnmounted(() => {
         </div>
 
         <div class="drawer-body">
+          <div v-if="project.coverImage" class="drawer-media-preview">
+            <img
+              :src="project.coverImage.src"
+              :alt="project.coverImage.alt[lang]"
+              width="640"
+              height="360"
+              loading="lazy"
+              class="drawer-cover-img"
+            />
+          </div>
+
           <h2 class="drawer-title">{{ project.content[lang].title }}</h2>
           <p class="drawer-outcome">{{ project.content[lang].outcomeHeadline }}</p>
 
@@ -123,6 +134,10 @@ onUnmounted(() => {
           </BaseButton>
           <BaseButton v-if="project.links.live" :href="project.links.live" external variant="primary">
             <span>{{ t('caseStudyPage.openLive') }}</span>
+            <AppIcon name="arrow-up-right" :size="16" />
+          </BaseButton>
+          <BaseButton v-if="project.links.figma" :href="project.links.figma" external variant="primary">
+            <span>{{ lang === 'it' ? 'Apri Design Figma' : 'Open Figma Design' }}</span>
             <AppIcon name="arrow-up-right" :size="16" />
           </BaseButton>
         </div>
@@ -198,6 +213,23 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1.35rem;
+}
+
+.drawer-media-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.drawer-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .drawer-title {

@@ -38,7 +38,7 @@ const previewMetrics = (project) => {
           v-for="(project, idx) in featured"
           :key="project.slug"
           class="glass-card work-card"
-          :class="idx === 0 ? 'work-card--lead' : 'work-card--secondary'"
+          :class="idx === 0 ? 'work-card--lead' : idx === 1 ? 'work-card--secondary' : 'work-card--tertiary'"
         >
           <div class="card-media">
             <img
@@ -85,6 +85,15 @@ const previewMetrics = (project) => {
                 variant="primary"
               >
                 <span>{{ t('caseStudyPage.openLive') }}</span>
+                <AppIcon name="arrow-up-right" :size="16" />
+              </BaseButton>
+              <BaseButton
+                v-if="project.links.figma"
+                :href="project.links.figma"
+                external
+                variant="primary"
+              >
+                <span>{{ lang === 'it' ? 'Design Figma' : 'Figma Design' }}</span>
                 <AppIcon name="arrow-up-right" :size="16" />
               </BaseButton>
             </div>
@@ -145,6 +154,18 @@ const previewMetrics = (project) => {
 
   .work-card--secondary {
     grid-column: span 5;
+  }
+
+  .work-card--tertiary {
+    grid-column: span 12;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+
+  .work-card--tertiary .card-media {
+    border-bottom: none;
+    border-right: 1px solid var(--border-subtle);
+    height: 100%;
   }
 }
 

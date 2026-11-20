@@ -1,8 +1,9 @@
 <script setup>
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { profileData } from '../../data/profile'
 import { useI18n } from '../../i18n/useI18n'
 import AppIcon from '../ui/AppIcon.vue'
+import BaseDropdown from '../ui/BaseDropdown.vue'
 
 const { lang, t } = useI18n()
 const openPolicy = inject('openPolicy', null)
@@ -16,23 +17,34 @@ const gdprAccepted = ref(false)
 const formError = ref('')
 const sentNotice = ref('')
 
-const subjects = computed(() =>
-  lang.value === 'it'
-    ? [
-        'Collaborazione UI/UX & Design System',
-        'Sviluppo Front-End / Web App',
-        'Progetto Motion / Showreel',
-        'Stage / Opportunità Lavorativa',
-        'Altro',
-      ]
-    : [
-        'UI/UX & Design System Collaboration',
-        'Front-End / Web App Engineering',
-        'Motion / Showreel Project',
-        'Internship / Job Opportunity',
-        'Other',
-      ]
-)
+const subjectsIT = [
+  'Collaborazione UI/UX & Design System',
+  'Sviluppo Front-End / Web App',
+  'Progetto Motion / Showreel',
+  'Stage / Opportunità Lavorativa',
+  'Altro',
+]
+
+const subjectsEN = [
+  'UI/UX & Design System Collaboration',
+  'Front-End / Web App Engineering',
+  'Motion / Showreel Project',
+  'Internship / Job Opportunity',
+  'Other',
+]
+
+const subjects = computed(() => (lang.value === 'it' ? subjectsIT : subjectsEN))
+
+watch(lang, (newLang, oldLang) => {
+  if (!subjectInput.value) return
+  if (oldLang === 'it' && newLang === 'en') {
+    const idx = subjectsIT.indexOf(subjectInput.value)
+    if (idx !== -1) subjectInput.value = subjectsEN[idx]
+  } else if (oldLang === 'en' && newLang === 'it') {
+    const idx = subjectsEN.indexOf(subjectInput.value)
+    if (idx !== -1) subjectInput.value = subjectsIT[idx]
+  }
+})
 
 const copyEmail = async () => {
   try {
@@ -220,15 +232,16 @@ const socialLinks = [
             </label>
           </div>
 
-          <label class="tx-field" for="tx-subject">
-            <span class="tx-label mono">{{ lang === 'it' ? 'OGGETTO' : 'SUBJECT' }}</span>
-            <select id="tx-subject" v-model="subjectInput" class="tx-input tx-select">
-              <option value="" disabled>
-                {{ lang === 'it' ? 'Seleziona un argomento…' : 'Select a subject…' }}
-              </option>
-              <option v-for="sub in subjects" :key="sub" :value="sub">{{ sub }}</option>
-            </select>
-          </label>
+          <div class="tx-field">
+            <label class="tx-label mono" for="tx-subject">{{ lang === 'it' ? 'OGGETTO' : 'SUBJECT' }}</label>
+            <BaseDropdown
+              id="tx-subject"
+              v-model="subjectInput"
+              :options="subjects"
+              :placeholder="lang === 'it' ? 'Seleziona un argomento…' : 'Select a subject…'"
+              :aria-label="lang === 'it' ? 'Oggetto della trasmissione' : 'Transmission subject'"
+            />
+          </div>
 
           <label class="tx-field" for="tx-msg">
             <span class="tx-label mono">{{ lang === 'it' ? 'MESSAGGIO' : 'MESSAGE' }}</span>

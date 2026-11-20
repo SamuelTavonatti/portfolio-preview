@@ -44,9 +44,13 @@ const project = computed(() => {
           <h1 class="cs-title">{{ project.content[lang].title }}</h1>
           <p class="cs-outcome">{{ project.content[lang].outcomeHeadline }}</p>
 
-          <div v-if="project.links.live || project.links.repo" class="cs-actions">
+          <div v-if="project.links.live || project.links.repo || project.links.figma" class="cs-actions">
             <BaseButton v-if="project.links.live" :href="project.links.live" external variant="primary">
               <span>{{ t('caseStudyPage.openLive') }}</span>
+              <AppIcon name="arrow-up-right" :size="16" />
+            </BaseButton>
+            <BaseButton v-if="project.links.figma" :href="project.links.figma" external variant="primary">
+              <span>{{ lang === 'it' ? 'Apri Prototipo / Design Figma' : 'Open Figma Prototype / Design' }}</span>
               <AppIcon name="arrow-up-right" :size="16" />
             </BaseButton>
             <BaseButton v-if="project.links.repo" :href="project.links.repo" external variant="secondary">
@@ -104,6 +108,28 @@ const project = computed(() => {
           <ul class="cs-list">
             <li v-for="(res, i) in project.content[lang].results" :key="i">{{ res }}</li>
           </ul>
+        </section>
+
+        <!-- Interactive Screen Gallery / Visual Preview -->
+        <section v-if="project.gallery?.length" class="cs-section cs-gallery-section">
+          <h2 class="cs-h2">{{ lang === 'it' ? 'Galleria Interfacce & Flussi Figma' : 'Interface Gallery & Figma Flows' }}</h2>
+          <div class="cs-gallery-grid">
+            <figure v-for="(item, idx) in project.gallery" :key="idx" class="cs-gallery-figure">
+              <div class="cs-gallery-img-wrap">
+                <img
+                  :src="item.src"
+                  :alt="item.caption[lang]"
+                  width="960"
+                  height="540"
+                  loading="lazy"
+                  class="cs-gallery-img"
+                />
+              </div>
+              <figcaption class="cs-gallery-caption mono">
+                {{ item.caption[lang] }}
+              </figcaption>
+            </figure>
+          </div>
         </section>
       </div>
     </article>
@@ -283,5 +309,60 @@ const project = computed(() => {
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 0.35rem 0.7rem;
+}
+
+/* Gallery Section */
+.cs-gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .cs-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.cs-gallery-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  padding: 0.85rem;
+  transition: border-color var(--transition-base), transform var(--transition-base);
+}
+
+.cs-gallery-figure:hover {
+  border-color: var(--accent-lumina);
+  transform: translateY(-2px);
+}
+
+.cs-gallery-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.cs-gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cs-gallery-caption {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  padding: 0.15rem 0.4rem 0.35rem;
 }
 </style>
