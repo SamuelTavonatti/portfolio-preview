@@ -2,6 +2,8 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from '../../i18n/useI18n'
+import { profileData } from '../../data/profile'
+import AppIcon from '../ui/AppIcon.vue'
 
 const { lang, setLang, t } = useI18n()
 const route = useRoute()
@@ -120,13 +122,121 @@ const closeMobile = () => {
     </div>
 
     <Transition name="drawer">
-      <div v-if="isMobileOpen" class="mobile-drawer" @click.self="closeMobile">
-        <nav class="mobile-nav" aria-label="Mobile navigation">
-          <router-link to="/" @click="closeMobile">{{ t('nav.overview') }}</router-link>
-          <router-link to="/progetti" @click="closeMobile">{{ t('nav.projects') }}</router-link>
-          <router-link to="/esperienze" @click="closeMobile">{{ t('nav.experience') }}</router-link>
-          <router-link :to="{ path: '/', hash: '#contatti' }" @click="closeMobile">{{ t('nav.contact') }}</router-link>
-        </nav>
+      <div v-if="isMobileOpen" class="mobile-drawer-overlay" @click.self="closeMobile">
+        <aside
+          class="side-drawer"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="lang === 'it' ? 'Indice di navigazione' : 'Navigation index'"
+        >
+          <!-- Top Header -->
+          <div class="drawer-header">
+            <span class="drawer-kicker mono">{{ lang === 'it' ? 'INDICE' : 'INDEX' }}</span>
+            <button
+              type="button"
+              class="drawer-close"
+              :aria-label="t('nav.closeMenu')"
+              @click="closeMobile"
+            >
+              <AppIcon name="close" :size="18" />
+            </button>
+          </div>
+
+          <!-- Middle Navigation (Numbered Items) -->
+          <nav class="drawer-nav" aria-label="Mobile navigation">
+            <router-link
+              to="/"
+              data-key="overview"
+              :class="{ active: activeKey === 'overview' }"
+              @click="closeMobile"
+            >
+              <span class="nav-num mono">01</span>
+              <span class="nav-label">{{ t('nav.overview') }}</span>
+              <span v-if="activeKey === 'overview'" class="nav-active-pip" aria-hidden="true" />
+            </router-link>
+            <router-link
+              to="/progetti"
+              data-key="projects"
+              :class="{ active: activeKey === 'projects' }"
+              @click="closeMobile"
+            >
+              <span class="nav-num mono">02</span>
+              <span class="nav-label">{{ t('nav.projects') }}</span>
+              <span v-if="activeKey === 'projects'" class="nav-active-pip" aria-hidden="true" />
+            </router-link>
+            <router-link
+              to="/esperienze"
+              data-key="experience"
+              :class="{ active: activeKey === 'experience' }"
+              @click="closeMobile"
+            >
+              <span class="nav-num mono">03</span>
+              <span class="nav-label">{{ t('nav.experience') }}</span>
+              <span v-if="activeKey === 'experience'" class="nav-active-pip" aria-hidden="true" />
+            </router-link>
+            <router-link
+              :to="{ path: '/', hash: '#contatti' }"
+              data-key="contact"
+              :class="{ active: activeKey === 'contact' }"
+              @click="closeMobile"
+            >
+              <span class="nav-num mono">04</span>
+              <span class="nav-label">{{ t('nav.contact') }}</span>
+              <span v-if="activeKey === 'contact'" class="nav-active-pip" aria-hidden="true" />
+            </router-link>
+          </nav>
+
+          <!-- Bottom Utility Footer -->
+          <div class="drawer-footer">
+            <div class="drawer-lang-switch" role="group" aria-label="Language selector">
+              <button
+                type="button"
+                :class="{ active: lang === 'it' }"
+                :aria-pressed="lang === 'it'"
+                @click="setLang('it')"
+              >
+                IT
+              </button>
+              <span class="lang-divider" aria-hidden="true">/</span>
+              <button
+                type="button"
+                :class="{ active: lang === 'en' }"
+                :aria-pressed="lang === 'en'"
+                @click="setLang('en')"
+              >
+                EN
+              </button>
+            </div>
+
+            <div class="drawer-socials">
+              <a
+                :href="profileData.links.github"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                class="drawer-social-pill"
+              >
+                <AppIcon name="github" :size="16" />
+              </a>
+              <a
+                :href="profileData.links.linkedin"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                class="drawer-social-pill"
+              >
+                <AppIcon name="linkedin" :size="16" />
+              </a>
+              <a
+                :href="`mailto:${profileData.email}`"
+                aria-label="Email"
+                class="drawer-social-pill"
+              >
+                <AppIcon name="mail" :size="16" />
+              </a>
+            </div>
+          </div>
+        </aside>
       </div>
     </Transition>
   </header>
@@ -362,77 +472,231 @@ const closeMobile = () => {
 .bar.open1 { transform: translateY(4px) rotate(45deg); }
 .bar.open2 { transform: translateY(-4px) rotate(-45deg); }
 
-.mobile-drawer {
+.mobile-drawer-overlay {
   pointer-events: auto;
   position: fixed;
   inset: 0;
-  z-index: 90;
-  background: rgba(8, 13, 26, 0.76);
-  backdrop-filter: blur(26px) saturate(170%);
-  -webkit-backdrop-filter: blur(26px) saturate(170%);
+  z-index: 120;
+  background: rgba(4, 6, 12, 0.38);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
-  align-items: flex-end;
-  padding: 0 1.25rem 3rem;
+  justify-content: flex-end;
+  align-items: stretch;
 }
 
-/* Thumb-zone: mobile navigation anchored to the lower reach area with 45ms staggered reveal */
-.mobile-nav {
+.side-drawer {
+  width: min(80vw, 320px);
+  height: calc(100dvh - 24px);
+  margin: 12px;
+  border-radius: 24px;
+  background: rgba(11, 17, 32, 0.92);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), -12px 0 40px rgba(0, 0, 0, 0.55);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
-  width: 100%;
+  justify-content: space-between;
+  padding: 1.25rem 1.2rem;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
-@keyframes mobilePillIn {
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.drawer-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--accent-azure);
+}
+
+.drawer-close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.18s var(--ease-spring);
+}
+
+.drawer-close:active {
+  transform: scale(0.92);
+}
+
+.drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.5rem 0;
+  flex: 1;
+}
+
+.drawer-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 52px;
+  padding: 0 1.15rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: transform 0.18s var(--ease-spring), color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  animation: drawerItemIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.drawer-nav a:nth-child(1) { animation-delay: 0ms; }
+.drawer-nav a:nth-child(2) { animation-delay: 40ms; }
+.drawer-nav a:nth-child(3) { animation-delay: 80ms; }
+.drawer-nav a:nth-child(4) { animation-delay: 120ms; }
+
+@keyframes drawerItemIn {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateX(16px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
-.mobile-nav a {
+.drawer-nav a:active {
+  transform: scale(0.97);
+}
+
+.drawer-nav a.active {
+  color: var(--text-primary);
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.38);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 20px rgba(56, 189, 248, 0.15);
+}
+
+.drawer-nav a.active .nav-num {
+  color: var(--accent-azure);
+}
+
+.nav-num {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.nav-label {
+  flex: 1;
+}
+
+.nav-active-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-azure);
+  box-shadow: 0 0 8px var(--accent-azure);
+}
+
+.drawer-footer {
   display: flex;
   align-items: center;
-  min-height: 54px;
-  padding: 0 1.5rem;
-  border-radius: var(--radius-3xl);
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(56, 189, 248, 0.28);
-  box-shadow: var(--specular), 0 12px 32px rgba(0, 0, 0, 0.45);
-  text-decoration: none;
-  color: var(--text-primary);
-  font-size: 1.15rem;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.drawer-lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.drawer-lang-switch button {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: var(--track-display);
-  animation: mobilePillIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
-  transition: transform 0.14s var(--ease-out-expo), border-color 0.2s var(--ease-effects);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color 0.18s ease;
 }
 
-.mobile-nav a:nth-child(1) { animation-delay: 0ms; }
-.mobile-nav a:nth-child(2) { animation-delay: 45ms; }
-.mobile-nav a:nth-child(3) { animation-delay: 90ms; }
-.mobile-nav a:nth-child(4) { animation-delay: 135ms; }
-
-.mobile-nav a:active {
-  transform: scale(0.96);
+.drawer-lang-switch button.active {
+  color: var(--accent-azure);
 }
 
-.mobile-nav a:hover {
-  border-color: rgba(56, 189, 248, 0.48);
+.lang-divider {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  opacity: 0.5;
+}
+
+.drawer-socials {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.drawer-social-pill {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.18s ease, border-color 0.18s ease, transform 0.18s var(--ease-spring);
+}
+
+.drawer-social-pill:hover,
+.drawer-social-pill:focus-visible {
+  color: var(--accent-azure);
+  border-color: rgba(56, 189, 248, 0.35);
+  transform: translateY(-1px);
 }
 
 .drawer-enter-active,
 .drawer-leave-active {
-  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.28s var(--ease-out-expo);
 }
+
+.drawer-enter-active .side-drawer,
+.drawer-leave-active .side-drawer {
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .drawer-enter-from,
 .drawer-leave-to {
   opacity: 0;
+}
+
+.drawer-enter-from .side-drawer,
+.drawer-leave-to .side-drawer {
+  transform: translateX(100%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -440,7 +704,7 @@ const closeMobile = () => {
   .lang-thumb {
     transition: none;
   }
-  .mobile-nav a {
+  .drawer-nav a {
     animation: none;
   }
 }

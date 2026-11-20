@@ -59,6 +59,36 @@ useScrollReveal()
       </div>
     </section>
 
+    <!-- 02.B DOMINI & PASSIONI / DOMAIN KNOWLEDGE -->
+    <section id="domini" class="section-block">
+      <div class="container scroll-reveal">
+        <div class="section-head">
+          <span class="section-kicker tabular-nums">{{ profileData.domains.header[lang].kicker }}</span>
+          <h2 class="section-heading">{{ profileData.domains.header[lang].title }}</h2>
+          <p class="section-subtitle">{{ profileData.domains.header[lang].subtitle }}</p>
+        </div>
+
+        <div class="domains-bento">
+          <article
+            v-for="(domain, idx) in profileData.domains.items"
+            :key="domain.id"
+            class="glass-card domain-card"
+            :class="{ 'domain-card--lead': idx === 0 }"
+          >
+            <div class="domain-top">
+              <span class="domain-badge mono">{{ domain.badge[lang] }}</span>
+              <span class="domain-num mono tabular-nums">0{{ idx + 1 }}</span>
+            </div>
+            <h3 class="domain-title">{{ domain.title[lang] }}</h3>
+            <p class="domain-body">{{ domain.body[lang] }}</p>
+            <div class="domain-tags">
+              <span v-for="tag in domain.tags" :key="tag" class="domain-tag mono">{{ tag }}</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <!-- 03. METODO & COMPETENZE (3-STEP UX PROCESS) -->
     <section id="competenze" class="section-block">
       <div class="container scroll-reveal">
@@ -389,8 +419,100 @@ useScrollReveal()
   border-top: 1px solid var(--border-subtle);
 }
 
+.section-subtitle {
+  font-size: 0.98rem;
+  color: var(--text-secondary);
+  margin-top: 0.45rem;
+  max-width: 62ch;
+  line-height: 1.5;
+}
+
+.domains-bento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 860px) {
+  .domains-bento {
+    grid-template-columns: 1.25fr 1fr;
+  }
+}
+
+.domain-card {
+  padding: 2rem 2.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  border-radius: var(--radius-2xl);
+  transition: transform 0.25s var(--ease-spring), border-color 0.2s ease;
+}
+
+.domain-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.domain-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.domain-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent-azure);
+  background: var(--accent-azure-soft);
+  border: 1px solid var(--accent-azure-border);
+  border-radius: 9999px;
+  padding: 0.32rem 0.85rem;
+}
+
+.domain-num {
+  font-size: 0.82rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.domain-title {
+  font-size: clamp(1.22rem, 1.8vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.domain-body {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.domain-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.domain-tag {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 0.28rem 0.65rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .skill-card:hover {
+  .skill-card:hover,
+  .domain-card:hover {
     transform: none;
   }
 }

@@ -980,6 +980,8 @@ onUnmounted(() => {
   margin: 0;
   min-height: 93vh;
   overflow: hidden;
+  overflow-x: clip;
+  contain: paint;
   box-sizing: border-box;
   background: radial-gradient(ellipse 90% 75% at 50% 42%, #0C162B 0%, #050812 58%, #04060C 100%);
   border-bottom: 1px solid var(--border-subtle-w);
@@ -990,6 +992,11 @@ onUnmounted(() => {
   inset: 0;
   pointer-events: none;
   z-index: 1;
+  overflow: hidden;
+  contain: paint;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .bloom {
@@ -997,6 +1004,7 @@ onUnmounted(() => {
   border-radius: 50%;
   filter: blur(110px);
   will-change: transform;
+  pointer-events: none;
 }
 
 .bloom-ice {
@@ -1085,7 +1093,11 @@ onUnmounted(() => {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transform: translate3d(44px, 0, 0);
+  transform: translate3d(20px, 0, 0);
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: clip;
   transition:
     opacity 0.48s var(--ease-spatial),
     transform 0.64s var(--ease-spatial),
@@ -1105,7 +1117,7 @@ onUnmounted(() => {
 
 .scene.is-panning-out {
   opacity: 0;
-  transform: translate3d(-72px, 0, 0);
+  transform: translate3d(-24px, 0, 0);
 }
 
 .scene.is-exiting {
@@ -1283,6 +1295,10 @@ onUnmounted(() => {
 .s1-layout {
   flex: 1;
   min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
   display: grid;
   grid-template-columns: minmax(0, 64fr) minmax(0, 32fr);
   gap: 4%;
@@ -1351,12 +1367,16 @@ onUnmounted(() => {
 .p-swatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
 .sw-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; color: var(--slate); }
 .sw-dot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.22); flex-shrink: 0; }
-.aaa-pill { align-self: flex-start; font-size: 0.72rem; color: var(--emerald); background: var(--emerald-soft); border: 1px solid rgba(52, 211, 153, 0.34); border-radius: 9999px; padding: 0.3rem 0.75rem; }
+.aaa-pill { align-self: flex-start; font-size: 0.72rem; color: var(--ice); background: var(--ice-soft); border: 1px solid var(--ice-border); border-radius: 9999px; padding: 0.3rem 0.75rem; }
 
 /* SCENE 02 */
 .s2-layout {
   flex: 1;
   min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
   display: grid;
   grid-template-columns: minmax(0, 58fr) minmax(0, 38fr);
   gap: 4%;
@@ -1392,7 +1412,7 @@ onUnmounted(() => {
 }
 
 .s2-kpi { display: flex; flex-direction: column; gap: 0.2rem; }
-.kpi-big { font-size: clamp(1.45rem, 2.2vw, 1.9rem); font-weight: 700; letter-spacing: -0.03em; color: var(--gold); }
+.kpi-big { font-size: clamp(1.45rem, 2.2vw, 1.9rem); font-weight: 700; letter-spacing: -0.03em; color: var(--ice); }
 .kpi-ice { color: var(--ice); }
 .kpi-sub { font-size: 0.72rem; color: var(--slate); }
 
@@ -1418,6 +1438,10 @@ onUnmounted(() => {
   position: relative;
   flex: 1;
   min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1773,12 +1797,17 @@ onUnmounted(() => {
 
 .pill-echo {
   position: absolute;
-  width: 280px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(280px, 90vw);
   height: 78px;
   border-radius: 9999px;
   border: 1.5px solid rgba(56, 189, 248, 0.55);
   opacity: 0;
   pointer-events: none;
+  max-width: calc(100vw - 16px);
+  box-sizing: border-box;
 }
 
 .pill-echo.is-firing { animation: echoExpand 1.2s var(--ease-spatial) forwards; }
@@ -1786,14 +1815,28 @@ onUnmounted(() => {
 .pill-echo.e3.is-firing { animation-delay: 0.24s; }
 
 @keyframes echoExpand {
-  0% { width: 280px; height: 78px; opacity: 0.85; }
-  100% { width: 96vw; height: 420px; opacity: 0; }
+  0% {
+    width: min(280px, 90vw);
+    height: 78px;
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    width: min(94vw, 800px);
+    height: 420px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
 }
 
 /* SCENE 04 */
 .s4-layout {
   flex: 1;
   min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4%;
@@ -1864,26 +1907,41 @@ onUnmounted(() => {
 .sys-metrics { display: flex; flex-direction: column; gap: 0.6rem; padding: 1.15rem; background: rgba(4, 6, 12, 0.55); border: 1px solid var(--border-subtle-w); border-radius: 16px; }
 .sys-fps { font-size: 1.3rem; font-weight: 700; color: var(--alabaster); }
 .sys-scores { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.8rem; color: var(--slate); }
-.sys-scores strong { color: var(--gold); }
+.sys-scores strong { color: var(--ice); }
 
 .preview-btn-wrap { position: relative; display: inline-flex; align-items: center; justify-content: center; }
 
 .loop-echo {
   position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: 150px;
   height: 40px;
   border-radius: 9999px;
   border: 1.5px solid var(--ice);
   opacity: 0;
   pointer-events: none;
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
 }
 .loop-echo.is-firing { animation: loopRipple 1.05s var(--ease-spatial) forwards; }
 .loop-echo.le2.is-firing { animation-delay: 0.12s; }
 .loop-echo.le3.is-firing { animation-delay: 0.24s; }
 
 @keyframes loopRipple {
-  0% { width: 150px; height: 40px; opacity: 0.85; }
-  100% { width: 520px; height: 180px; opacity: 0; }
+  0% {
+    width: 150px;
+    height: 40px;
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    width: min(520px, calc(100vw - 32px));
+    height: 180px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
 }
 
 .loop-veil {
@@ -1988,24 +2046,78 @@ onUnmounted(() => {
   .scene {
     padding: 80px 20px 148px;
     gap: 12px;
+    transform: translate3d(0, 14px, 0);
+    overflow-x: clip;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  .scene.is-active {
+    transform: translate3d(0, 0, 0);
+  }
+  .scene.is-panning-out {
+    opacity: 0;
+    transform: translate3d(0, -14px, 0);
   }
   .scene-head {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.35rem;
+  }
+  .headline-mask {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .display-title {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: clamp(1.6rem, 5.8vw, 2.4rem);
+    word-break: break-word;
   }
   .scene-tag { display: none; }
   .s1-layout, .s2-layout, .s4-layout {
     grid-template-columns: 1fr;
     gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: clip;
   }
   .glass-panel { padding: 1.1rem 1.15rem; gap: 0.85rem; }
   .figma-canvas { padding: 0.9rem; gap: 0.75rem; }
-  .s1-peripheral, .s2-left, .s4-right { display: none; }
+  .s1-peripheral, .s4-right { display: none; }
+  .s2-left {
+    display: flex;
+    padding: 0.85rem 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .dd-wrap {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .dd-svg {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  .sh-row {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
   .mod-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
   .mod-card { padding: 0.65rem 0.55rem; gap: 0.5rem; }
   .mod-label { font-size: 0.62rem; }
-  .s3-camera.is-zoomed { transform: scale(1.03); }
+  .s3-camera.is-zoomed { transform: scale(1.02); }
   .ai-morph-shell { width: calc(100vw - 32px); max-width: 100%; min-height: 92px; height: auto; border-radius: 28px; }
   .ai-morph-shell.is-app-generated { width: 100%; height: 370px; }
   .prompt-view { padding: 12px 14px 12px 18px; }
@@ -2016,6 +2128,8 @@ onUnmounted(() => {
   .wa-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .wa-metrics .wa-metric-card:last-child { display: none; }
   .vol-bars { height: 92px; }
+  .bloom-ice { width: 50vw; height: 50vw; left: 10px; top: -5%; animation: none; }
+  .bloom-gold { width: 50vw; height: 50vw; right: 10px; bottom: -5%; animation: none; }
   .hero-safe-zone { bottom: 20px; padding-inline: 20px; }
   .safe-cta { padding: 0 1.05rem; font-size: 0.82rem; }
 }
