@@ -46,15 +46,29 @@ const copyEmail = async () => {
   }
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const handleSubmit = async () => {
   formError.value = ''
   sentNotice.value = ''
 
-  if (!nameInput.value.trim() || !emailInput.value.trim() || !messageInput.value.trim()) {
+  const rawName = nameInput.value.replace(/[\r\n]+/g, ' ').trim()
+  const rawEmail = emailInput.value.replace(/[\r\n]+/g, ' ').trim()
+  const rawMsg = messageInput.value.trim()
+
+  if (!rawName || !rawEmail || !rawMsg) {
     formError.value =
       lang.value === 'it'
         ? 'Compila nome, email e messaggio prima di procedere.'
         : 'Please fill in your name, email, and message.'
+    return
+  }
+
+  if (!EMAIL_REGEX.test(rawEmail)) {
+    formError.value =
+      lang.value === 'it'
+        ? 'Inserisci un indirizzo email valido (es. nome@dominio.com).'
+        : 'Please enter a valid email address (e.g. name@domain.com).'
     return
   }
 
@@ -66,21 +80,31 @@ const handleSubmit = async () => {
     return
   }
 
-  const chosenSubject = subjectInput.value || subjects.value[0]
-  const formattedBody = `${lang.value === 'it' ? 'Da' : 'From'}: ${nameInput.value.trim()} (${emailInput.value.trim()})\n\n${messageInput.value.trim()}`
+  const chosenSubject = (subjectInput.value || subjects.value[0]).replace(/[\r\n]+/g, ' ').trim()
+  const formattedBody = `${lang.value === 'it' ? 'Da' : 'From'}: ${rawName} (${rawEmail})\n\n${rawMsg}`
   const mailtoUrl = `mailto:${profileData.email}?subject=${encodeURIComponent(chosenSubject)}&body=${encodeURIComponent(formattedBody)}`
 
+  let copySuccess = false
   try {
     await navigator.clipboard.writeText(`${chosenSubject}\n\n${formattedBody}`)
+    copySuccess = true
   } catch {
-    // clipboard optional fallback
+    copySuccess = false
   }
 
-  window.location.href = mailtoUrl
-  sentNotice.value =
-    lang.value === 'it'
-      ? 'Client email aperto e messaggio copiato negli appunti ✓'
-      : 'Email client opened and message copied to clipboard ✓'
+  try {
+    window.location.href = mailtoUrl
+  } catch {
+    // window location fallback
+  }
+
+  sentNotice.value = copySuccess
+    ? (lang.value === 'it'
+        ? 'Client email avviato e messaggio copiato negli appunti ✓'
+        : 'Email client launched and message copied to clipboard ✓')
+    : (lang.value === 'it'
+        ? 'Client email avviato ✓'
+        : 'Email client launched ✓')
 }
 
 const socialLinks = [
@@ -169,32 +193,36 @@ const socialLinks = [
           </div>
 
           <div class="tx-grid-2">
-            <label class="tx-field">
+            <label class="tx-field" for="tx-name">
               <span class="tx-label mono">{{ lang === 'it' ? 'NOME / AZIENDA' : 'NAME / COMPANY' }}</span>
               <input
+                id="tx-name"
                 v-model="nameInput"
                 type="text"
                 required
+                maxlength="80"
                 :placeholder="lang === 'it' ? 'Mario Rossi — Studio' : 'Alex Morgan — Studio'"
                 class="tx-input"
               />
             </label>
 
-            <label class="tx-field">
+            <label class="tx-field" for="tx-email">
               <span class="tx-label mono">EMAIL</span>
               <input
+                id="tx-email"
                 v-model="emailInput"
                 type="email"
                 required
+                maxlength="100"
                 placeholder="name@company.com"
                 class="tx-input"
               />
             </label>
           </div>
 
-          <label class="tx-field">
+          <label class="tx-field" for="tx-subject">
             <span class="tx-label mono">{{ lang === 'it' ? 'OGGETTO' : 'SUBJECT' }}</span>
-            <select v-model="subjectInput" class="tx-input tx-select">
+            <select id="tx-subject" v-model="subjectInput" class="tx-input tx-select">
               <option value="" disabled>
                 {{ lang === 'it' ? 'Seleziona un argomento…' : 'Select a subject…' }}
               </option>
@@ -202,12 +230,14 @@ const socialLinks = [
             </select>
           </label>
 
-          <label class="tx-field">
+          <label class="tx-field" for="tx-msg">
             <span class="tx-label mono">{{ lang === 'it' ? 'MESSAGGIO' : 'MESSAGE' }}</span>
             <textarea
+              id="tx-msg"
               v-model="messageInput"
               required
               rows="4"
+              maxlength="2000"
               :placeholder="lang === 'it' ? 'Raccontami il tuo progetto o opportunità…' : 'Tell me about your project or opportunity…'"
               class="tx-input tx-textarea"
             />
@@ -361,6 +391,7 @@ const socialLinks = [
 }
 
 .copy-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -375,6 +406,13 @@ const socialLinks = [
   cursor: pointer;
   flex-shrink: 0;
   transition: transform 0.18s var(--ease-spring), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.copy-btn::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
 }
 
 .copy-btn:hover {
@@ -560,8 +598,20 @@ const socialLinks = [
   font-weight: 500;
   margin: 0;
 }
-.tx-feedback.is-error { color: #FCA5A5; }
-.tx-feedback.is-ok { color: var(--status-live); }
+.tx-feedback.is-error {
+  color: #FCA5A5;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 0.65rem 0.95rem;
+  border-radius: var(--radius-md);
+}
+.tx-feedback.is-ok {
+  color: var(--status-live);
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  padding: 0.65rem 0.95rem;
+  border-radius: var(--radius-md);
+}
 
 .tx-actions {
   display: flex;

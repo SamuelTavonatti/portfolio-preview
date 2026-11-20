@@ -10,6 +10,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const rootRef = ref(null)
 
 let rafId = null
+let cleanupShowreel = null
 
 onMounted(() => {
   const root = rootRef.value
@@ -131,11 +132,6 @@ onMounted(() => {
 
   function updateCursor(now) {
     if (!cursor.moving) return
-    if (cursor.targetEl) {
-      const live = getCenter(cursor.targetEl)
-      cursor.targetX = live.x
-      cursor.targetY = live.y
-    }
     const p = Math.min(1, Math.max(0, (now - cursor.moveStart) / cursor.duration))
     const e = easeOutCubic(p)
     cursor.x = cursor.startX + (cursor.targetX - cursor.startX) * e
@@ -507,9 +503,15 @@ onMounted(() => {
 
   const bootTime = performance.now()
   let lastLoop = -1
+  let isIntersecting = true
+  let isDocumentVisible = typeof document !== 'undefined' ? !document.hidden : true
+  let isRunning = false
+  let pauseStart = 0
+  let totalPausedTime = 0
 
   function tick(now) {
-    const elapsed = now - bootTime
+    if (!isRunning) return
+    const elapsed = now - bootTime - totalPausedTime
     const loopIdx = Math.floor(elapsed / LOOP_MS)
     const t = elapsed % LOOP_MS
 
@@ -524,12 +526,72 @@ onMounted(() => {
     rafId = window.requestAnimationFrame(tick)
   }
 
-  rafId = window.requestAnimationFrame(tick)
+  function startRaf() {
+    if (isRunning) return
+    if (!isIntersecting || !isDocumentVisible) return
+    isRunning = true
+    if (pauseStart > 0) {
+      totalPausedTime += performance.now() - pauseStart
+      pauseStart = 0
+    }
+    rafId = window.requestAnimationFrame(tick)
+  }
+
+  function stopRaf() {
+    if (!isRunning) return
+    isRunning = false
+    if (pauseStart === 0) {
+      pauseStart = performance.now()
+    }
+    if (rafId !== null) {
+      window.cancelAnimationFrame(rafId)
+      rafId = null
+    }
+  }
+
+  const observer =
+    typeof IntersectionObserver !== 'undefined' && stage
+      ? new IntersectionObserver(
+          ([entry]) => {
+            isIntersecting = entry.isIntersecting
+            if (isIntersecting) {
+              startRaf()
+            } else {
+              stopRaf()
+            }
+          },
+          { threshold: 0.05 }
+        )
+      : null
+
+  if (observer && stage) {
+    observer.observe(stage)
+  }
+
+  const handleVisibilityChange = () => {
+    isDocumentVisible = typeof document !== 'undefined' ? !document.hidden : true
+    if (isDocumentVisible) {
+      startRaf()
+    } else {
+      stopRaf()
+    }
+  }
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+
+  startRaf()
+
+  cleanupShowreel = () => {
+    stopRaf()
+    if (observer) observer.disconnect()
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }
 })
 
 onUnmounted(() => {
+  if (cleanupShowreel) cleanupShowreel()
   if (rafId !== null && typeof window !== 'undefined') {
     window.cancelAnimationFrame(rafId)
+    rafId = null
   }
 })
 </script>

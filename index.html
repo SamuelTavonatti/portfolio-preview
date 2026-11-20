@@ -9,16 +9,20 @@
     <meta name="theme-color" content="#04060C" />
     <meta name="google-site-verification" content="ToX9Nmsn9mQUw-DWINSguE53Bo7Q_pgIFXd9-vvb9tk" />
 
+    <link rel="canonical" href="https://samueltavonatti.github.io/portfolio-preview/" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Samuel Tavonatti — UI/UX Designer &amp; Interaction Design" />
     <meta property="og:description" content="Progettazione di interfacce digitali ad alta usabilità, ergonomia cognitiva e case study reali." />
-    <meta property="og:image" content="/assets/avatar.webp" />
+    <meta property="og:image" content="https://samueltavonatti.github.io/portfolio-preview/assets/avatar.webp" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Samuel Tavonatti — UI/UX Designer &amp; Interaction Design" />
     <meta name="twitter:description" content="Progettazione di interfacce digitali ad alta usabilità, ergonomia cognitiva e case study reali." />
+    <meta name="twitter:image" content="https://samueltavonatti.github.io/portfolio-preview/assets/avatar.webp" />
 
     <!-- SPA 404.html restore for GitHub Pages -->
     <script>
@@ -27,8 +31,9 @@
           var decoded = l.search.slice(1).split('&').map(function(s) {
             return s.replace(/~and~/g, '&')
           }).join('?');
+          var basePath = l.pathname.endsWith('/') ? l.pathname.slice(0, -1) : l.pathname;
           window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
+              basePath + (decoded.startsWith('/') ? '' : '/') + decoded + l.hash
           );
         }
       }(window.location))

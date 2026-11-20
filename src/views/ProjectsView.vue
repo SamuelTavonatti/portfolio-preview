@@ -62,6 +62,8 @@ const filteredProjects = computed(() => {
               <img
                 :src="project.coverImage.src"
                 :alt="project.coverImage.alt[lang]"
+                width="640"
+                height="360"
                 class="cover-img"
                 loading="lazy"
               />

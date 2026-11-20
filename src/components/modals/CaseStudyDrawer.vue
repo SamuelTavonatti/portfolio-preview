@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { useI18n } from '../../i18n/useI18n'
+import { useFocusTrap } from '../../composables/useFocusTrap'
 import BaseBadge from '../ui/BaseBadge.vue'
 import BaseButton from '../ui/BaseButton.vue'
 import AppIcon from '../ui/AppIcon.vue'
@@ -15,11 +16,10 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 const { lang, t } = useI18n()
 
-const handleKeydown = (e) => {
-  if (e.key === 'Escape' && props.project) {
-    emit('close')
-  }
-}
+const drawerPanelRef = ref(null)
+const isOpen = computed(() => !!props.project)
+
+useFocusTrap(drawerPanelRef, isOpen, () => emit('close'))
 
 watch(
   () => props.project,
@@ -30,12 +30,7 @@ watch(
   { immediate: true }
 )
 
-onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
-})
-
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
   if (typeof document !== 'undefined') {
     document.body.style.overflow = ''
   }
@@ -45,7 +40,14 @@ onUnmounted(() => {
 <template>
   <Transition name="drawer-fade">
     <div v-if="project" class="drawer-overlay" @click.self="emit('close')">
-      <aside class="drawer-panel" role="dialog" aria-modal="true" :aria-label="project.content[lang].title">
+      <aside
+        ref="drawerPanelRef"
+        tabindex="-1"
+        class="drawer-panel"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="project.content[lang].title"
+      >
         <div class="drawer-header">
           <div class="drawer-badges">
             <BaseBadge variant="accent">{{ project.category }}</BaseBadge>

@@ -27,7 +27,7 @@
   /* Text hierarchy (WCAG AA/AAA on #04060C) */
   --text-primary: #F5F7FA;
   --text-secondary: #94A3B8;
-  --text-tertiary: #64748B;
+  --text-tertiary: #8596AB;
 
   /* Liquid Glass dividers + specular highlight */
   --border-subtle: rgba(148, 197, 255, 0.12);

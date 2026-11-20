@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onUnmounted, ref, toRef, watch } from 'vue'
 import { useI18n } from '../../i18n/useI18n'
+import { useFocusTrap } from '../../composables/useFocusTrap'
 import AppIcon from '../ui/AppIcon.vue'
 
 const props = defineProps({
@@ -14,6 +15,9 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 const { lang, t } = useI18n()
 const currentTab = ref(props.activeTab)
+const modalContainerRef = ref(null)
+
+useFocusTrap(modalContainerRef, toRef(props, 'isOpen'), () => emit('close'))
 
 watch(
   () => props.activeTab,
@@ -32,18 +36,7 @@ watch(
   { immediate: true }
 )
 
-const handleKeydown = (e) => {
-  if (e.key === 'Escape' && props.isOpen) {
-    emit('close')
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
-})
-
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
   if (typeof document !== 'undefined') {
     document.body.style.overflow = ''
   }
@@ -53,7 +46,14 @@ onUnmounted(() => {
 <template>
   <Transition name="fade">
     <div v-if="isOpen" class="modal-overlay" @click.self="emit('close')">
-      <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="policy-title">
+      <div
+        ref="modalContainerRef"
+        class="modal-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="policy-title"
+        tabindex="-1"
+      >
         <div class="modal-header">
           <h2 id="policy-title">
             {{

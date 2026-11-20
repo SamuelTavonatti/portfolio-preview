@@ -44,6 +44,8 @@ const previewMetrics = (project) => {
             <img
               :src="project.coverImage.src"
               :alt="project.coverImage.alt[lang]"
+              width="640"
+              height="360"
               loading="lazy"
               class="card-cover"
             />
@@ -161,7 +163,7 @@ const previewMetrics = (project) => {
 .card-media {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-subtle);

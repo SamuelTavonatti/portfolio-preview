@@ -53,9 +53,18 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('resize', measure)
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = ''
+  }
 })
 
 watch([activeKey, lang], () => nextTick(measure))
+
+watch(isMobileOpen, (open) => {
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = open ? 'hidden' : ''
+  }
+})
 
 const closeMobile = () => {
   isMobileOpen.value = false
@@ -417,7 +426,7 @@ const closeMobile = () => {
   position: relative;
   z-index: 1;
   min-width: 44px;
-  min-height: 40px;
+  min-height: 44px;
   background: none;
   border: none;
   color: var(--text-tertiary);
@@ -428,6 +437,12 @@ const closeMobile = () => {
   letter-spacing: 0.04em;
   padding: 0 0.7rem;
   transition: color 0.2s var(--ease-effects), transform 0.14s var(--ease-out-expo);
+}
+
+.lang-switch button::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
 }
 
 .lang-switch button:active {
