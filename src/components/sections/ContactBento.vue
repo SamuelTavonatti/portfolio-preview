@@ -48,6 +48,12 @@ const copyEmail = async () => {
           <span>GitHub</span>
           <AppIcon name="arrow-up-right" :size="15" />
         </BaseButton>
+
+        <BaseButton :href="profileData.links.instagram" external variant="secondary" class="contact-pill">
+          <AppIcon name="instagram" :size="17" />
+          <span>Instagram</span>
+          <AppIcon name="arrow-up-right" :size="15" />
+        </BaseButton>
       </div>
 
       <div class="glass-card email-bar">

@@ -757,7 +757,7 @@ onUnmounted(() => {
                 </button>
               </div>
 
-              <!-- State B: Full Generated Luxury Web Application Interface -->
+              <!-- State B: Elaborate Generated Luxury Web Application Interface -->
               <div class="webapp-view" aria-label="Generated Minimalist Workout and Habit OS">
                 <div class="wa-topbar">
                   <div class="wa-brand">
@@ -765,46 +765,93 @@ onUnmounted(() => {
                     <strong>Aether OS</strong>
                     <span class="mono wa-pill">8pt Grid · 60fps</span>
                   </div>
-                  <div class="wa-status mono">Generated Live</div>
+                  <div class="wa-top-tabs mono" aria-hidden="true">
+                    <span class="is-active">Overview</span>
+                    <span>Training</span>
+                    <span>Habits</span>
+                  </div>
+                  <div class="wa-top-right">
+                    <span class="wa-kbd mono">⌘K</span>
+                    <div class="wa-status mono">Generated Live</div>
+                  </div>
                 </div>
 
                 <div class="wa-body">
                   <aside class="wa-sidebar" aria-hidden="true">
-                    <span class="wa-nav-item is-on">Dashboard</span>
-                    <span class="wa-nav-item">Workouts</span>
-                    <span class="wa-nav-item">Habits</span>
-                    <span class="wa-nav-item">Recovery</span>
+                    <div class="wa-side-group">
+                      <span class="wa-side-lbl mono">Workspace</span>
+                      <span class="wa-nav-item is-on">Dashboard</span>
+                      <span class="wa-nav-item">Workouts <em class="mono">4</em></span>
+                      <span class="wa-nav-item">Habits <em class="mono">6</em></span>
+                      <span class="wa-nav-item">Recovery</span>
+                    </div>
+                    <div class="wa-side-footer">
+                      <span class="mono wa-side-lbl">Readiness</span>
+                      <strong class="tabular t-ice">96% · Optimal</strong>
+                    </div>
                   </aside>
 
                   <div class="wa-main">
                     <div class="wa-metrics">
                       <div class="wa-metric-card">
-                        <span class="mono wa-m-lbl">Weekly Volume</span>
+                        <div class="wa-m-top">
+                          <span class="mono wa-m-lbl">Weekly Volume</span>
+                          <span class="mono wa-delta is-up">+12.4%</span>
+                        </div>
                         <strong class="tabular wa-m-val t-gold">14,820 kg</strong>
                       </div>
                       <div class="wa-metric-card">
-                        <span class="mono wa-m-lbl">Habit Streak</span>
+                        <div class="wa-m-top">
+                          <span class="mono wa-m-lbl">Habit Streak</span>
+                          <span class="mono wa-delta is-ice">Best</span>
+                        </div>
                         <strong class="tabular wa-m-val t-ice">21 days</strong>
                       </div>
                       <div class="wa-metric-card">
-                        <span class="mono wa-m-lbl">Readiness</span>
-                        <strong class="tabular wa-m-val">96%</strong>
+                        <div class="wa-m-top">
+                          <span class="mono wa-m-lbl">Session Focus</span>
+                          <span class="mono wa-delta">Zero Lag</span>
+                        </div>
+                        <strong class="tabular wa-m-val">54 min</strong>
                       </div>
                     </div>
 
-                    <div class="wa-chart-card">
-                      <div class="wa-chart-head">
-                        <span class="mono wa-m-lbl">Progressive Overload Curve</span>
-                        <span class="mono wa-badge">+12.4%</span>
+                    <div class="wa-bottom-grid">
+                      <div class="wa-chart-card">
+                        <div class="wa-chart-head">
+                          <span class="mono wa-m-lbl">Progressive Overload Curve</span>
+                          <span class="mono wa-badge">+1,640 kg</span>
+                        </div>
+                        <div class="wa-bars" aria-hidden="true">
+                          <div class="wa-bar-col"><span style="height:38%"></span><em class="mono">M</em></div>
+                          <div class="wa-bar-col"><span style="height:52%"></span><em class="mono">T</em></div>
+                          <div class="wa-bar-col"><span style="height:48%"></span><em class="mono">W</em></div>
+                          <div class="wa-bar-col"><span style="height:68%"></span><em class="mono">T</em></div>
+                          <div class="wa-bar-col"><span style="height:76%"></span><em class="mono">F</em></div>
+                          <div class="wa-bar-col"><span class="is-ice" style="height:84%"></span><em class="mono">S</em></div>
+                          <div class="wa-bar-col"><span class="is-gold" style="height:94%"></span><em class="mono t-gold">S</em></div>
+                        </div>
                       </div>
-                      <div class="wa-bars" aria-hidden="true">
-                        <span style="height:38%"></span>
-                        <span style="height:52%"></span>
-                        <span style="height:48%"></span>
-                        <span style="height:68%"></span>
-                        <span style="height:76%"></span>
-                        <span class="is-ice" style="height:84%"></span>
-                        <span class="is-gold" style="height:94%"></span>
+
+                      <div class="wa-checklist-card">
+                        <div class="wa-chart-head">
+                          <span class="mono wa-m-lbl">Today’s Stack</span>
+                          <span class="mono wa-badge">2 / 3</span>
+                        </div>
+                        <div class="wa-task-list">
+                          <div class="wa-task is-done">
+                            <span class="wa-check">✓</span>
+                            <span>Hack Squat · 120kg × 6</span>
+                          </div>
+                          <div class="wa-task is-done">
+                            <span class="wa-check">✓</span>
+                            <span>Deep Work · 90m</span>
+                          </div>
+                          <div class="wa-task">
+                            <span class="wa-ring"></span>
+                            <span>Mobility · 15m</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1422,8 +1469,8 @@ onUnmounted(() => {
 }
 
 .ai-morph-shell.is-app-generated {
-  width: min(980px, 100%);
-  height: 410px;
+  width: min(1060px, 100%);
+  height: 440px;
   border-radius: 24px;
   border-color: rgba(255, 255, 255, 0.12);
 }
@@ -1507,7 +1554,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.25rem;
+  gap: 0.75rem;
+  padding: 0.78rem 1.25rem;
   border-bottom: 1px solid var(--border-subtle-w);
   background: rgba(4, 6, 12, 0.55);
 }
@@ -1534,6 +1582,44 @@ onUnmounted(() => {
   padding: 0.15rem 0.55rem;
 }
 
+.wa-top-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(11, 17, 32, 0.9);
+  border: 1px solid var(--border-subtle-w);
+  font-size: 0.7rem;
+  color: var(--slate);
+}
+
+.wa-top-tabs span {
+  padding: 0.24rem 0.7rem;
+  border-radius: 999px;
+}
+
+.wa-top-tabs span.is-active {
+  background: var(--ice-soft);
+  border: 1px solid var(--ice-border);
+  color: var(--alabaster);
+}
+
+.wa-top-right {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.wa-kbd {
+  font-size: 0.68rem;
+  color: var(--slate);
+  border: 1px solid var(--border-subtle-w);
+  background: rgba(11, 17, 32, 0.75);
+  border-radius: 7px;
+  padding: 0.18rem 0.45rem;
+}
+
 .wa-status {
   font-size: 0.72rem;
   color: var(--emerald);
@@ -1547,7 +1633,7 @@ onUnmounted(() => {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 168px minmax(0, 1fr);
+  grid-template-columns: 184px minmax(0, 1fr);
 }
 
 .wa-sidebar {
@@ -1555,15 +1641,38 @@ onUnmounted(() => {
   padding: 1rem 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  justify-content: space-between;
   background: rgba(4, 6, 12, 0.32);
 }
 
+.wa-side-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.wa-side-lbl {
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--slate);
+  padding: 0 0.55rem 0.25rem;
+}
+
 .wa-nav-item {
-  padding: 0.48rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.46rem 0.7rem;
   border-radius: 10px;
   font-size: 0.8rem;
   color: var(--slate);
+}
+
+.wa-nav-item em {
+  font-style: normal;
+  font-size: 0.68rem;
+  opacity: 0.75;
 }
 
 .wa-nav-item.is-on {
@@ -1573,43 +1682,78 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-.wa-main {
-  padding: 1.15rem 1.35rem;
+.wa-side-footer {
+  padding: 0.7rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(11, 17, 32, 0.72);
+  border: 1px solid var(--border-subtle-w);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.15rem;
+}
+
+.wa-side-footer .wa-side-lbl { padding: 0; }
+.wa-side-footer strong { font-size: 0.84rem; }
+
+.wa-main {
+  padding: 1.05rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
 }
 
 .wa-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.85rem;
+  gap: 0.8rem;
 }
 
 .wa-metric-card {
-  padding: 0.85rem 1rem;
+  padding: 0.78rem 0.95rem;
   border-radius: 14px;
   background: rgba(4, 6, 12, 0.55);
   border: 1px solid var(--border-subtle-w);
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
-.wa-m-lbl { font-size: 0.68rem; color: var(--slate); text-transform: uppercase; }
+.wa-m-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.wa-m-lbl { font-size: 0.66rem; color: var(--slate); text-transform: uppercase; }
 .wa-m-val { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; }
 
-.wa-chart-card {
+.wa-delta {
+  font-size: 0.64rem;
+  color: var(--slate);
+}
+.wa-delta.is-up { color: var(--emerald); }
+.wa-delta.is-ice { color: var(--ice); }
+
+.wa-bottom-grid {
   flex: 1;
   min-height: 0;
-  padding: 0.95rem 1.1rem;
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 0.85rem;
+}
+
+.wa-chart-card,
+.wa-checklist-card {
+  min-height: 0;
+  padding: 0.9rem 1.05rem;
   border-radius: 14px;
   background: rgba(4, 6, 12, 0.55);
   border: 1px solid var(--border-subtle-w);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .wa-chart-head {
@@ -1624,22 +1768,78 @@ onUnmounted(() => {
 }
 
 .wa-bars {
-  height: 110px;
+  flex: 1;
+  min-height: 112px;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.65rem;
+  gap: 0.55rem;
   align-items: end;
 }
 
-.wa-bars span {
+.wa-bar-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wa-bar-col span {
   display: block;
   width: 100%;
-  border-radius: 7px;
+  border-radius: 6px;
   background: rgba(148, 197, 255, 0.2);
 }
 
-.wa-bars span.is-ice { background: var(--ice); }
-.wa-bars span.is-gold { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
+.wa-bar-col span.is-ice { background: var(--ice); }
+.wa-bar-col span.is-gold { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
+.wa-bar-col em { font-style: normal; font-size: 0.62rem; color: var(--slate); }
+
+.wa-task-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.wa-task {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.52rem 0.7rem;
+  border-radius: 10px;
+  background: rgba(11, 17, 32, 0.72);
+  border: 1px solid var(--border-subtle-w);
+  font-size: 0.78rem;
+  color: var(--alabaster);
+}
+
+.wa-task.is-done {
+  border-color: rgba(52, 211, 153, 0.28);
+  color: var(--slate);
+}
+
+.wa-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--emerald-soft);
+  color: var(--emerald);
+  font-size: 0.68rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.wa-ring {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ice);
+  flex-shrink: 0;
+}
 
 .pill-echo {
   position: absolute;
@@ -1869,7 +2069,8 @@ onUnmounted(() => {
   .ai-morph-shell.is-app-generated { height: 390px; }
   .prompt-view { padding: 0.75rem 0.9rem; }
   .wa-body { grid-template-columns: 1fr; }
-  .wa-sidebar { display: none; }
+  .wa-sidebar, .wa-top-tabs, .wa-kbd, .wa-checklist-card { display: none; }
+  .wa-bottom-grid { grid-template-columns: 1fr; }
   .wa-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .wa-metrics .wa-metric-card:last-child { display: none; }
   .vol-bars { height: 92px; }
