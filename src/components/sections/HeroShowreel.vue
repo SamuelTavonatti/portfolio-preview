@@ -1,2790 +1,3694 @@
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import BaseButton from '../ui/BaseButton.vue'
-import AppIcon from '../ui/AppIcon.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-// =============================================================================
-// 20.0s SEAMLESS HERO SHOWREEL (4SCjXcBeW1E Motion Mechanics + Rich Peripheral Graphics)
-// - Scene 01 (0.0s – 5.0s) : UX/UI DESIGN
-//   · Inline Pill `[ + System ]` + Vertical Word Carousel (`Systems` -> `Interfaces` -> `DESIGN`)
-//   · Spatial 2D Figma Auto-Layout Frame (`8pt Grid · WCAG AA`) with live redline guides (16px/24px)
-//   · Multiplayer Live Cursors (`UX`, `UI`, `Dev`) snapping modular style grid components
-//   · Peripheral Typography Scale, Color Token Swatches (#050507, #E2B878, #34D399), Contrast 14.8:1 AAA
-//   · Cursor clicks `Validate Flow →` -> `Validated ✓` + horizontal spatial pan & capsule wave
-// - Scene 02 (5.0s – 10.0s): USER RESEARCH
-//   · Text-First reveal + Staggered Dark-Glass UX Outline & Telemetry Stack:
-//     Row 1: `Cognitive Load Audit` -> `-42% Friction` (tabular-nums counter + sparkline)
-//     Row 2: `Usability Benchmark` -> `98.4% Task Completion · SUS 91/100` (progress fill)
-//     Row 3: `User Journey Architecture` -> `Simplify Flow` -> `Simplified ✓` (3 ergonomic nodes)
-//   · Peripheral heuristic pills (`Card Sorting`, `Heuristic Audit`, `Zero Dead-Ends`) & dashed guide tracks
-//   · Cursor clicks `Simplify Flow` then `Next →`, collapsing stack (width/height/borderRadius) into AI Prompt Pill
-// - Scene 03 (10.0s – 15.0s): CREATIVE AI (NO Robot / NO Binary Stream)
-//   · Glassmorphic AI Prompt Pill Composer (#0F1117, #E2B878 focus ring, rounded-full)
-//   · Macro Close-Up Caret Typing (scale 1.32) streaming senior copy
-//   · Camera pulls back (scale 1.0) revealing peripheral cards (`Voltrep_Tokens.fig`, `A11y_Rules.json`, `UX_Telemetry`)
-//   · Cursor drags `Voltrep_Tokens.fig` and drops it inside prompt pill as inline chip `[Voltrep_Tokens.fig ×]`
-//   · Cursor clicks `↑ Generate` -> morphs width/height/borderRadius into `Generating...` capsule +
-//     3 expanding concentric pill outline echoes + pulsing vertical equalizer bar wave into Scene 04
-// - Scene 04 (15.0s – 20.0s): MOTION & FRONT-END
-//   · Peripheral physics telemetry (`60 FPS · GPU Compositing · cubic-bezier(0.16, 1, 0.3, 1)`)
-//   · Left/Center Foreground: Voltrep Live Logger (`Hack Squat · 120 kg × 6 reps`) + `Log Set` -> `Set Logged ✓`
-//   · Right Foreground: Portfolio Sliding Pill Navbar (`Overview | Case Studies | Journey`) +
-//     `Voltrep Case Study` (`60 FPS · Semantic Code`) + `▶ Preview System`
-//   · Cursor clicks `▶ Preview System` -> 3 concentric pill outline echoes wipe to `[ + System ]` at 0.0s
-// =============================================================================
-
-const LOOP_SEC = 20.0
-const LOOP_MS = LOOP_SEC * 1000
-
-const PROMPT_TEXT =
-  'Architect a low-friction workout logger with WCAG AA contrast, 8pt spatial rhythm, and 60fps micro-interactions.'
-
-const elapsedMs = ref(0)
-const isAutoPlaying = ref(true)
+/**
+ * =========================================================================
+ * 20.5-SECOND SEAMLESS APPLE KEYNOTE / GOOGLE LAUNCH HERO SHOWREEL ENGINE
+ * 4 Scenes · Native 60fps requestAnimationFrame · Exact Cursor Physics
+ * Ported directly from user's portfolio_hero_showreel.html
+ * =========================================================================
+ */
+const rootRef = ref(null)
 
 let rafId = null
-let lastTs = null
-
-// Live DOM Refs for getBoundingClientRect() cursor targeting
-const stageRef = ref(null)
-const s1ValidateBtnRef = ref(null)
-const s2SimplifyBtnRef = ref(null)
-const s2NextBtnRef = ref(null)
-const s3DragCardRef = ref(null)
-const s3DropZoneRef = ref(null)
-const s3GenerateBtnRef = ref(null)
-const s4LogBtnRef = ref(null)
-const s4PreviewBtnRef = ref(null)
-
-const targets = reactive({
-  s1Validate: { x: 720, y: 440 },
-  s2Simplify: { x: 780, y: 405 },
-  s2Next: { x: 885, y: 465 },
-  s3DragCard: { x: 260, y: 360 },
-  s3DropZone: { x: 470, y: 315 },
-  s3Generate: { x: 890, y: 365 },
-  s4Log: { x: 525, y: 435 },
-  s4Preview: { x: 895, y: 435 },
-})
-
-const clamp = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v))
-const lerp = (a, b, k) => a + (b - a) * k
-const easeOutCubic = (x) => 1 - Math.pow(1 - clamp(x), 3)
-const easeOutQuint = (x) => 1 - Math.pow(1 - clamp(x), 5)
-const easeInOutCubic = (x) => {
-  const c = clamp(x)
-  return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2
-}
-const easeInOutQuart = (x) => {
-  const c = clamp(x)
-  return c < 0.5 ? 8 * c * c * c * c : 1 - Math.pow(-2 * c + 2, 4) / 2
-}
-const easeSpring = (x) => {
-  const c = clamp(x)
-  if (c === 0 || c === 1) return c
-  return 1 + Math.pow(2, -9 * c) * Math.sin((c * 10 - 0.75) * ((2 * Math.PI) / 3)) * 0.22
-}
-
-const sec = computed(() => (elapsedMs.value % LOOP_MS) / 1000)
-
-const centerOf = (el, vpRect, fallback) => {
-  if (!el || !vpRect || !vpRect.width) return fallback
-  const r = el.getBoundingClientRect()
-  if (!r.width && !r.height) return fallback
-  return {
-    x: r.left - vpRect.left + r.width / 2,
-    y: r.top - vpRect.top + r.height / 2,
-  }
-}
-
-const measureTargets = () => {
-  const vp = stageRef.value
-  if (!vp) return
-  const vpRect = vp.getBoundingClientRect()
-  if (!vpRect.width) return
-  const s = sec.value
-  if (s < 5.0) {
-    targets.s1Validate = centerOf(s1ValidateBtnRef.value, vpRect, targets.s1Validate)
-  } else if (s < 10.0) {
-    targets.s2Simplify = centerOf(s2SimplifyBtnRef.value, vpRect, targets.s2Simplify)
-    targets.s2Next = centerOf(s2NextBtnRef.value, vpRect, targets.s2Next)
-  } else if (s < 15.0) {
-    targets.s3DragCard = centerOf(s3DragCardRef.value, vpRect, targets.s3DragCard)
-    targets.s3DropZone = centerOf(s3DropZoneRef.value, vpRect, targets.s3DropZone)
-    targets.s3Generate = centerOf(s3GenerateBtnRef.value, vpRect, targets.s3Generate)
-  } else {
-    targets.s4Log = centerOf(s4LogBtnRef.value, vpRect, targets.s4Log)
-    targets.s4Preview = centerOf(s4PreviewBtnRef.value, vpRect, targets.s4Preview)
-  }
-}
-
-const bez = (p0, p1, p2, k) => ({
-  x: (1 - k) * (1 - k) * p0.x + 2 * (1 - k) * k * p1.x + k * k * p2.x,
-  y: (1 - k) * (1 - k) * p0.y + 2 * (1 - k) * k * p1.y + k * k * p2.y,
-})
-
-// =============================================================================
-// SCENE 01 (0.00s – 5.00s) — UX/UI DESIGN
-// Inline Pill `[ + System ]` + Vertical Word Carousel -> Spatial Figma Canvas
-// =============================================================================
-const s1State = computed(() => {
-  const s = sec.value
-  if (s >= 5.0) {
-    return { visible: false, opacity: '0', transform: 'none' }
-  }
-  if (s < 0.35) {
-    const k = easeOutQuint(s / 0.35)
-    return {
-      visible: true,
-      opacity: k.toFixed(3),
-      transform: `scale(${(1.04 - k * 0.04).toFixed(4)})`,
-    }
-  }
-  if (s < 4.42) {
-    return {
-      visible: true,
-      opacity: '1',
-      transform: 'translate3d(0, 0, 0) scale(1)',
-    }
-  }
-  // 4.42s -> 5.00s: Horizontal spatial pan + capsule wave clears Scene 01
-  const k = easeInOutQuart((s - 4.42) / 0.58)
-  return {
-    visible: true,
-    opacity: (1 - k).toFixed(3),
-    transform: `translate3d(${(-k * 140).toFixed(1)}px, 0, 0) scale(${(1 - k * 0.04).toFixed(4)})`,
-  }
-})
-
-// Vertical word carousel index: 0 = Systems (0.0-0.42s), 1 = Interfaces (0.42-0.84s), 2 = DESIGN (0.84s+)
-const s1WordIndex = computed(() => {
-  const s = sec.value
-  if (s < 0.42) return 0
-  if (s < 0.84) return 1
-  return 2
-})
-
-const s1CarouselOffsetEm = computed(() => {
-  const s = sec.value
-  let pos = 0
-  if (s < 0.42) {
-    pos = easeInOutCubic(clamp((s - 0.12) / 0.3)) * 1
-  } else if (s < 0.88) {
-    pos = 1 + easeSpring(clamp((s - 0.42) / 0.44)) * 1
-  } else {
-    pos = 2
-  }
-  return (-pos * 1.18).toFixed(3)
-})
-
-// Camera pulls back at 0.9s – 1.45s to reveal Figma Auto-Layout Frame & peripheral tokens
-const s1CanvasReveal = computed(() => easeOutQuint(clamp((sec.value - 0.65) / 0.7)))
-
-// Modular style grid toggle: Wireframe -> Production UI when multiplayer cursors align (2.1s)
-const s1ProductionMode = computed(() => sec.value >= 2.05)
-
-// Multiplayer Live Cursors (`UX`, `UI`, `Dev`)
-const s1PeerCursors = computed(() => {
-  const s = clamp(sec.value, 0, 5)
-  const k = easeInOutCubic(clamp((s - 1.0) / 1.15))
-  const floatA = Math.sin(s * 2.8) * 4
-  const floatB = Math.cos(s * 2.5) * 4
-  return {
-    ux: {
-      x: lerp(28, 128, k) + floatA,
-      y: lerp(96, 48, k) - floatB,
-    },
-    ui: {
-      x: lerp(390, 315, k) - floatB,
-      y: lerp(124, 68, k) + floatA,
-    },
-    dev: {
-      x: lerp(210, 248, k) + floatB,
-      y: lerp(164, 134, k) - floatA,
-    },
-  }
-})
-
-const s1Hover = computed(() => sec.value >= 3.55 && sec.value < 4.55)
-const s1Pressed = computed(() => sec.value >= 3.92 && sec.value < 4.08)
-const s1Validated = computed(() => sec.value >= 4.0)
-const s1Ripple = computed(() => sec.value >= 3.96 && sec.value < 4.55)
-
-// Capsule wave transition bridge between Scene 01 and Scene 02 (4.35s – 5.25s)
-const s12CapsuleWave = computed(() => {
-  const s = sec.value
-  if (s < 4.32 || s >= 5.28) return { visible: false, progress: 0 }
-  const k = (s - 4.32) / 0.96
-  return { visible: true, progress: k }
-})
-
-// =============================================================================
-// SCENE 02 (5.00s – 10.00s) — USER RESEARCH
-// Staggered Dark-Glass UX Outline & Telemetry Stack + Simplify Flow -> Next -> Morph
-// =============================================================================
-const s2State = computed(() => {
-  const s = sec.value
-  if (s < 5.0 || s >= 10.0) {
-    return { visible: false, opacity: '0', transform: 'none' }
-  }
-  const local = s - 5.0
-  if (local < 0.48) {
-    const k = easeOutQuint(local / 0.48)
-    return {
-      visible: true,
-      opacity: k.toFixed(3),
-      transform: `translate3d(${((1 - k) * 95).toFixed(1)}px, 0, 0)`,
-    }
-  }
-  if (local < 4.3) {
-    return {
-      visible: true,
-      opacity: '1',
-      transform: 'translate3d(0, 0, 0)',
-    }
-  }
-  // 9.30s -> 10.00s: Stack collapses via width/height/borderRadius spring into Scene 03 Prompt Pill
-  const k = easeInOutQuart((local - 4.3) / 0.7)
-  return {
-    visible: true,
-    opacity: (1 - k * 0.92).toFixed(3),
-    transform: `translate3d(0, ${(-k * 12).toFixed(1)}px, 0)`,
-  }
-})
-
-const s2TitleY = computed(() => `${((1 - easeOutQuint(clamp((sec.value - 5.04) / 0.42))) * 105).toFixed(1)}%`)
-
-const s2RowReveal = (idx) => {
-  const k = easeSpring(clamp((sec.value - (5.22 + idx * 0.14)) / 0.55))
-  return {
-    opacity: clamp((sec.value - (5.22 + idx * 0.14)) / 0.3).toFixed(3),
-    transform: `translate3d(0, ${((1 - k) * 22).toFixed(1)}px, 0)`,
-  }
-}
-
-const s2FrictionVal = computed(() => {
-  const k = easeOutCubic(clamp((sec.value - 5.35) / 1.15))
-  return Math.round(42 * k)
-})
-
-const s2CompletionVal = computed(() => {
-  const k = easeOutCubic(clamp((sec.value - 5.5) / 1.25))
-  return (98.4 * k).toFixed(1)
-})
-
-const s2SusVal = computed(() => {
-  const k = easeOutCubic(clamp((sec.value - 5.5) / 1.25))
-  return Math.round(91 * k)
-})
-
-const s2SimplifyHover = computed(() => sec.value >= 7.3 && sec.value < 8.15)
-const s2SimplifyPressed = computed(() => sec.value >= 7.72 && sec.value < 7.88)
-const s2Simplified = computed(() => sec.value >= 7.8)
-const s2SimplifyRipple = computed(() => sec.value >= 7.76 && sec.value < 8.3)
-
-const s2NextHover = computed(() => sec.value >= 8.55 && sec.value < 9.35)
-const s2NextPressed = computed(() => sec.value >= 8.88 && sec.value < 9.04)
-const s2NextClicked = computed(() => sec.value >= 8.95)
-const s2NextRipple = computed(() => sec.value >= 8.92 && sec.value < 9.45)
-
-// Surgical width / height / borderRadius morph on Scene 02 Stack -> Scene 03 Prompt Pill (9.15s – 9.95s)
-const s2StackMorphStyle = computed(() => {
-  const s = sec.value
-  if (s < 9.15) {
-    return {
-      maxWidth: '760px',
-      borderRadius: '20px',
-    }
-  }
-  const k = easeInOutQuart(clamp((s - 9.15) / 0.8))
-  return {
-    maxWidth: `${lerp(760, 680, k).toFixed(1)}px`,
-    maxHeight: `${lerp(310, 74, k).toFixed(1)}px`,
-    borderRadius: `${lerp(20, 999, k).toFixed(1)}px`,
-    overflow: 'hidden',
-  }
-})
-
-// =============================================================================
-// SCENE 03 (10.00s – 15.00s) — CREATIVE AI (NO Robot / NO Binary Stream)
-// Macro Close-Up Caret Typing + Drag-and-Drop Context Chip + Concentric Submit Echo
-// + Capsule-to-Equalizer Wave into Scene 04
-// =============================================================================
-const s3State = computed(() => {
-  const s = sec.value
-  if (s < 10.0 || s >= 15.0) {
-    return { visible: false, opacity: '0', transform: 'none' }
-  }
-  const local = s - 10.0
-  if (local < 0.38) {
-    const k = easeOutQuint(local / 0.38)
-    return {
-      visible: true,
-      opacity: k.toFixed(3),
-      transform: 'translate3d(0, 0, 0)',
-    }
-  }
-  if (local < 4.4) {
-    return {
-      visible: true,
-      opacity: '1',
-      transform: 'translate3d(0, 0, 0)',
-    }
-  }
-  const k = easeInOutQuart((local - 4.4) / 0.6)
-  return {
-    visible: true,
-    opacity: (1 - k).toFixed(3),
-    transform: `scale(${(1 + k * 0.05).toFixed(4)})`,
-  }
-})
-
-const s3TitleY = computed(() => `${((1 - easeOutQuint(clamp((sec.value - 10.02) / 0.4))) * 105).toFixed(1)}%`)
-
-// Macro camera zoom onto the blinking caret (10.18s – 11.45s: scale 1.32 -> 1.00)
-const s3MacroZoomStyle = computed(() => {
-  const s = sec.value
-  let sc = 1
-  if (s >= 10.12 && s < 10.52) {
-    sc = lerp(1, 1.32, easeOutCubic((s - 10.12) / 0.4))
-  } else if (s >= 10.52 && s < 11.28) {
-    sc = 1.32
-  } else if (s >= 11.28 && s < 11.72) {
-    sc = lerp(1.32, 1, easeInOutCubic((s - 11.28) / 0.44))
-  }
-  return {
-    transform: `scale(${sc.toFixed(4)})`,
-  }
-})
-
-// Live senior prompt typing (10.22s – 11.65s)
-const s3TypedCopy = computed(() => {
-  const s = sec.value
-  if (s < 10.2) return ''
-  const k = clamp((s - 10.2) / 1.42)
-  const chars = Math.floor(k * PROMPT_TEXT.length)
-  return PROMPT_TEXT.slice(0, chars)
-})
-
-// Peripheral context cards reveal as camera pulls back (11.35s+)
-const s3ContextReveal = computed(() => easeOutQuint(clamp((sec.value - 11.25) / 0.55)))
-
-// Drag-and-drop sequence for `Voltrep_Tokens.fig`:
-// 11.78s -> 12.42s: Cursor grabs `Voltrep_Tokens.fig` and drags it into the prompt pill
-// 12.42s+: Attached inline as `[Voltrep_Tokens.fig ×]`
-const s3IsDraggingChip = computed(() => sec.value >= 11.82 && sec.value < 12.42)
-const s3ChipAttached = computed(() => sec.value >= 12.42)
-
-const s3DragCardStyle = computed(() => {
-  const s = sec.value
-  if (s >= 12.42) {
-    return {
-      opacity: '0.28',
-      transform: 'scale(0.92)',
-    }
-  }
-  if (s >= 11.82 && s < 12.42) {
-    const k = easeInOutCubic((s - 11.82) / 0.6)
-    const dx = (targets.s3DropZone.x - targets.s3DragCard.x) * k
-    const dy = (targets.s3DropZone.y - targets.s3DragCard.y) * k
-    const sc = lerp(1, 0.88, k)
-    return {
-      zIndex: 35,
-      opacity: '1',
-      transform: `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0) scale(${sc.toFixed(3)})`,
-      borderColor: '#E2B878',
-      boxShadow: '0 18px 40px rgba(226, 184, 120, 0.32)',
-    }
-  }
-  return {
-    opacity: s3ContextReveal.value.toFixed(3),
-    transform: `translate3d(0, ${((1 - s3ContextReveal.value) * 16).toFixed(1)}px, 0) scale(0.95)`,
-  }
-})
-
-// Submit click & `Generating...` pill morph (13.05s+)
-const s3GenHover = computed(() => sec.value >= 12.7 && sec.value < 13.45)
-const s3GenPressed = computed(() => sec.value >= 13.02 && sec.value < 13.18)
-const s3IsGenerating = computed(() => sec.value >= 13.12)
-const s3GenRipple = computed(() => sec.value >= 13.08 && sec.value < 13.7)
-
-// Prompt Pill width / height / borderRadius morph into compact `Generating...` capsule (13.15s – 13.75s)
-const s3PromptMorphStyle = computed(() => {
-  const s = sec.value
-  if (s < 13.15) {
-    return {
-      maxWidth: '790px',
-      borderRadius: '999px',
-    }
-  }
-  const k = easeInOutQuart(clamp((s - 13.15) / 0.55))
-  return {
-    maxWidth: `${lerp(790, 290, k).toFixed(1)}px`,
-    borderRadius: '999px',
-  }
-})
-
-// 3 Concentric Expanding Pill Outline Echoes on `Generating...` (13.18s – 14.35s)
-const s3ConcentricEchoes = computed(() => {
-  const s = sec.value
-  if (s < 13.16 || s >= 14.45) return []
-  return [0, 1, 2].map((i) => {
-    const k = clamp((s - (13.16 + i * 0.16)) / 0.85)
-    const e = easeOutCubic(k)
-    return {
-      id: i,
-      opacity: ((1 - e) * (k > 0 ? 0.78 : 0)).toFixed(3),
-      width: `${lerp(280, 760 + i * 110, e).toFixed(1)}px`,
-      height: `${lerp(62, 168 + i * 44, e).toFixed(1)}px`,
-    }
-  })
-})
-
-// Capsule-to-Equalizer Bar Wave Bridge (13.95s – 15.25s)
-const EQ_WAVE_BARS = Array.from({ length: 24 }, (_, i) => i)
-const s34EqualizerBridge = computed(() => {
-  const s = sec.value
-  if (s < 13.92 || s >= 15.22) return { visible: false, bars: [] }
-  const local = (s - 13.92) / 1.3
-  const env = Math.sin(clamp(local) * Math.PI)
-  const bars = EQ_WAVE_BARS.map((i) => {
-    const centerDist = Math.abs(i - 11.5) / 11.5
-    const phase = Math.sin(s * 9.5 - i * 0.45) * 0.5 + 0.5
-    const h = clamp((24 + phase * 150 * (1 - centerDist * 0.45)) * env, 12, 180)
-    return {
-      id: i,
-      height: `${h.toFixed(1)}px`,
-      opacity: clamp(env * 1.25, 0, 0.95).toFixed(3),
-      isGold: i % 2 === 0,
-    }
-  })
-  return { visible: true, bars }
-})
-
-// =============================================================================
-// SCENE 04 (15.00s – 20.00s) — MOTION & FRONT-END
-// Voltrep Live Logger + Portfolio Sliding Pill Navbar + Concentric Echo Loop Reset
-// =============================================================================
-const s4State = computed(() => {
-  const s = sec.value
-  if (s < 15.0) {
-    return { visible: false, opacity: '0', transform: 'none' }
-  }
-  const local = s - 15.0
-  if (local < 0.45) {
-    const k = easeOutQuint(local / 0.45)
-    return {
-      visible: true,
-      opacity: k.toFixed(3),
-      transform: `translate3d(0, ${((1 - k) * 24).toFixed(1)}px, 0)`,
-    }
-  }
-  if (local < 4.35) {
-    return {
-      visible: true,
-      opacity: '1',
-      transform: 'translate3d(0, 0, 0)',
-    }
-  }
-  // 19.35s -> 20.00s: Concentric Echo Loop Reset wipes cleanly into `[ + System ]` at 0.0s
-  const k = easeInOutQuart((local - 4.35) / 0.65)
-  return {
-    visible: true,
-    opacity: (1 - k).toFixed(3),
-    transform: `scale(${(1 - k * 0.04).toFixed(4)})`,
-  }
-})
-
-const s4TitleY = computed(() => `${((1 - easeOutQuint(clamp((sec.value - 15.04) / 0.42))) * 105).toFixed(1)}%`)
-
-const s4LogHover = computed(() => sec.value >= 16.05 && sec.value < 16.95)
-const s4LogPressed = computed(() => sec.value >= 16.45 && sec.value < 16.61)
-const s4SetLogged = computed(() => sec.value >= 16.52)
-const s4LogRipple = computed(() => sec.value >= 16.49 && sec.value < 17.05)
-
-// Sliding Pill Navbar: glides from `Overview` (index 0) to `Case Studies` (index 1) at 16.85s
-const s4NavCaseStudiesActive = computed(() => sec.value >= 16.85)
-
-const s4PreviewHover = computed(() => sec.value >= 18.15 && sec.value < 19.1)
-const s4PreviewPressed = computed(() => sec.value >= 18.58 && sec.value < 18.74)
-const s4PreviewClicked = computed(() => sec.value >= 18.65)
-const s4PreviewRipple = computed(() => sec.value >= 18.62 && sec.value < 19.25)
-
-// 3 Concentric Expanding Pill Outline Echoes on `▶ Preview System` (18.66s – 19.95s)
-const s4LoopEchoes = computed(() => {
-  const s = sec.value
-  if (s < 18.66) return []
-  return [0, 1, 2].map((i) => {
-    const k = clamp((s - (18.66 + i * 0.16)) / 0.92)
-    const e = easeOutCubic(k)
-    return {
-      id: i,
-      opacity: ((1 - e) * (k > 0 ? 0.82 : 0)).toFixed(3),
-      width: `${lerp(220, 820 + i * 140, e).toFixed(1)}px`,
-      height: `${lerp(52, 220 + i * 56, e).toFixed(1)}px`,
-    }
-  })
-})
-
-// =============================================================================
-// UNIFIED PIXEL-ACCURATE DYNAMIC CURSOR (`getBoundingClientRect()`)
-// =============================================================================
-const stageCursor = computed(() => {
-  const s = sec.value
-  let x = targets.s1Validate.x
-  let y = targets.s1Validate.y
-  let scale = 1
-  let opacity = 0
-
-  // SCENE 01: Glide to `Validate Flow →` & click (3.10s – 4.45s)
-  if (s >= 3.1 && s < 4.45) {
-    const b = targets.s1Validate
-    const start = { x: b.x + 150, y: b.y + 80 }
-    if (s < 3.65) {
-      const k = easeOutQuint((s - 3.1) / 0.55)
-      opacity = clamp((s - 3.1) / 0.22)
-      const p = bez(start, { x: b.x + 55, y: b.y - 24 }, b, k)
-      x = p.x
-      y = p.y
-    } else if (s < 4.18) {
-      opacity = 1
-      x = b.x
-      y = b.y
-      if (s >= 3.92 && s < 4.08) scale = 0.92
-    } else {
-      const k = easeOutCubic((s - 4.18) / 0.27)
-      opacity = 1 - k
-      x = b.x - k * 45
-      y = b.y + k * 15
-    }
-  }
-  // SCENE 02: Glide to `Simplify Flow` (7.10s), click (7.75s), then glide to `Next →` (8.55s) & click (8.92s)
-  else if (s >= 7.05 && s < 9.45) {
-    const b1 = targets.s2Simplify
-    const b2 = targets.s2Next
-    const start = { x: b1.x + 140, y: b1.y - 70 }
-    if (s < 7.55) {
-      const k = easeOutQuint((s - 7.05) / 0.5)
-      opacity = clamp((s - 7.05) / 0.2)
-      const p = bez(start, { x: b1.x + 48, y: b1.y - 24 }, b1, k)
-      x = p.x
-      y = p.y
-    } else if (s < 8.15) {
-      opacity = 1
-      x = b1.x
-      y = b1.y
-      if (s >= 7.72 && s < 7.88) scale = 0.92
-    } else if (s < 8.65) {
-      opacity = 1
-      const k = easeInOutCubic((s - 8.15) / 0.5)
-      const p = bez(b1, { x: (b1.x + b2.x) / 2 + 18, y: (b1.y + b2.y) / 2 - 14 }, b2, k)
-      x = p.x
-      y = p.y
-    } else if (s < 9.18) {
-      opacity = 1
-      x = b2.x
-      y = b2.y
-      if (s >= 8.88 && s < 9.04) scale = 0.92
-    } else {
-      const k = easeOutCubic((s - 9.18) / 0.27)
-      opacity = 1 - k
-      x = b2.x + k * 35
-      y = b2.y + k * 20
-    }
-  }
-  // SCENE 03: Grab `Voltrep_Tokens.fig` (11.50s), drag into prompt pill (11.82s-12.42s), glide to `↑ Generate` (12.85s) & click (13.05s)
-  else if (s >= 11.45 && s < 13.75) {
-    const card = targets.s3DragCard
-    const drop = targets.s3DropZone
-    const gen = targets.s3Generate
-    const start = { x: card.x - 70, y: card.y + 70 }
-    if (s < 11.82) {
-      const k = easeOutQuint((s - 11.45) / 0.37)
-      opacity = clamp((s - 11.45) / 0.18)
-      x = lerp(start.x, card.x, k)
-      y = lerp(start.y, card.y, k)
-    } else if (s < 12.42) {
-      opacity = 1
-      scale = 0.93
-      const k = easeInOutCubic((s - 11.82) / 0.6)
-      x = lerp(card.x, drop.x, k)
-      y = lerp(card.y, drop.y, k)
-    } else if (s < 12.88) {
-      opacity = 1
-      const k = easeInOutCubic((s - 12.42) / 0.46)
-      const p = bez(drop, { x: (drop.x + gen.x) / 2, y: drop.y - 26 }, gen, k)
-      x = p.x
-      y = p.y
-    } else if (s < 13.42) {
-      opacity = 1
-      x = gen.x
-      y = gen.y
-      if (s >= 13.02 && s < 13.18) scale = 0.92
-    } else {
-      const k = easeOutCubic((s - 13.42) / 0.33)
-      opacity = 1 - k
-      x = gen.x + k * 40
-      y = gen.y + k * 20
-    }
-  }
-  // SCENE 04: Glide to `Log Set` (15.85s), click (16.48s), then glide to `▶ Preview System` (18.25s) & click (18.62s)
-  else if (s >= 15.8 && s < 19.15) {
-    const bLog = targets.s4Log
-    const bPrev = targets.s4Preview
-    const start = { x: bLog.x - 130, y: bLog.y + 70 }
-    if (s < 16.28) {
-      const k = easeOutQuint((s - 15.8) / 0.48)
-      opacity = clamp((s - 15.8) / 0.2)
-      const p = bez(start, { x: bLog.x - 40, y: bLog.y - 22 }, bLog, k)
-      x = p.x
-      y = p.y
-    } else if (s < 17.15) {
-      opacity = 1
-      x = bLog.x
-      y = bLog.y
-      if (s >= 16.45 && s < 16.61) scale = 0.92
-    } else if (s < 18.25) {
-      opacity = 1
-      const k = easeInOutCubic((s - 17.15) / 1.1)
-      const p = bez(bLog, { x: (bLog.x + bPrev.x) / 2, y: Math.min(bLog.y, bPrev.y) - 38 }, bPrev, k)
-      x = p.x
-      y = p.y
-    } else if (s < 18.88) {
-      opacity = 1
-      x = bPrev.x
-      y = bPrev.y
-      if (s >= 18.58 && s < 18.74) scale = 0.92
-    } else {
-      const k = easeOutCubic((s - 18.88) / 0.27)
-      opacity = 1 - k
-      x = bPrev.x + k * 36
-      y = bPrev.y - k * 20
-    }
-  }
-
-  return {
-    opacity: opacity.toFixed(3),
-    transform: `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale})`,
-  }
-})
-
-const onResize = () => {
-  measureTargets()
-}
-
-const tick = (ts) => {
-  if (lastTs !== null && isAutoPlaying.value) {
-    elapsedMs.value += ts - lastTs
-  }
-  lastTs = ts
-  measureTargets()
-  rafId = window.requestAnimationFrame(tick)
-}
+let resizeHandler = null
 
 onMounted(() => {
-  if (typeof window === 'undefined') return
-  window.addEventListener('resize', onResize, { passive: true })
+  const root = rootRef.value
+  if (!root || typeof window === 'undefined') return
+
+  const q = (id) => root.querySelector(`#${id}`)
+
+  const LOOP_MS = 20500
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const stage = q('stage')
+  const introBrand = q('introBrand')
+  const cursorEl = q('cursor')
+  const rippleEl = q('ripple')
+  const loopSweep = q('loopSweep')
+
+  const scenes = {
+    1: q('scene1'),
+    2: q('scene2'),
+    3: q('scene3'),
+    4: q('scene4'),
+  }
+
+  const headlineMasks = {
+    1: scenes[1].querySelector('.headline-mask'),
+    2: scenes[2].querySelector('.headline-mask'),
+    3: scenes[3].querySelector('.headline-mask'),
+    4: scenes[4].querySelector('.headline-mask'),
+  }
+
+  // Easing curves
+  const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3)
+  const easeOutQuint = (x) => 1 - Math.pow(1 - x, 5)
+
+  // Scene 1 refs
+  const s1Artboard = q('s1Artboard')
+  const btnValidate = q('btnValidate')
+
+  // Scene 2 refs (Double Diamond, Telemetry, Stakeholders, Constraints)
+  const ddTracePath = q('ddTracePath')
+  const DD_LEN = ddTracePath.getTotalLength()
+  ddTracePath.style.strokeDasharray = `${DD_LEN}`
+  ddTracePath.style.strokeDashoffset = `${DD_LEN}`
+
+  const ddPhases = [
+    q('ddPhase1'),
+    q('ddPhase2'),
+    q('ddPhase3'),
+    q('ddPhase4'),
+  ]
+  const ddNodeStart = q('ddNodeStart')
+  const ddNodeMid = q('ddNodeMid')
+  const ddNodeEnd = q('ddNodeEnd')
+  const ddLabelMid = q('ddLabelMid')
+  const ddLabelEnd = q('ddLabelEnd')
+  const ddTracerDot = q('ddTracerDot')
+  const ddTracerHalo = q('ddTracerHalo')
+
+  const bezierPath = q('bezierPath')
+  const BEZIER_LEN = bezierPath.getTotalLength()
+  bezierPath.style.strokeDasharray = `${BEZIER_LEN}`
+  bezierPath.style.strokeDashoffset = `${BEZIER_LEN}`
+  const bezierArea = q('bezierArea')
+  const tracerDot = q('tracerDot')
+  const tracerHalo = q('tracerHalo')
+  const frictionCounter = q('frictionCounter')
+
+  const ringProgress = q('ringProgress')
+  const RING_CIRC = 2 * Math.PI * 74
+  ringProgress.style.strokeDasharray = `${RING_CIRC}`
+  ringProgress.style.strokeDashoffset = `${RING_CIRC}`
+  const ringCounter = q('ringCounter')
+
+  const btnAlign = q('btnAlign')
+  const shNodes = [q('sh1'), q('sh2'), q('sh3'), q('sh4')]
+  const shConns = [q('shc1'), q('shc2'), q('shc3')]
+  const constraints = [q('con1'), q('con2'), q('con3'), q('con4')]
+
+  // Scene 3 refs (Apple Intelligence Prompt Pill + Generated Website Preview)
+  const s3Camera = q('s3Camera')
+  const aiPillWrap = q('aiPillWrap')
+  const aiSitePreview = q('aiSitePreview')
+  const promptTyped = q('promptTyped')
+  const btnAiSubmit = q('btnAiSubmit')
+  const echoes = [q('echo1'), q('echo2'), q('echo3')]
+  const PROMPT_COPY = 'Architect an accessible design system with 8pt rhythm & 60fps native motion.'
+
+  // Scene 4 refs (Code, Frame-Time Telemetry, Lighthouse Rings, Voltrep Card)
+  const codeScanner = q('codeScanner')
+  const fpsSvg = q('fpsSvg')
+  fpsSvg.innerHTML = ''
+  const fpsBars = []
+  const SVG_NS = 'http://www.w3.org/2000/svg'
+  for (let i = 0; i < 24; i++) {
+    const rect = document.createElementNS(SVG_NS, 'rect')
+    rect.setAttribute('x', String(i * 9.2 + 1))
+    rect.setAttribute('y', '24')
+    rect.setAttribute('width', '5.5')
+    rect.setAttribute('height', '42')
+    rect.setAttribute('rx', '2.5')
+    rect.setAttribute('fill', i % 4 === 0 ? '#E2B878' : 'rgba(245, 245, 247, 0.24)')
+    fpsSvg.appendChild(rect)
+    fpsBars.push(rect)
+  }
+
+  const lhRings = [
+    { el: q('lhPerf'), num: q('lhPerfNum') },
+    { el: q('lhA11y'), num: q('lhA11yNum') },
+    { el: q('lhSeo'), num: q('lhSeoNum') },
+  ]
+
+  const segmentedNav = q('segmentedNav')
+  const voltrepCard = q('voltrepCard')
+  const volPeakBar = q('volPeakBar')
+  const prBadge = q('prBadge')
+  const btnLogSet = q('btnLogSet')
+
+  // Dynamic cursor state
+  const cursor = {
+    x: -120,
+    y: -120,
+    startX: -120,
+    startY: -120,
+    targetX: -120,
+    targetY: -120,
+    targetEl: null,
+    moveStart: 0,
+    duration: 450,
+    moving: false,
+  }
+
+  function getCenter(el) {
+    const sRect = stage.getBoundingClientRect()
+    const r = el.getBoundingClientRect()
+    return {
+      x: r.left - sRect.left + r.width / 2,
+      y: r.top - sRect.top + r.height / 2,
+    }
+  }
+
+  function placeCursor(x, y) {
+    cursor.x = x
+    cursor.y = y
+    cursor.moving = false
+    cursorEl.style.transform = `translate3d(${x}px, ${y}px, 0)`
+  }
+
+  function glideTo(el, duration, now) {
+    const pt = getCenter(el)
+    cursor.startX = cursor.x
+    cursor.startY = cursor.y
+    cursor.targetX = pt.x
+    cursor.targetY = pt.y
+    cursor.targetEl = el
+    cursor.moveStart = now
+    cursor.duration = duration
+    cursor.moving = true
+    cursorEl.classList.add('is-visible')
+  }
+
+  function updateCursor(now) {
+    if (!cursor.moving) return
+    if (cursor.targetEl) {
+      const live = getCenter(cursor.targetEl)
+      cursor.targetX = live.x
+      cursor.targetY = live.y
+    }
+    const p = Math.min(1, Math.max(0, (now - cursor.moveStart) / cursor.duration))
+    const e = easeOutCubic(p)
+    cursor.x = cursor.startX + (cursor.targetX - cursor.startX) * e
+    cursor.y = cursor.startY + (cursor.targetY - cursor.startY) * e
+    cursorEl.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0)`
+    if (p >= 1) cursor.moving = false
+  }
+
+  function fireRipple(el) {
+    const pt = getCenter(el)
+    rippleEl.style.left = `${pt.x}px`
+    rippleEl.style.top = `${pt.y}px`
+    rippleEl.classList.remove('is-popping')
+    void rippleEl.offsetWidth
+    rippleEl.classList.add('is-popping')
+  }
+
+  function setActiveScene(num) {
+    Object.keys(scenes).forEach((k) => {
+      const idx = Number(k)
+      scenes[idx].classList.remove('is-exiting')
+      scenes[idx].classList.toggle('is-active', idx === num)
+    })
+  }
+
+  // Compute untransformed layout offset inside a scene (immune to scene scale/blur)
+  function getOffsetInScene(el, sceneEl) {
+    let left = 0
+    let top = 0
+    let curr = el
+    while (curr && curr !== sceneEl) {
+      left += curr.offsetLeft
+      top += curr.offsetTop
+      curr = curr.offsetParent
+    }
+    return { left, top, width: el.offsetWidth, height: el.offsetHeight }
+  }
+
+  // FLIP: Place a scene's headline dead-center & gently scaled up before docking
+  function centerHeadline(num) {
+    const mask = headlineMasks[num]
+    const sceneEl = scenes[num]
+    if (!mask || !sceneEl) return
+    mask.classList.remove('is-docking')
+    const box = getOffsetInScene(mask, sceneEl)
+    const sw = stage.clientWidth
+    const sh = stage.clientHeight
+    const maxScale = (sw * 0.86) / Math.max(box.width, 1)
+    const heroScale = Math.min(1.36, Math.max(1.0, maxScale))
+    const dx = sw / 2 - (box.left + box.width / 2)
+    const dy = sh / 2 - (box.top + box.height / 2)
+    mask.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0) scale(${heroScale.toFixed(3)})`
+  }
+
+  // Smoothly glide & scale the centered headline into its docked top-left header slot
+  function dockHeadline(num) {
+    const mask = headlineMasks[num]
+    if (!mask) return
+    mask.classList.add('is-docking')
+    mask.style.transform = 'translate3d(0, 0, 0) scale(1)'
+  }
+
+  function resetAll() {
+    Object.keys(scenes).forEach((k) => {
+      const idx = Number(k)
+      scenes[idx].classList.remove('is-active', 'is-exiting', 'is-content-visible')
+      centerHeadline(idx)
+    })
+
+    // Scene 1 reset
+    s1Artboard.classList.remove('is-snapped', 'is-swept')
+    btnValidate.classList.remove('is-hovered', 'is-pressed', 'is-validated')
+    btnValidate.textContent = 'Validate System →'
+
+    // Scene 2 reset
+    ddTracePath.style.strokeDashoffset = `${DD_LEN}`
+    ddPhases.forEach((ph) => ph.classList.remove('is-lit'))
+    ddNodeStart.classList.remove('is-lit')
+    ddNodeMid.classList.remove('is-lit')
+    ddNodeEnd.classList.remove('is-lit')
+    ddLabelMid.classList.remove('is-lit')
+    ddLabelEnd.classList.remove('is-lit')
+    ddTracerDot.classList.remove('is-active')
+    ddTracerHalo.classList.remove('is-active')
+    ddTracerDot.setAttribute('cx', '44')
+    ddTracerDot.setAttribute('cy', '95')
+    ddTracerHalo.setAttribute('cx', '44')
+    ddTracerHalo.setAttribute('cy', '95')
+
+    bezierPath.style.strokeDashoffset = `${BEZIER_LEN}`
+    bezierArea.classList.remove('is-visible')
+    tracerDot.classList.remove('is-active')
+    tracerHalo.classList.remove('is-active')
+    tracerDot.setAttribute('cx', '6')
+    tracerDot.setAttribute('cy', '22')
+    tracerHalo.setAttribute('cx', '6')
+    tracerHalo.setAttribute('cy', '22')
+    frictionCounter.textContent = '0% Friction'
+    ringProgress.style.strokeDashoffset = `${RING_CIRC}`
+    ringCounter.textContent = '0.0%'
+
+    btnAlign.classList.remove('is-hovered', 'is-pressed', 'is-validated')
+    btnAlign.textContent = 'Align Goals'
+    shNodes.forEach((n) => n.classList.remove('is-aligned'))
+    shConns.forEach((c) => c.classList.remove('is-lit'))
+    constraints.forEach((c) => c.classList.remove('is-locked'))
+
+    // Scene 3 reset
+    s3Camera.classList.remove('is-zoomed', 'is-dismissed')
+    aiPillWrap.classList.remove('is-synthesizing')
+    aiSitePreview.classList.remove('is-built', 'is-swept')
+    promptTyped.textContent = ''
+    btnAiSubmit.classList.remove('is-hovered', 'is-pressed')
+    echoes.forEach((e) => e.classList.remove('is-firing'))
+
+    // Scene 4 reset
+    codeScanner.classList.remove('is-on')
+    codeScanner.style.top = '18%'
+    lhRings.forEach((r) => {
+      r.el.classList.remove('is-full')
+      r.num.textContent = '0'
+    })
+    segmentedNav.classList.remove('at-liveset')
+    voltrepCard.classList.remove('is-logged')
+    volPeakBar.style.height = '58%'
+    prBadge.classList.remove('is-visible')
+    btnLogSet.classList.remove('is-hovered', 'is-pressed', 'is-validated')
+    btnLogSet.textContent = 'Log Set'
+
+    // Sweep & Cursor
+    loopSweep.classList.remove('is-sweeping')
+    cursorEl.classList.remove('is-visible', 'is-clicking')
+    cursor.moving = false
+    cursor.targetEl = null
+  }
+
+  /* =======================================================================
+     DETERMINISTIC CHOREOGRAPHY TIMELINE
+     ======================================================================= */
+  const fired = new Set()
+
+  function cue(id, cond, fn) {
+    if (cond && !fired.has(id)) {
+      fired.add(id)
+      fn()
+    }
+  }
+
+  function renderTimeline(t, now) {
+    /* -------------------------------------------------------------------
+       SCENE 1 (0.0s - 4.5s): UX/UI DESIGNER — CENTER TITLE -> DOCK -> UI
+       ------------------------------------------------------------------- */
+    cue('s1_in', t >= 0, () => {
+      setActiveScene(1)
+    })
+
+    cue('s1_dock', t >= 700, () => {
+      dockHeadline(1)
+    })
+
+    cue('s1_content', t >= 920, () => {
+      scenes[1].classList.add('is-content-visible')
+    })
+
+    cue('s1_snap', t >= 1320, () => {
+      s1Artboard.classList.add('is-snapped')
+    })
+
+    cue('s1_glide', t >= 2100, () => {
+      const r = stage.getBoundingClientRect()
+      placeCursor(r.width * 0.62, r.height * 0.48)
+      glideTo(btnValidate, 480, now)
+    })
+
+    cue('s1_hover', t >= 2580, () => {
+      btnValidate.classList.add('is-hovered')
+    })
+
+    cue('s1_click', t >= 2650, () => {
+      cursorEl.classList.add('is-clicking')
+      btnValidate.classList.add('is-pressed')
+      fireRipple(btnValidate)
+    })
+
+    cue('s1_valid', t >= 2790, () => {
+      cursorEl.classList.remove('is-clicking')
+      btnValidate.classList.remove('is-pressed', 'is-hovered')
+      btnValidate.classList.add('is-validated')
+      btnValidate.textContent = 'Validated ✓'
+      s1Artboard.classList.add('is-swept')
+    })
+
+    cue('s1_out', t >= 4120, () => {
+      cursorEl.classList.remove('is-visible')
+      scenes[1].classList.add('is-exiting')
+    })
+
+    /* -------------------------------------------------------------------
+       SCENE 2 (4.5s - 9.0s): USER RESEARCH — DOUBLE DIAMOND & TELEMETRY
+       ------------------------------------------------------------------- */
+    cue('s2_in', t >= 4500, () => {
+      setActiveScene(2)
+    })
+
+    cue('s2_dock', t >= 5200, () => {
+      dockHeadline(2)
+    })
+
+    cue('s2_content', t >= 5420, () => {
+      scenes[2].classList.add('is-content-visible')
+      bezierArea.classList.add('is-visible')
+      ddNodeStart.classList.add('is-lit')
+      ddTracerDot.classList.add('is-active')
+      ddTracerHalo.classList.add('is-active')
+      tracerDot.classList.add('is-active')
+      tracerHalo.classList.add('is-active')
+    })
+
+    // Continuous Double Diamond, Radial Ring & Bezier Telemetry (5.48s -> 7.18s)
+    if (t >= 5480 && t <= 7240) {
+      const p = easeOutCubic(Math.min(1, (t - 5480) / 1700))
+
+      // Double Diamond path + glowing tracer
+      ddTracePath.style.strokeDashoffset = `${DD_LEN * (1 - p)}`
+      const ddPt = ddTracePath.getPointAtLength(p * DD_LEN)
+      ddTracerDot.setAttribute('cx', ddPt.x.toFixed(1))
+      ddTracerDot.setAttribute('cy', ddPt.y.toFixed(1))
+      ddTracerHalo.setAttribute('cx', ddPt.x.toFixed(1))
+      ddTracerHalo.setAttribute('cy', ddPt.y.toFixed(1))
+
+      if (p >= 0.08) ddPhases[0].classList.add('is-lit')
+      if (p >= 0.34) ddPhases[1].classList.add('is-lit')
+      if (p >= 0.5) {
+        ddNodeMid.classList.add('is-lit')
+        ddLabelMid.classList.add('is-lit')
+      }
+      if (p >= 0.64) ddPhases[2].classList.add('is-lit')
+      if (p >= 0.86) ddPhases[3].classList.add('is-lit')
+      if (p >= 0.98) {
+        ddNodeEnd.classList.add('is-lit')
+        ddLabelEnd.classList.add('is-lit')
+      }
+
+      // Bezier area chart + friction counter
+      bezierPath.style.strokeDashoffset = `${BEZIER_LEN * (1 - p)}`
+      const bPt = bezierPath.getPointAtLength(p * BEZIER_LEN)
+      tracerDot.setAttribute('cx', bPt.x.toFixed(1))
+      tracerDot.setAttribute('cy', bPt.y.toFixed(1))
+      tracerHalo.setAttribute('cx', bPt.x.toFixed(1))
+      tracerHalo.setAttribute('cy', bPt.y.toFixed(1))
+      frictionCounter.textContent = `-${Math.round(p * 42)}% Friction`
+
+      // Radial Ring Gauge (0% -> 98.4%)
+      const pct = p * 98.4
+      ringProgress.style.strokeDashoffset = `${RING_CIRC * (1 - pct / 100)}`
+      ringCounter.textContent = `${pct.toFixed(1)}%`
+    }
+
+    // Staggered Non-Negotiable Constraints lock-in
+    cue('s2_con1', t >= 5920, () => constraints[0].classList.add('is-locked'))
+    cue('s2_con2', t >= 6140, () => constraints[1].classList.add('is-locked'))
+    cue('s2_con3', t >= 6360, () => constraints[2].classList.add('is-locked'))
+    cue('s2_con4', t >= 6580, () => constraints[3].classList.add('is-locked'))
+
+    // Stakeholder Alignment interactive click
+    cue('s2_glide', t >= 6820, () => {
+      const r = stage.getBoundingClientRect()
+      placeCursor(r.width * 0.34, r.height * 0.56)
+      glideTo(btnAlign, 440, now)
+    })
+
+    cue('s2_hover', t >= 7260, () => {
+      btnAlign.classList.add('is-hovered')
+    })
+
+    cue('s2_click', t >= 7330, () => {
+      cursorEl.classList.add('is-clicking')
+      btnAlign.classList.add('is-pressed')
+      fireRipple(btnAlign)
+    })
+
+    cue('s2_aligned', t >= 7460, () => {
+      cursorEl.classList.remove('is-clicking')
+      btnAlign.classList.remove('is-pressed', 'is-hovered')
+      btnAlign.classList.add('is-validated')
+      btnAlign.textContent = 'Aligned ✓'
+      shNodes.forEach((n) => n.classList.add('is-aligned'))
+      shConns.forEach((c) => c.classList.add('is-lit'))
+    })
+
+    cue('s2_out', t >= 8620, () => {
+      cursorEl.classList.remove('is-visible')
+      scenes[2].classList.add('is-exiting')
+    })
+
+    /* -------------------------------------------------------------------
+       SCENE 3 (9.0s - 16.0s): CREATIVE AI — PROMPT -> LIVE GENERATED SITE
+       ------------------------------------------------------------------- */
+    cue('s3_in', t >= 9000, () => {
+      setActiveScene(3)
+    })
+
+    cue('s3_dock', t >= 9700, () => {
+      dockHeadline(3)
+    })
+
+    cue('s3_content', t >= 9920, () => {
+      scenes[3].classList.add('is-content-visible')
+    })
+
+    cue('s3_zoom', t >= 10220, () => {
+      s3Camera.classList.add('is-zoomed')
+    })
+
+    // Smooth Macro Prompt Typing (10.28s -> 11.75s)
+    if (t >= 10280 && t <= 11780) {
+      const p = Math.min(1, (t - 10280) / 1470)
+      promptTyped.textContent = PROMPT_COPY.slice(0, Math.floor(p * PROMPT_COPY.length))
+    } else if (t > 11780 && t < 16000) {
+      promptTyped.textContent = PROMPT_COPY
+    }
+
+    // Pull back smoothly to 1.0 & glide cursor straight to circular Submit button
+    cue('s3_pullback', t >= 11820, () => {
+      s3Camera.classList.remove('is-zoomed')
+      const r = stage.getBoundingClientRect()
+      placeCursor(r.width * 0.54, r.height * 0.64)
+      glideTo(btnAiSubmit, 380, now)
+    })
+
+    cue('s3_hover', t >= 12200, () => {
+      btnAiSubmit.classList.add('is-hovered')
+    })
+
+    cue('s3_click', t >= 12270, () => {
+      cursorEl.classList.add('is-clicking')
+      btnAiSubmit.classList.add('is-pressed')
+      fireRipple(btnAiSubmit)
+    })
+
+    cue('s3_morph', t >= 12400, () => {
+      cursorEl.classList.remove('is-clicking', 'is-visible')
+      btnAiSubmit.classList.remove('is-pressed', 'is-hovered')
+      aiPillWrap.classList.add('is-synthesizing')
+      echoes.forEach((e) => e.classList.add('is-firing'))
+    })
+
+    // Synthesizing pill smoothly gives way to the Live Generated Website
+    cue('s3_build_site', t >= 13180, () => {
+      s3Camera.classList.add('is-dismissed')
+      aiSitePreview.classList.add('is-built')
+    })
+
+    // Specular gold sheen sweep across the generated site
+    cue('s3_site_sweep', t >= 14550, () => {
+      aiSitePreview.classList.add('is-swept')
+    })
+
+    cue('s3_out', t >= 15620, () => {
+      scenes[3].classList.add('is-exiting')
+    })
+
+    /* -------------------------------------------------------------------
+       SCENE 4 (16.0s - 20.5s): WEB DEVELOPER — CENTER TITLE -> DOCK -> UI
+       ------------------------------------------------------------------- */
+    cue('s4_in', t >= 16000, () => {
+      echoes.forEach((e) => e.classList.remove('is-firing'))
+      setActiveScene(4)
+    })
+
+    cue('s4_dock', t >= 16700, () => {
+      dockHeadline(4)
+    })
+
+    cue('s4_content', t >= 16920, () => {
+      scenes[4].classList.add('is-content-visible')
+      codeScanner.classList.add('is-on')
+      codeScanner.style.top = '18%'
+      lhRings.forEach((r) => r.el.classList.add('is-full'))
+    })
+
+    // Animate Lighthouse counters (16.98s -> 18.05s) & Live 60 FPS frame bars
+    if (t >= 16980 && t <= 18100) {
+      const p = easeOutQuint(Math.min(1, (t - 16980) / 1070))
+      const val = Math.round(p * 100)
+      lhRings.forEach((r) => {
+        r.num.textContent = String(val)
+      })
+    } else if (t > 18100) {
+      lhRings.forEach((r) => {
+        r.num.textContent = '100'
+      })
+    }
+
+    if (t >= 16920 && t < 20500) {
+      const phase = (t - 16920) * 0.006
+      for (let i = 0; i < fpsBars.length; i++) {
+        const h = 42 + Math.sin(phase + i * 0.55) * 4.5
+        fpsBars[i].setAttribute('height', h.toFixed(1))
+        fpsBars[i].setAttribute('y', (66 - h).toFixed(1))
+      }
+    }
+
+    cue('s4_scan2', t >= 17400, () => {
+      codeScanner.style.top = '48%'
+      segmentedNav.classList.add('at-liveset')
+    })
+
+    cue('s4_scan3', t >= 17900, () => {
+      codeScanner.style.top = '72%'
+    })
+
+    cue('s4_glide', t >= 18250, () => {
+      const r = stage.getBoundingClientRect()
+      placeCursor(r.width * 0.64, r.height * 0.44)
+      glideTo(btnLogSet, 460, now)
+    })
+
+    cue('s4_hover', t >= 18710, () => {
+      btnLogSet.classList.add('is-hovered')
+    })
+
+    cue('s4_click', t >= 18770, () => {
+      cursorEl.classList.add('is-clicking')
+      btnLogSet.classList.add('is-pressed')
+      fireRipple(btnLogSet)
+    })
+
+    cue('s4_logged', t >= 18910, () => {
+      cursorEl.classList.remove('is-clicking')
+      btnLogSet.classList.remove('is-pressed', 'is-hovered')
+      btnLogSet.classList.add('is-validated')
+      btnLogSet.textContent = 'Set Logged ✓'
+      voltrepCard.classList.add('is-logged')
+      volPeakBar.style.height = '92%'
+      prBadge.classList.add('is-visible')
+    })
+
+    cue('s4_sweep', t >= 19900, () => {
+      cursorEl.classList.remove('is-visible')
+      loopSweep.classList.add('is-sweeping')
+    })
+  }
+
+  /* =======================================================================
+     MASTER 60FPS ANIMATION LOOP (CENTERED NAME INTRO -> DOCK -> 20.5s LOOP)
+     ======================================================================= */
   const params = new URLSearchParams(window.location.search)
   const tParam = params.get('t')
+
   if (tParam !== null && !Number.isNaN(Number(tParam))) {
-    isAutoPlaying.value = false
-    elapsedMs.value = Number(tParam) * 1000
-  } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    isAutoPlaying.value = false
-    elapsedMs.value = 2400
-  } else {
-    elapsedMs.value = 150
+    // Deterministic QA snapshot mode (?t=seconds into the 20.5s loop)
+    introBrand.classList.add('is-revealed', 'is-docking')
+    introBrand.style.transform = 'translate3d(0, 0, 0) scale(1)'
+    resetAll()
+    const targetMs = (Number(tParam) * 1000) % LOOP_MS
+    const now = performance.now()
+    // Step through timeline so all preceding cues fire in order
+    for (let step = 0; step <= targetMs; step += 40) {
+      renderTimeline(step, now + step)
+    }
+    renderTimeline(targetMs, now + targetMs)
+    if (cursor.targetEl) {
+      const pt = getCenter(cursor.targetEl)
+      placeCursor(pt.x, pt.y)
+    }
+  } else if (!prefersReducedMotion) {
+    const INTRO_REVEAL_MS = 120
+    const INTRO_DOCK_MS = 2050
+    const SHOWREEL_START_MS = 2550
+
+    // FLIP: Position the name dead-center & scaled up before docking to top-left
+    function positionBrandAtCenter() {
+      const sRect = stage.getBoundingClientRect()
+      const bRect = introBrand.getBoundingClientRect()
+      const maxScale = (sRect.width * 0.82) / Math.max(bRect.width, 1)
+      const introScale = Math.min(2.6, Math.max(1.35, maxScale))
+      const dx = sRect.width / 2 - (bRect.left - sRect.left + bRect.width / 2)
+      const dy = sRect.height / 2 - (bRect.top - sRect.top + bRect.height / 2)
+      introBrand.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0) scale(${introScale.toFixed(3)})`
+    }
+
+    positionBrandAtCenter()
+    resetAll()
+
+    resizeHandler = () => {
+      Object.keys(headlineMasks).forEach((k) => {
+        const idx = Number(k)
+        if (!headlineMasks[idx].classList.contains('is-docking')) {
+          centerHeadline(idx)
+        }
+      })
+    }
+    window.addEventListener('resize', resizeHandler, { passive: true })
+
+    const bootTime = performance.now()
+    let introRevealed = false
+    let introDocked = false
+    let lastLoop = -1
+
+    function tick(now) {
+      const sinceBoot = now - bootTime
+
+      // Phase 1: Reveal centered name & role
+      if (!introRevealed && sinceBoot >= INTRO_REVEAL_MS) {
+        introRevealed = true
+        introBrand.classList.add('is-revealed')
+      }
+
+      // Phase 2: Glide & scale name smoothly into docked top-left slot
+      if (!introDocked && sinceBoot >= INTRO_DOCK_MS) {
+        introDocked = true
+        introBrand.classList.add('is-docking')
+        introBrand.style.transform = 'translate3d(0, 0, 0) scale(1)'
+      }
+
+      // Phase 3: Launch the seamless 20.5-second 4-scene loop
+      if (sinceBoot >= SHOWREEL_START_MS) {
+        const elapsed = sinceBoot - SHOWREEL_START_MS
+        const loopIdx = Math.floor(elapsed / LOOP_MS)
+        const t = elapsed % LOOP_MS
+
+        if (loopIdx !== lastLoop) {
+          lastLoop = loopIdx
+          fired.clear()
+          resetAll()
+        }
+
+        renderTimeline(t, now)
+        updateCursor(now)
+      }
+
+      rafId = window.requestAnimationFrame(tick)
+    }
+
+    rafId = window.requestAnimationFrame(tick)
   }
-  nextTick(() => {
-    measureTargets()
-    window.setTimeout(measureTargets, 120)
-    window.setTimeout(measureTargets, 320)
-  })
-  rafId = window.requestAnimationFrame(tick)
 })
 
 onUnmounted(() => {
-  if (rafId !== null) window.cancelAnimationFrame(rafId)
-  if (typeof window !== 'undefined') window.removeEventListener('resize', onResize)
+  if (rafId !== null && typeof window !== 'undefined') {
+    window.cancelAnimationFrame(rafId)
+  }
+  if (resizeHandler && typeof window !== 'undefined') {
+    window.removeEventListener('resize', resizeHandler)
+  }
 })
 </script>
 
 <template>
-  <section
-    class="vids-hero"
-    aria-label="UX/UI Design, User Research, Creative AI, and Motion & Front-End Interactive Showreel"
-  >
-    <div class="vids-stage">
-      <!-- Ambient Obsidian Radial Light Blooms + Subtle Dashed Precision Guides -->
-      <div class="ambient-bg" aria-hidden="true">
-        <div class="rad-bloom b-gold" />
-        <div class="rad-bloom b-mint" />
-        <div class="rad-bloom b-alabaster" />
-        <svg class="precision-guides" viewBox="0 0 1440 800" preserveAspectRatio="none">
-          <line x1="88" y1="60" x2="88" y2="620" stroke="rgba(226,184,120,0.14)" stroke-dasharray="3 7" />
-          <line x1="1352" y1="60" x2="1352" y2="620" stroke="rgba(52,211,153,0.14)" stroke-dasharray="3 7" />
-          <line x1="120" y1="92" x2="1320" y2="92" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2 8" />
+  <div ref="rootRef" class="showreel-host">
+    <section id="stage" class="stage" aria-label="Full-Screen Hero Showreel">
+      <!-- Subtle Ambient Light Blooms -->
+      <div class="ambient-layer" aria-hidden="true">
+        <div class="bloom bloom-gold"></div>
+        <div class="bloom bloom-alabaster"></div>
+      </div>
+
+      <!-- Opening Identity Intro -> Smoothly Docks to Top-Left -->
+      <div id="introBrand" class="intro-brand" aria-label="Samuel Tavonatti">
+        <div class="intro-name-mask">
+          <span class="intro-name"><span class="metallic">Samuel</span> <span class="gold">Tavonatti</span></span>
+        </div>
+        <div id="introRole" class="intro-role mono">UI/UX Designer · Creative AI · Web Developer</div>
+      </div>
+
+      <!-- ======================================================================
+           SCENE 1 (0.0s - 4.5s): UX/UI DESIGNER — APPLE DESIGN SYSTEM BENTO
+           ====================================================================== -->
+      <section id="scene1" class="scene">
+        <div class="stage-hairlines" aria-hidden="true">
+          <div class="stage-hl h-top"></div>
+          <div class="stage-hl h-bot"></div>
+          <div class="stage-hl v-left"></div>
+          <div class="stage-hl v-right"></div>
+        </div>
+
+        <header class="scene-header">
+          <div class="headline-mask">
+            <h1 class="headline"><span class="metallic">UX/UI</span> <span class="gold">DESIGNER</span></h1>
+          </div>
+          <span class="header-tag mono">Design Systems · 8pt Optical Rhythm</span>
+        </header>
+
+        <div class="s1-grid">
+          <!-- Left Bento Card: Design System Tokens (Typography Scale + 4 Color Swatches + AAA) -->
+          <div class="bento s1-tokens-bento">
+            <div class="type-block">
+              <div class="bento-eyebrow mono">Design System Tokens</div>
+              <div class="type-head">
+                <div class="specimen-aa">Aa</div>
+                <div class="specimen-meta mono">Inter · -0.045em · tabular-nums</div>
+              </div>
+              <div class="type-rows">
+                <div class="type-row">
+                  <span class="tr-name">H1 Display</span>
+                  <span class="tr-spec mono">72px / 700 · -0.045em</span>
+                </div>
+                <div class="type-row">
+                  <span class="tr-name">Body UI</span>
+                  <span class="tr-spec mono">16px / 500 · 1.50 lh</span>
+                </div>
+                <div class="type-row">
+                  <span class="tr-name mono">Mono Data</span>
+                  <span class="tr-spec mono">13px / 500 · tabular</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div class="bento-eyebrow mono">Color Palette</div>
+                <span class="contrast-pill mono">Contrast 14.8:1 AAA</span>
+              </div>
+              <div class="swatch-row">
+                <div class="swatch-unit">
+                  <div class="swatch-orb obs"></div>
+                  <span class="swatch-code mono">#050507</span>
+                  <span class="swatch-name">Obsidian</span>
+                </div>
+                <div class="swatch-unit">
+                  <div class="swatch-orb gls"></div>
+                  <span class="swatch-code mono">#0D0F14</span>
+                  <span class="swatch-name">Glass</span>
+                </div>
+                <div class="swatch-unit">
+                  <div class="swatch-orb ala"></div>
+                  <span class="swatch-code mono">#F5F5F7</span>
+                  <span class="swatch-name">Alabaster</span>
+                </div>
+                <div class="swatch-unit">
+                  <div class="swatch-orb gld"></div>
+                  <span class="swatch-code mono">#E2B878</span>
+                  <span class="swatch-name">Gold</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Bento Card: Magnetic Auto-Layout Frame -->
+          <div id="s1Artboard" class="bento s1-main-bento">
+            <div class="specular-sweep" aria-hidden="true"></div>
+
+            <div class="artboard-top">
+              <span class="artboard-heading">Magnetic Auto-Layout Frame</span>
+              <div class="spacing-badges mono">
+                <span class="space-badge">8pt Grid · WCAG AA</span>
+              </div>
+            </div>
+
+            <div class="artboard-canvas">
+              <div class="guide-line h1" aria-hidden="true"></div>
+              <div class="guide-line h2" aria-hidden="true"></div>
+              <div class="guide-line v1" aria-hidden="true"></div>
+              <div class="guide-line v2" aria-hidden="true"></div>
+
+              <div class="ui-header-strip">
+                <div class="ui-pill-row">
+                  <span class="mini-dot gold"></span>
+                  <span class="mini-dot"></span>
+                  <span class="mini-dot"></span>
+                </div>
+                <span class="mono" style="font-size: 0.72rem; color: var(--titanium);">Auto-Layout · Flat 2D</span>
+              </div>
+
+              <div class="redline-row mono" aria-hidden="true">
+                <div class="redline-seg">
+                  <span class="redline-bar"></span>
+                  <span class="redline-tag">16px</span>
+                  <span class="redline-bar"></span>
+                </div>
+                <div class="redline-seg">
+                  <span class="redline-bar"></span>
+                  <span class="redline-tag">24px</span>
+                  <span class="redline-bar"></span>
+                </div>
+                <div class="redline-seg">
+                  <span class="redline-bar"></span>
+                  <span class="redline-tag">16px</span>
+                  <span class="redline-bar"></span>
+                </div>
+              </div>
+
+              <div class="ui-card-row">
+                <div class="sys-card c1">
+                  <div class="sys-label mono">Surface</div>
+                  <div>
+                    <div class="sk-line"></div>
+                    <div class="sk-line short"></div>
+                    <div class="sk-line accent"></div>
+                  </div>
+                </div>
+                <div class="sys-card c2">
+                  <div class="sys-label mono">Hierarchy</div>
+                  <div>
+                    <div class="sk-line"></div>
+                    <div class="sk-line short"></div>
+                    <div class="sk-line accent"></div>
+                  </div>
+                </div>
+                <div class="sys-card c3">
+                  <div class="sys-label mono">Motion</div>
+                  <div>
+                    <div class="sk-line"></div>
+                    <div class="sk-line short"></div>
+                    <div class="sk-line accent"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="artboard-bottom">
+              <span class="mono" style="font-size: 0.74rem; color: var(--titanium);">16px / 24px Spatial Rhythm</span>
+              <button id="btnValidate" type="button" class="action-pill">Validate System →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           SCENE 2 (4.5s - 9.0s): USER RESEARCH — DOUBLE DIAMOND & GUARDRAILS
+           ====================================================================== -->
+      <section id="scene2" class="scene">
+        <header class="scene-header">
+          <div class="headline-mask">
+            <h1 class="headline"><span class="metallic">USER</span> <span class="gold">RESEARCH</span></h1>
+          </div>
+          <span class="header-tag mono">Double Diamond · Stakeholders · Constraints</span>
+        </header>
+
+        <div class="s2-grid">
+          <!-- Top-Left Wide Bento: Interactive SVG Double Diamond -->
+          <div class="bento s2-card">
+            <div class="s2-card-head">
+              <div class="bento-eyebrow mono">Double Diamond Methodology</div>
+              <span class="sus-pill mono">Diverge · <span>Converge</span></span>
+            </div>
+
+            <div class="diamond-wrap">
+              <svg class="diamond-svg" viewBox="0 0 600 190" aria-hidden="true">
+                <defs>
+                  <linearGradient id="ddGoldGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#F5F5F7" stop-opacity="0.78" />
+                    <stop offset="50%" stop-color="#E2B878" stop-opacity="1" />
+                    <stop offset="100%" stop-color="#F5DAB0" stop-opacity="1" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Two Sleek Geometric Diamonds -->
+                <polygon class="dd-outline" points="44,95 172,26 300,95 172,164" />
+                <polygon class="dd-outline" points="300,95 428,26 556,95 428,164" />
+
+                <!-- Vertical Phase Dividers -->
+                <line class="dd-divider" x1="172" y1="26" x2="172" y2="164" />
+                <line class="dd-divider" x1="428" y1="26" x2="428" y2="164" />
+
+                <!-- Phase Labels -->
+                <text id="ddPhase1" class="dd-phase-label" x="116" y="16" text-anchor="middle">Discover</text>
+                <text id="ddPhase2" class="dd-phase-label" x="232" y="16" text-anchor="middle">Define</text>
+                <text id="ddPhase3" class="dd-phase-label" x="368" y="16" text-anchor="middle">Develop</text>
+                <text id="ddPhase4" class="dd-phase-label" x="484" y="16" text-anchor="middle">Deliver</text>
+
+                <!-- Diverge / Converge micro labels -->
+                <text class="dd-sub-label" x="116" y="182" text-anchor="middle">Diverge</text>
+                <text class="dd-sub-label" x="232" y="182" text-anchor="middle">Converge</text>
+                <text class="dd-sub-label" x="368" y="182" text-anchor="middle">Diverge</text>
+                <text class="dd-sub-label" x="484" y="182" text-anchor="middle">Converge</text>
+
+                <!-- Luminous Champagne-Gold Animated Path Across All 4 Phases -->
+                <path
+                  id="ddTracePath"
+                  class="dd-trace"
+                  d="M 44 95 L 172 26 L 300 95 L 428 26 L 556 95"
+                />
+
+                <!-- Milestone Nodes -->
+                <circle id="ddNodeStart" class="dd-node" cx="44" cy="95" r="5" />
+                <circle id="ddNodeMid" class="dd-node" cx="300" cy="95" r="6.5" />
+                <circle id="ddNodeEnd" class="dd-node" cx="556" cy="95" r="6.5" />
+
+                <!-- Central & Final Milestone Labels -->
+                <text id="ddLabelMid" class="dd-milestone" x="300" y="120" text-anchor="middle">Problem Defined</text>
+                <text id="ddLabelEnd" class="dd-milestone" x="556" y="120" text-anchor="end">Solution Validated</text>
+
+                <!-- Glowing Tracer Dot -->
+                <circle id="ddTracerHalo" class="dd-tracer-halo" cx="44" cy="95" r="11" />
+                <circle id="ddTracerDot" class="dd-tracer-dot" cx="44" cy="95" r="4.5" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Top-Right Bento: Radial Ring Gauge + Smooth Bezier Area Chart -->
+          <div class="bento s2-card delay-2 telemetry-card">
+            <div class="s2-card-head">
+              <div class="bento-eyebrow mono">Usability Telemetry</div>
+              <span id="frictionCounter" class="friction-pill mono tabular">0% Friction</span>
+            </div>
+
+            <div class="telemetry-combo">
+              <div class="ring-mini-col">
+                <div class="ring-stage">
+                  <svg class="ring-svg" viewBox="0 0 180 180" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="ringGoldGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#F6DFB7" />
+                        <stop offset="100%" stop-color="#E2B878" />
+                      </linearGradient>
+                    </defs>
+                    <circle class="ring-track" cx="90" cy="90" r="74" />
+                    <circle id="ringProgress" class="ring-progress" cx="90" cy="90" r="74" />
+                  </svg>
+
+                  <div class="ring-center">
+                    <div id="ringCounter" class="ring-value tabular">0.0%</div>
+                    <div class="ring-label">Task Success</div>
+                  </div>
+                </div>
+                <div class="sus-pill mono">SUS <span>91/100</span></div>
+              </div>
+
+              <div class="bezier-col">
+                <div class="bento-eyebrow mono" style="font-size: 0.64rem;">Cognitive Friction</div>
+                <div class="bezier-wrap">
+                  <svg class="bezier-svg" viewBox="0 0 280 110" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="goldAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#E2B878" stop-opacity="0.34" />
+                        <stop offset="90%" stop-color="#E2B878" stop-opacity="0.02" />
+                        <stop offset="100%" stop-color="#E2B878" stop-opacity="0" />
+                      </linearGradient>
+                      <linearGradient id="goldStrokeGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#F5F5F7" stop-opacity="0.7" />
+                        <stop offset="50%" stop-color="#E2B878" stop-opacity="1" />
+                        <stop offset="100%" stop-color="#F5DAB0" stop-opacity="1" />
+                      </linearGradient>
+                    </defs>
+
+                    <line class="chart-grid-line" x1="0" y1="22" x2="280" y2="22" />
+                    <line class="chart-grid-line" x1="0" y1="56" x2="280" y2="56" />
+                    <line class="chart-grid-line" x1="0" y1="90" x2="280" y2="90" />
+
+                    <path
+                      id="bezierArea"
+                      class="area-fill"
+                      d="M 6 22 C 55 24, 92 40, 136 58 C 180 76, 224 84, 274 88 L 274 108 L 6 108 Z"
+                      fill="url(#goldAreaGrad)"
+                    />
+
+                    <path
+                      id="bezierPath"
+                      class="bezier-stroke"
+                      d="M 6 22 C 55 24, 92 40, 136 58 C 180 76, 224 84, 274 88"
+                    />
+
+                    <circle id="tracerHalo" class="tracer-halo" cx="6" cy="22" r="8" />
+                    <circle id="tracerDot" class="tracer-dot" cx="6" cy="22" r="3.5" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom-Left Bento: Stakeholder Alignment -->
+          <div class="bento s2-card delay-3">
+            <div class="s2-card-head">
+              <div class="bento-eyebrow mono">Stakeholder Alignment</div>
+              <button id="btnAlign" type="button" class="action-pill">Align Goals</button>
+            </div>
+
+            <div id="stakeholderTrack" class="stakeholder-track">
+              <span id="sh1" class="sh-node"><span class="sh-dot"></span>Product</span>
+              <span id="shc1" class="sh-conn"></span>
+              <span id="sh2" class="sh-node"><span class="sh-dot"></span>Engineering</span>
+              <span id="shc2" class="sh-conn"></span>
+              <span id="sh3" class="sh-node"><span class="sh-dot"></span>Business</span>
+              <span id="shc3" class="sh-conn"></span>
+              <span id="sh4" class="sh-node"><span class="sh-dot"></span>Users</span>
+            </div>
+          </div>
+
+          <!-- Bottom-Right Bento: Non-Negotiable Constraints -->
+          <div class="bento s2-card delay-4">
+            <div class="s2-card-head">
+              <div class="bento-eyebrow mono">Non-Negotiable Constraints</div>
+              <span class="bento-eyebrow gold mono">Guardrails</span>
+            </div>
+
+            <div class="constraints-grid">
+              <div id="con1" class="constraint-pill">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <span>WCAG AA Contrast</span>
+              </div>
+              <div id="con2" class="constraint-pill">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <span>Zero Dead-Ends</span>
+              </div>
+              <div id="con3" class="constraint-pill">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <span>Tech Feasibility</span>
+              </div>
+              <div id="con4" class="constraint-pill">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <span class="mono">&lt; 100ms Latency</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           SCENE 3 (9.0s - 16.0s): CREATIVE AI — APPLE INTELLIGENCE PROMPT PILL
+           ====================================================================== -->
+      <section id="scene3" class="scene">
+        <header class="scene-header">
+          <div class="headline-mask">
+            <h1 class="headline"><span class="metallic">CREATIVE</span> <span class="gold">AI</span></h1>
+          </div>
+          <span class="header-tag mono">Generative Product Synthesis</span>
+        </header>
+
+        <div class="s3-stage">
+          <div id="s3Camera" class="s3-camera">
+            <!-- 3 Massive Concentric Edge-to-Edge Expanding Rings -->
+            <div id="echo1" class="echo-ring r1" aria-hidden="true"></div>
+            <div id="echo2" class="echo-ring r2" aria-hidden="true"></div>
+            <div id="echo3" class="echo-ring r3" aria-hidden="true"></div>
+
+            <!-- Sculptural Glassmorphic AI Prompt Pill with Rotating Luminous Halo -->
+            <div id="aiPillWrap" class="pill-halo-wrap">
+              <div class="ai-pill-inner">
+                <div class="pill-input-area">
+                  <div class="prompt-text-wrap">
+                    <span id="promptTyped"></span>
+                    <span class="gold-caret" aria-hidden="true"></span>
+                  </div>
+                </div>
+
+                <button id="btnAiSubmit" type="button" class="ai-submit-btn" aria-label="Submit prompt">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 19V5" />
+                    <path d="M5 12l7-7 7 7" />
+                  </svg>
+                </button>
+
+                <div class="synth-view">
+                  <div class="wave-bars" aria-hidden="true">
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                  </div>
+                  <span>Synthesizing…</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Generated Website Preview Window -->
+          <div id="aiSitePreview" class="bento ai-site-preview" aria-label="AI Generated Website Preview">
+            <div class="specular-sweep" aria-hidden="true"></div>
+
+            <div class="site-chrome">
+              <div class="site-dots" aria-hidden="true">
+                <span class="site-dot gold"></span>
+                <span class="site-dot"></span>
+                <span class="site-dot"></span>
+              </div>
+              <div class="site-url mono">https://aether-system.studio</div>
+              <div class="site-live-badge mono">Generated · 0.6s</div>
+            </div>
+
+            <div class="site-body">
+              <div class="site-nav">
+                <div class="site-brand">Aether<span>.</span></div>
+                <div class="site-nav-links">
+                  <span>Architecture</span>
+                  <span>Tokens</span>
+                  <span>Motion</span>
+                </div>
+                <span class="site-nav-cta">Launch</span>
+              </div>
+
+              <div class="site-hero">
+                <div class="site-hero-copy">
+                  <div class="bento-eyebrow gold mono">8pt Optical Rhythm · WCAG AAA</div>
+                  <div class="site-hero-title">Spatial Interfaces, <span>Engineered.</span></div>
+                  <div class="site-hero-sub">Adaptive design systems compiled from natural language with native 60fps transitions and zero layout shift.</div>
+                  <div class="site-hero-actions">
+                    <span class="site-btn-primary">Deploy System</span>
+                    <span class="site-btn-ghost">Inspect Tokens</span>
+                  </div>
+                </div>
+
+                <div class="site-hero-visual">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span class="bento-eyebrow mono" style="font-size: 0.64rem;">Live Layout Matrix</span>
+                    <span class="mono" style="font-size: 0.68rem; color: var(--gold);">60 FPS</span>
+                  </div>
+                  <div class="site-vis-bars" aria-hidden="true">
+                    <div class="site-vis-bar" style="height: 46%;"></div>
+                    <div class="site-vis-bar" style="height: 68%;"></div>
+                    <div class="site-vis-bar gold" style="height: 94%;"></div>
+                    <div class="site-vis-bar" style="height: 62%;"></div>
+                    <div class="site-vis-bar" style="height: 78%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="site-features">
+                <div class="site-feat-card">
+                  <span class="site-feat-title">Adaptive 8pt Grid</span>
+                  <span class="site-feat-meta mono">Fluid clamp() · 0px overflow</span>
+                </div>
+                <div class="site-feat-card">
+                  <span class="site-feat-title">Semantic Tokens</span>
+                  <span class="site-feat-meta mono">Obsidian · Alabaster · Gold</span>
+                </div>
+                <div class="site-feat-card">
+                  <span class="site-feat-title">Native Motion</span>
+                  <span class="site-feat-meta mono">GPU-composited · 14.8:1 AAA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           SCENE 4 (16.0s - 20.5s): WEB DEVELOPER — XCODE / LINEAR TELEMETRY
+           ====================================================================== -->
+      <section id="scene4" class="scene">
+        <header class="scene-header">
+          <div class="headline-mask">
+            <h1 class="headline"><span class="metallic">WEB</span> <span class="gold">DEVELOPER</span></h1>
+          </div>
+          <span class="header-tag mono">Semantic Code · 60 FPS Telemetry · Production UI</span>
+        </header>
+
+        <div class="s4-grid">
+          <!-- Left Column: Clean Code + Real-Time Telemetry -->
+          <div class="s4-left-stack">
+            <div class="bento code-bento">
+              <div class="code-head mono">
+                <span>VoltrepSet.tsx</span>
+                <span style="color: var(--gold);">TypeScript · Native 60fps</span>
+              </div>
+
+              <div class="code-lines mono">
+                <div id="codeScanner" class="code-scanner" aria-hidden="true"></div>
+                <div class="c-line"><span class="c-num">1</span><span><span class="t-tag">&lt;VoltrepSet</span></span></div>
+                <div class="c-line"><span class="c-num">2</span><span>&nbsp;&nbsp;<span class="t-attr">exercise</span>=<span class="t-val">"Hack Squat"</span></span></div>
+                <div class="c-line"><span class="c-num">3</span><span>&nbsp;&nbsp;<span class="t-attr">load</span>=<span class="t-val">{120}</span> <span class="t-attr">reps</span>=<span class="t-val">{6}</span></span></div>
+                <div class="c-line"><span class="c-num">4</span><span>&nbsp;&nbsp;<span class="t-attr">physics</span>=<span class="t-val">"apple-spring"</span></span></div>
+                <div class="c-line"><span class="c-num">5</span><span>&nbsp;&nbsp;<span class="t-attr">onLog</span>=<span class="t-val">{commitVolumePR}</span></span></div>
+                <div class="c-line"><span class="c-num">6</span><span><span class="t-tag">/&gt;</span></span></div>
+              </div>
+            </div>
+
+            <div class="bento telemetry-bento">
+              <div class="fps-panel">
+                <div>
+                  <div class="bento-eyebrow mono">Frame-Time Budget</div>
+                  <div class="fps-badge mono"><span>60 FPS</span> · 0.4ms</div>
+                </div>
+                <svg id="fpsSvg" class="fps-svg" viewBox="0 0 222 66" preserveAspectRatio="none" aria-hidden="true"></svg>
+              </div>
+
+              <div class="lighthouse-row">
+                <div class="lh-item">
+                  <div class="lh-ring-box">
+                    <svg class="lh-svg" viewBox="0 0 60 60" aria-hidden="true">
+                      <circle class="lh-track" cx="30" cy="30" r="25" />
+                      <circle id="lhPerf" class="lh-fill" cx="30" cy="30" r="25" />
+                    </svg>
+                    <span id="lhPerfNum" class="lh-num mono">0</span>
+                  </div>
+                  <span class="lh-label mono">Perf</span>
+                </div>
+
+                <div class="lh-item">
+                  <div class="lh-ring-box">
+                    <svg class="lh-svg" viewBox="0 0 60 60" aria-hidden="true">
+                      <circle class="lh-track" cx="30" cy="30" r="25" />
+                      <circle id="lhA11y" class="lh-fill alabaster" cx="30" cy="30" r="25" />
+                    </svg>
+                    <span id="lhA11yNum" class="lh-num mono">0</span>
+                  </div>
+                  <span class="lh-label mono">A11y</span>
+                </div>
+
+                <div class="lh-item">
+                  <div class="lh-ring-box">
+                    <svg class="lh-svg" viewBox="0 0 60 60" aria-hidden="true">
+                      <circle class="lh-track" cx="30" cy="30" r="25" />
+                      <circle id="lhSeo" class="lh-fill" cx="30" cy="30" r="25" />
+                    </svg>
+                    <span id="lhSeoNum" class="lh-num mono">0</span>
+                  </div>
+                  <span class="lh-label mono">SEO</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Rendered Voltrep Interactive Card -->
+          <div id="voltrepCard" class="bento voltrep-bento">
+            <nav id="segmentedNav" class="segmented-nav" aria-label="Voltrep Views">
+              <div class="seg-indicator"></div>
+              <div class="seg-tab">Overview</div>
+              <div class="seg-tab">Live Set</div>
+              <div class="seg-tab">Analytics</div>
+            </nav>
+
+            <div class="voltrep-mid">
+              <div class="workout-top">
+                <div>
+                  <div class="bento-eyebrow gold mono">Voltrep Live Logger</div>
+                  <div class="workout-title">Hack Squat</div>
+                  <div class="workout-stats mono"><strong>120 kg</strong> × <strong>6 reps</strong></div>
+                </div>
+                <span id="prBadge" class="pr-badge mono">+5 kg PR</span>
+              </div>
+
+              <div class="volume-chart" aria-label="Volume Progression Chart">
+                <div class="vol-col">
+                  <div class="vol-bar" style="height: 44%;"></div>
+                  <span class="vol-lbl mono">W1</span>
+                </div>
+                <div class="vol-col">
+                  <div class="vol-bar" style="height: 54%;"></div>
+                  <span class="vol-lbl mono">W2</span>
+                </div>
+                <div class="vol-col">
+                  <div class="vol-bar" style="height: 62%;"></div>
+                  <span class="vol-lbl mono">W3</span>
+                </div>
+                <div class="vol-col">
+                  <div class="vol-bar" style="height: 70%;"></div>
+                  <span class="vol-lbl mono">W4</span>
+                </div>
+                <div class="vol-col">
+                  <div id="volPeakBar" class="vol-bar peak" style="height: 58%;"></div>
+                  <span class="vol-lbl mono" style="color: var(--gold);">W5</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="voltrep-foot">
+              <span class="mono" style="font-size: 0.74rem; color: var(--titanium);">Volume Progression · Live State</span>
+              <button id="btnLogSet" type="button" class="action-pill">Log Set</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Silky Full-Screen Obsidian & Champagne-Gold Loop Reset Sweep -->
+      <div id="loopSweep" class="loop-sweep" aria-hidden="true"></div>
+
+      <!-- High-DPI Vector Cursor & Champagne-Gold Ripple -->
+      <div id="ripple" class="ripple" aria-hidden="true"></div>
+      <div id="cursor" class="cursor" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M4.5 3.2L19.2 10.6L12.1 12.6L9.4 19.8L4.5 3.2Z" fill="#F5F5F7" stroke="#050507" stroke-width="1.6" stroke-linejoin="round" />
         </svg>
       </div>
-
-      <!-- =====================================================================
-           MAIN INTERACTIVE VIEWPORT (20.0s 4-Scene Seamless Loop)
-           ===================================================================== -->
-      <div ref="stageRef" class="vids-viewport">
-        <!-- ===================================================================
-             SCENE 01 (0.0s – 5.0s) — UX/UI DESIGN
-             Inline Pill `[ + System ]` + Vertical Word Carousel + Multiplayer Figma Canvas
-             =================================================================== -->
-        <div
-          v-show="s1State.visible"
-          class="scene-layer s1-layer"
-          :style="{
-            opacity: s1State.opacity,
-            transform: s1State.transform,
-          }"
-        >
-          <!-- Peripheral Top Telemetry Bar -->
-          <div class="periph-topbar">
-            <div class="periph-pill">
-              <span class="pp-dot gold" />
-              <span class="tabular">FIGMA AUTO-LAYOUT // 8PT_GRID</span>
-            </div>
-            <div class="periph-pill">
-              <span class="pp-dot mint" />
-              <span class="tabular">CONTRAST 14.8:1 · WCAG AAA</span>
-            </div>
-          </div>
-
-          <!-- Inline Pill Opener + Vertical Word Carousel ([00:00:01]–[00:00:03] mechanic) -->
-          <div class="opener-headline-bar">
-            <h1 class="inline-pill-title">
-              <span class="ipt-word">UX/UI</span>
-              <span class="inline-sys-pill">
-                <span class="isp-plus">+</span>
-                <span>System</span>
-              </span>
-              <span class="word-carousel-viewport">
-                <span
-                  class="word-carousel-track"
-                  :style="{ transform: `translate3d(0, ${s1CarouselOffsetEm}em, 0)` }"
-                >
-                  <span class="wc-item muted" :class="{ active: s1WordIndex === 0 }">Systems</span>
-                  <span class="wc-item muted" :class="{ active: s1WordIndex === 1 }">Interfaces</span>
-                  <span class="wc-item gold" :class="{ active: s1WordIndex === 2 }">DESIGN</span>
-                </span>
-              </span>
-            </h1>
-          </div>
-
-          <!-- Spatial Figma Canvas + Rich Peripheral Elements -->
-          <div
-            class="s1-spatial-grid"
-            :style="{
-              opacity: s1CanvasReveal.toFixed(3),
-              transform: `translate3d(0, ${((1 - s1CanvasReveal) * 20).toFixed(1)}px, 0) scale(${(0.96 + s1CanvasReveal * 0.04).toFixed(3)})`,
-            }"
-          >
-            <!-- Left Peripheral Card: Typography Scale & Token Swatches -->
-            <aside class="periph-depth-card p-left">
-              <div class="pdc-kicker">TYPOGRAPHY SCALE</div>
-              <div class="pdc-title">Inter · -0.03em</div>
-              <div class="pdc-mono tabular">clamp(2.2rem, 5vw, 4.4rem) · tabular-nums</div>
-              <div class="swatch-list">
-                <div class="sw-row">
-                  <span class="sw-circle obs" />
-                  <span class="sw-hex tabular">#050507</span>
-                  <span class="sw-name">Obsidian</span>
-                </div>
-                <div class="sw-row">
-                  <span class="sw-circle gold" />
-                  <span class="sw-hex tabular">#E2B878</span>
-                  <span class="sw-name">Champagne</span>
-                </div>
-                <div class="sw-row">
-                  <span class="sw-circle mint" />
-                  <span class="sw-hex tabular">#34D399</span>
-                  <span class="sw-name">Emerald</span>
-                </div>
-              </div>
-            </aside>
-
-            <!-- Center Foreground: Flat 2D Figma Auto-Layout Frame with Multiplayer Cursors -->
-            <div class="figma-canvas-card" :class="{ 'is-prod': s1ProductionMode, 'is-validated': s1Validated }">
-              <div class="fcc-toolbar">
-                <div class="fcc-dots"><i /><i /><i /></div>
-                <span class="fcc-frame-name">Frame · Voltrep_Design_System</span>
-                <span class="fcc-mode-chip tabular">
-                  {{ s1ProductionMode ? 'PRODUCTION_UI · 8PT' : 'WIREFRAME_GRID' }}
-                </span>
-              </div>
-
-              <!-- Modular Style Grid with Redline Spacing Guides (16px / 24px) & Multiplayer Cursors -->
-              <div class="fcc-stage">
-                <!-- Redline 24px Left Padding Guide -->
-                <div class="redline-h rl-24" aria-hidden="true">
-                  <span>24px</span>
-                </div>
-
-                <!-- Modular Component Grid -->
-                <div class="mod-style-grid">
-                  <div class="mod-tile" :class="{ 'tile-live': s1ProductionMode }">
-                    <div class="mt-top">
-                      <span class="mt-tag">TOKEN_01</span>
-                      <span class="mt-status">{{ s1ProductionMode ? 'AA ✓' : 'DRAFT' }}</span>
-                    </div>
-                    <div class="mt-headline">Workout Set Card</div>
-                    <div class="mt-sub tabular">120 kg × 6 reps · 8pt rhythm</div>
-                  </div>
-
-                  <div class="mod-tile" :class="{ 'tile-live': s1ProductionMode }">
-                    <div class="mt-top">
-                      <span class="mt-tag">TOKEN_02</span>
-                      <span class="mt-status">{{ s1ProductionMode ? 'AAA ✓' : 'GRID' }}</span>
-                    </div>
-                    <div class="mt-headline">Tactile Pill Control</div>
-                    <div class="mt-sub tabular">14.8:1 Contrast · 60fps spring</div>
-                  </div>
-                </div>
-
-                <!-- Redline 16px Vertical Gap Guide -->
-                <div class="redline-v rl-16" aria-hidden="true">
-                  <span>16px</span>
-                </div>
-
-                <!-- Primary Action Pill Button inside Figma Frame (Cursor Click Target) -->
-                <div class="fcc-footer">
-                  <span class="fcc-spec tabular">Auto-Layout · Gap 16px · Padding 24px</span>
-                  <button
-                    ref="s1ValidateBtnRef"
-                    type="button"
-                    class="pill-cta"
-                    :class="{
-                      'is-hover': s1Hover,
-                      'is-pressed': s1Pressed,
-                      'is-flipped': s1Validated,
-                    }"
-                  >
-                    <span class="p-dot" />
-                    <span>{{ s1Validated ? 'Validated ✓' : 'Validate Flow →' }}</span>
-                    <span v-if="s1Ripple" class="btn-ripple" />
-                  </button>
-                </div>
-
-                <!-- Multiplayer Live Cursors (`UX`, `UI`, `Dev`) -->
-                <div
-                  class="peer-cursor pc-ux"
-                  :style="{ transform: `translate3d(${s1PeerCursors.ux.x.toFixed(1)}px, ${s1PeerCursors.ux.y.toFixed(1)}px, 0)` }"
-                  aria-hidden="true"
-                >
-                  <svg viewBox="0 0 16 16" width="13" height="13">
-                    <path d="M2 2L7 14L9.2 9.2L14 7L2 2Z" fill="#E2B878" />
-                  </svg>
-                  <span class="pc-badge gold">UX</span>
-                </div>
-
-                <div
-                  class="peer-cursor pc-ui"
-                  :style="{ transform: `translate3d(${s1PeerCursors.ui.x.toFixed(1)}px, ${s1PeerCursors.ui.y.toFixed(1)}px, 0)` }"
-                  aria-hidden="true"
-                >
-                  <svg viewBox="0 0 16 16" width="13" height="13">
-                    <path d="M2 2L7 14L9.2 9.2L14 7L2 2Z" fill="#34D399" />
-                  </svg>
-                  <span class="pc-badge mint">UI</span>
-                </div>
-
-                <div
-                  class="peer-cursor pc-dev"
-                  :style="{ transform: `translate3d(${s1PeerCursors.dev.x.toFixed(1)}px, ${s1PeerCursors.dev.y.toFixed(1)}px, 0)` }"
-                  aria-hidden="true"
-                >
-                  <svg viewBox="0 0 16 16" width="13" height="13">
-                    <path d="M2 2L7 14L9.2 9.2L14 7L2 2Z" fill="#F5F5F7" />
-                  </svg>
-                  <span class="pc-badge alabaster">Dev</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Peripheral Card: Contrast 14.8:1 AAA & Equalizer Micro-Telemetry -->
-            <aside class="periph-depth-card p-right">
-              <div class="pdc-kicker">A11Y TELEMETRY</div>
-              <div class="pdc-big tabular">14.8:1</div>
-              <span class="pdc-chip">Contrast 14.8:1 AAA</span>
-              <div class="mini-eq-bars" aria-hidden="true">
-                <i style="height: 45%" /><i style="height: 80%" /><i style="height: 60%" /><i style="height: 95%" /><i style="height: 70%" /><i style="height: 85%" />
-              </div>
-              <div class="pdc-mono">Zero Visual Clutter · 8pt Rhythm</div>
-            </aside>
-          </div>
-        </div>
-
-        <!-- Capsule Wave Bridge between Scene 01 and Scene 02 -->
-        <div v-if="s12CapsuleWave.visible" class="capsule-wave-overlay" aria-hidden="true">
-          <span
-            v-for="n in 5"
-            :key="n"
-            class="cw-pill"
-            :class="{ mint: n % 2 === 0 }"
-            :style="{
-              transform: `translate3d(${((0.5 - s12CapsuleWave.progress) * (280 + n * 55)).toFixed(1)}px, ${((n - 3) * 34).toFixed(1)}px, 0)`,
-              opacity: Math.sin(clamp(s12CapsuleWave.progress) * Math.PI).toFixed(3),
-            }"
-          />
-        </div>
-
-        <!-- ===================================================================
-             SCENE 02 (5.0s – 10.0s) — USER RESEARCH
-             Staggered Dark-Glass UX Outline & Telemetry Stack + Simplify Flow -> Next ->
-             =================================================================== -->
-        <div
-          v-show="s2State.visible"
-          class="scene-layer s2-layer"
-          :style="{
-            opacity: s2State.opacity,
-            transform: s2State.transform,
-          }"
-        >
-          <!-- Peripheral Heuristic Pills -->
-          <div class="periph-topbar">
-            <div class="heuristic-pills-group">
-              <span class="periph-pill"><span class="pp-dot gold" />Card Sorting</span>
-              <span class="periph-pill"><span class="pp-dot mint" />Heuristic Audit</span>
-              <span class="periph-pill"><span class="pp-dot alabaster" />Zero Dead-Ends</span>
-            </div>
-            <div class="periph-pill tabular">
-              <span>N = 48 MODERATED SESSIONS</span>
-            </div>
-          </div>
-
-          <!-- Display Headline -->
-          <div class="scene-head">
-            <h2 class="display-title">
-              <span class="t-mask">
-                <span class="t-inner" :style="{ transform: `translate3d(0, ${s2TitleY}, 0)` }">
-                  <span class="c-alabaster">USER</span>
-                  <span class="c-gold">RESEARCH</span>
-                </span>
-              </span>
-            </h2>
-          </div>
-
-          <!-- Spatial Stage: Left Peripheral Telemetry + Center Staggered UX Outline Stack + Right Peripheral Card -->
-          <div class="s2-spatial-grid">
-            <aside class="periph-depth-card p-left">
-              <div class="pdc-kicker">COGNITIVE ERGONOMICS</div>
-              <div class="pdc-big tabular c-mint">-{{ s2FrictionVal }}%</div>
-              <div class="pdc-mono">Decision Latency Reduction</div>
-            </aside>
-
-            <!-- Staggered Dark-Glass UX Outline & Telemetry Stack (Morphs into AI Prompt Pill) -->
-            <div class="ux-outline-stack" :style="s2StackMorphStyle">
-              <div class="uos-header">
-                <span class="uos-kicker">EMPIRICAL RESEARCH OUTLINE</span>
-                <span class="uos-status tabular">{{ s2Simplified ? '3/3 NODES VALIDATED' : 'AUDIT_IN_PROGRESS' }}</span>
-              </div>
-
-              <!-- Row 1: Cognitive Load Audit -> -42% Friction -->
-              <div class="uos-row" :style="s2RowReveal(0)">
-                <div class="ur-left">
-                  <span class="ur-index tabular">01</span>
-                  <div class="ur-copy">
-                    <span class="ur-label">Cognitive Load Audit</span>
-                    <span class="ur-sub">Checkout &amp; Workout Logging Friction</span>
-                  </div>
-                </div>
-                <div class="ur-right">
-                  <svg class="ur-spark" viewBox="0 0 88 26">
-                    <path
-                      d="M2 5 C 24 6, 38 18, 60 20 L 86 23"
-                      fill="none"
-                      stroke="#34D399"
-                      stroke-width="2.2"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                  <span class="ur-metric mint tabular">-{{ s2FrictionVal }}% Friction</span>
-                </div>
-              </div>
-
-              <!-- Row 2: Usability Benchmark -> 98.4% Task Completion · SUS 91/100 -->
-              <div class="uos-row" :style="s2RowReveal(1)">
-                <div class="ur-left">
-                  <span class="ur-index tabular">02</span>
-                  <div class="ur-copy">
-                    <span class="ur-label">Usability Benchmark</span>
-                    <div class="ur-progress-track">
-                      <div class="ur-progress-fill" :style="{ width: `${s2CompletionVal}%` }" />
-                    </div>
-                  </div>
-                </div>
-                <div class="ur-right">
-                  <span class="ur-metric gold tabular">
-                    {{ s2CompletionVal }}% Task Completion · SUS {{ s2SusVal }}/100
-                  </span>
-                </div>
-              </div>
-
-              <!-- Row 3: User Journey Architecture -> Simplify Flow + Next -> -->
-              <div class="uos-row uos-journey-row" :style="s2RowReveal(2)">
-                <div class="ur-left">
-                  <span class="ur-index tabular">03</span>
-                  <div class="ur-copy">
-                    <span class="ur-label">User Journey Architecture</span>
-                    <div class="journey-nodes-inline">
-                      <span class="jn-chip ok">Discover</span>
-                      <span class="jn-arrow">→</span>
-                      <span v-if="!s2Simplified" class="jn-chip tangled">Retry</span>
-                      <span v-if="!s2Simplified" class="jn-arrow">→</span>
-                      <span class="jn-chip ok">Validate</span>
-                      <span class="jn-arrow">→</span>
-                      <span v-if="!s2Simplified" class="jn-chip tangled">Filter</span>
-                      <span v-if="!s2Simplified" class="jn-arrow">→</span>
-                      <span class="jn-chip ok">Ship</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="ur-actions">
-                  <button
-                    ref="s2SimplifyBtnRef"
-                    type="button"
-                    class="pill-cta compact"
-                    :class="{
-                      'is-hover': s2SimplifyHover,
-                      'is-pressed': s2SimplifyPressed,
-                      'is-flipped': s2Simplified,
-                    }"
-                  >
-                    <span class="p-dot" />
-                    <span>{{ s2Simplified ? 'Simplified ✓' : 'Simplify Flow' }}</span>
-                    <span v-if="s2SimplifyRipple" class="btn-ripple" />
-                  </button>
-
-                  <button
-                    ref="s2NextBtnRef"
-                    type="button"
-                    class="pill-cta ghost compact"
-                    :class="{
-                      'is-hover': s2NextHover,
-                      'is-pressed': s2NextPressed,
-                      'is-flipped': s2NextClicked,
-                    }"
-                  >
-                    <span>Next →</span>
-                    <span v-if="s2NextRipple" class="btn-ripple" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <aside class="periph-depth-card p-right">
-              <div class="pdc-kicker">TASK VELOCITY</div>
-              <div class="pdc-big tabular c-gold">3 Steps</div>
-              <div class="pdc-mono">Discover → Validate → Ship</div>
-            </aside>
-          </div>
-        </div>
-
-        <!-- ===================================================================
-             SCENE 03 (10.0s – 15.0s) — CREATIVE AI (NO Robot / NO Binary Stream)
-             Macro Caret Typing + Drag-and-Drop Context Chip + Concentric Submit Echo
-             =================================================================== -->
-        <div
-          v-show="s3State.visible"
-          class="scene-layer s3-layer"
-          :style="{
-            opacity: s3State.opacity,
-            transform: s3State.transform,
-          }"
-        >
-          <!-- Peripheral Telemetry Header -->
-          <div class="periph-topbar">
-            <div class="periph-pill">
-              <span class="pp-dot gold" />
-              <span>AI PROMPT COMPOSER // CONTEXT-AWARE UI</span>
-            </div>
-            <div class="periph-pill tabular">
-              <span class="pp-dot mint" />
-              <span>{{ s3ChipAttached ? '1 CONTEXT ASSET ATTACHED' : 'DRAG & DROP TOKENS' }}</span>
-            </div>
-          </div>
-
-          <!-- Display Headline -->
-          <div class="scene-head">
-            <h2 class="display-title">
-              <span class="t-mask">
-                <span class="t-inner" :style="{ transform: `translate3d(0, ${s3TitleY}, 0)` }">
-                  <span class="c-alabaster">CREATIVE</span>
-                  <span class="c-gold">AI</span>
-                </span>
-              </span>
-            </h2>
-          </div>
-
-          <!-- Macro Zoom Stage: AI Prompt Pill + Drag-and-Drop Peripheral Context Cards -->
-          <div class="s3-composer-stage">
-            <!-- Concentric Expanding Pill Outline Echoes ([00:00:13] & [00:01:16] mechanic) -->
-            <div class="echo-rings-layer" aria-hidden="true">
-              <span
-                v-for="echo in s3ConcentricEchoes"
-                :key="echo.id"
-                class="concentric-pill-echo"
-                :style="{
-                  width: echo.width,
-                  height: echo.height,
-                  opacity: echo.opacity,
-                }"
-              />
-            </div>
-
-            <!-- Macro Camera Wrapper (Zooms 1.32x onto Caret during typing, pulls back to 1.0x for drag-and-drop) -->
-            <div class="s3-macro-camera" :style="s3MacroZoomStyle">
-              <div
-                class="ai-prompt-pill"
-                :class="{
-                  'is-drop-ready': s3IsDraggingChip,
-                  'is-generating': s3IsGenerating,
-                }"
-                :style="s3PromptMorphStyle"
-              >
-                <!-- Morphs cleanly into luminous `Generating...` capsule on Submit -->
-                <template v-if="!s3IsGenerating">
-                  <div ref="s3DropZoneRef" class="app-input-area">
-                    <span class="app-status-orb" />
-
-                    <!-- Inline Attachment Chip dropped via Drag-and-Drop -->
-                    <span v-if="s3ChipAttached" class="attached-context-chip">
-                      <span class="acc-dot" />
-                      <span>[Voltrep_Tokens.fig ×]</span>
-                    </span>
-
-                    <div class="app-typed-wrap">
-                      <span class="app-typed-text">{{ s3TypedCopy }}</span>
-                      <span class="app-caret" aria-hidden="true">|</span>
-                    </div>
-                  </div>
-
-                  <button
-                    ref="s3GenerateBtnRef"
-                    type="button"
-                    class="pill-cta submit-gen-btn"
-                    :class="{
-                      'is-hover': s3GenHover,
-                      'is-pressed': s3GenPressed,
-                    }"
-                  >
-                    <span>↑ Generate</span>
-                    <span v-if="s3GenRipple" class="btn-ripple" />
-                  </button>
-                </template>
-
-                <template v-else>
-                  <div class="generating-capsule-body">
-                    <span class="gen-pulse-orb" />
-                    <span class="gen-label">Generating...</span>
-                    <span class="gen-bars" aria-hidden="true">
-                      <i /><i /><i /><i />
-                    </span>
-                  </div>
-                </template>
-              </div>
-            </div>
-
-            <!-- Peripheral Context Asset Cards (Revealed on pullback; left card is dragged into prompt pill) -->
-            <div class="s3-context-cards-row">
-              <!-- Draggable Card 1: Voltrep_Tokens.fig -->
-              <div
-                ref="s3DragCardRef"
-                class="context-asset-card draggable-card"
-                :class="{ 'is-dragging': s3IsDraggingChip, 'is-dropped': s3ChipAttached }"
-                :style="s3DragCardStyle"
-              >
-                <div class="cac-top">
-                  <span class="cac-badge gold">FIGMA TOKENS</span>
-                  <span class="cac-action">{{ s3ChipAttached ? 'Attached ✓' : 'Drag to Prompt ↗' }}</span>
-                </div>
-                <div class="cac-filename">Voltrep_Tokens.fig</div>
-                <div class="cac-meta tabular">8pt Grid · #E2B878 · #34D399</div>
-              </div>
-
-              <!-- Context Card 2: A11y_Rules.json -->
-              <div
-                class="context-asset-card periph-blur-card"
-                :style="{ opacity: (s3ContextReveal * 0.78).toFixed(3) }"
-              >
-                <div class="cac-top">
-                  <span class="cac-badge mint">WCAG AA/AAA</span>
-                  <span class="cac-action">Constraint</span>
-                </div>
-                <div class="cac-filename">A11y_Rules.json</div>
-                <div class="cac-meta tabular">Contrast ≥ 14.8:1 · Focus Rings</div>
-              </div>
-
-              <!-- Context Card 3: UX_Telemetry -->
-              <div
-                class="context-asset-card periph-blur-card"
-                :style="{ opacity: (s3ContextReveal * 0.78).toFixed(3) }"
-              >
-                <div class="cac-top">
-                  <span class="cac-badge alabaster">USER TELEMETRY</span>
-                  <span class="cac-action">Dataset</span>
-                </div>
-                <div class="cac-filename">UX_Telemetry</div>
-                <div class="cac-meta tabular">-42% Friction · 98.4% Success</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Capsule-to-Equalizer Bar Wave Transition Bridge (13.95s – 15.22s) -->
-        <div v-if="s34EqualizerBridge.visible" class="equalizer-wave-bridge" aria-hidden="true">
-          <span
-            v-for="bar in s34EqualizerBridge.bars"
-            :key="bar.id"
-            class="ewb-bar"
-            :class="{ gold: bar.isGold, mint: !bar.isGold }"
-            :style="{
-              height: bar.height,
-              opacity: bar.opacity,
-            }"
-          />
-        </div>
-
-        <!-- ===================================================================
-             SCENE 04 (15.0s – 20.0s) — MOTION & FRONT-END
-             Voltrep Live Logger + Portfolio Sliding Pill Navbar + Concentric Echo Loop Reset
-             =================================================================== -->
-        <div
-          v-show="s4State.visible"
-          class="scene-layer s4-layer"
-          :style="{
-            opacity: s4State.opacity,
-            transform: s4State.transform,
-          }"
-        >
-          <!-- Peripheral Physics Telemetry Header -->
-          <div class="periph-topbar">
-            <div class="periph-pill">
-              <span class="pp-dot mint" />
-              <span class="tabular">60 FPS · GPU COMPOSITING</span>
-            </div>
-            <div class="periph-pill">
-              <span class="pp-dot gold" />
-              <span class="tabular">cubic-bezier(0.16, 1, 0.3, 1)</span>
-            </div>
-          </div>
-
-          <!-- Display Headline -->
-          <div class="scene-head">
-            <h2 class="display-title">
-              <span class="t-mask">
-                <span class="t-inner" :style="{ transform: `translate3d(0, ${s4TitleY}, 0)` }">
-                  <span class="c-alabaster">MOTION &amp;</span>
-                  <span class="c-gold">FRONT-END</span>
-                </span>
-              </span>
-            </h2>
-          </div>
-
-          <!-- Concentric Expanding Pill Outline Echoes on Loop Reset (18.66s – 20.0s) -->
-          <div class="echo-rings-layer" aria-hidden="true">
-            <span
-              v-for="echo in s4LoopEchoes"
-              :key="echo.id"
-              class="concentric-pill-echo"
-              :style="{
-                width: echo.width,
-                height: echo.height,
-                opacity: echo.opacity,
-              }"
-            />
-          </div>
-
-          <!-- Full-Viewport Spatial Workbench: Left Peripheral + Voltrep Live Logger + Portfolio Navbar/Case Study + Right Peripheral -->
-          <div class="s4-spatial-grid">
-            <aside class="periph-depth-card p-left">
-              <div class="pdc-kicker">SPRING TELEMETRY</div>
-              <div class="pdc-title">16.6ms Frame Lock</div>
-              <svg viewBox="0 0 120 42" class="pdc-curve-svg">
-                <path d="M4 36 C 24 6, 48 6, 116 6" fill="none" stroke="#34D399" stroke-width="2.2" stroke-linecap="round" />
-                <circle cx="34" cy="11" r="3.5" fill="#E2B878" />
-              </svg>
-              <div class="pdc-mono">Zero Layout Thrash</div>
-            </aside>
-
-            <!-- Left/Center Foreground: Voltrep Live Logger (#0E1015, rounded-2xl) -->
-            <div class="voltrep-logger-card" :class="{ 'is-logged': s4SetLogged }">
-              <div class="vlc-header">
-                <span class="vlc-kicker">VOLTREP LIVE LOGGER</span>
-                <span class="vlc-set tabular">SET 04 / 04</span>
-              </div>
-              <div class="vlc-exercise">Hack Squat</div>
-              <div class="vlc-metrics tabular">120 kg × 6 reps</div>
-              <div class="vlc-bars">
-                <i class="done" /><i class="done" /><i class="done" /><i :class="{ done: s4SetLogged }" />
-              </div>
-              <div class="vlc-footer">
-                <span class="vlc-rpe tabular">RPE 8.5 · Rest 120s</span>
-                <button
-                  ref="s4LogBtnRef"
-                  type="button"
-                  class="pill-cta"
-                  :class="{
-                    'is-hover': s4LogHover,
-                    'is-pressed': s4LogPressed,
-                    'is-flipped': s4SetLogged,
-                  }"
-                >
-                  <span class="p-dot" />
-                  <span>{{ s4SetLogged ? 'Set Logged ✓' : 'Log Set' }}</span>
-                  <span v-if="s4LogRipple" class="btn-ripple" />
-                </button>
-              </div>
-            </div>
-
-            <!-- Right Foreground: Portfolio Sliding Pill Navbar & Voltrep Case Study Card -->
-            <div class="portfolio-showcase-col">
-              <!-- Elastic Sliding Pill Navbar (`Overview | Case Studies | Journey`) -->
-              <div class="sliding-pill-navbar">
-                <div
-                  class="spn-indicator"
-                  :class="{ 'at-cases': s4NavCaseStudiesActive }"
-                />
-                <span class="spn-tab" :class="{ active: !s4NavCaseStudiesActive }">Overview</span>
-                <span class="spn-tab" :class="{ active: s4NavCaseStudiesActive }">Case Studies</span>
-                <span class="spn-tab">Journey</span>
-              </div>
-
-              <!-- Voltrep Case Study Card -->
-              <div class="case-study-card" :class="{ 'is-elevated': s4NavCaseStudiesActive }">
-                <div class="csc-top">
-                  <span class="csc-tag">PRODUCTION CASE STUDY</span>
-                  <span class="csc-fps tabular">60 FPS · Semantic Code</span>
-                </div>
-                <div class="csc-title">Voltrep Case Study</div>
-                <div class="csc-desc">Low-friction workout architecture with tactile 60fps micro-interactions.</div>
-                <div class="csc-footer">
-                  <span class="csc-a11y tabular">WCAG AA · Vue 3 + SVG</span>
-                  <button
-                    ref="s4PreviewBtnRef"
-                    type="button"
-                    class="pill-cta"
-                    :class="{
-                      'is-hover': s4PreviewHover,
-                      'is-pressed': s4PreviewPressed,
-                      'is-flipped': s4PreviewClicked,
-                    }"
-                  >
-                    <span>▶ Preview System</span>
-                    <span v-if="s4PreviewRipple" class="btn-ripple" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <aside class="periph-depth-card p-right">
-              <div class="pdc-kicker">WEB VITALS</div>
-              <div class="pdc-big tabular c-mint">100</div>
-              <div class="pdc-mono">Performance · A11y · SEO</div>
-            </aside>
-          </div>
-        </div>
-
-        <!-- ===================================================================
-             PIXEL-ACCURATE DYNAMIC VECTOR CURSOR (`getBoundingClientRect()`)
-             =================================================================== -->
-        <div
-          class="vids-cursor"
-          :style="{
-            opacity: stageCursor.opacity,
-            transform: stageCursor.transform,
-          }"
-          aria-hidden="true"
-        >
-          <svg viewBox="0 0 24 24" width="23" height="23" fill="none">
-            <path
-              d="M2.5 2.5L9.5 20.5L12.7 13.3L19.9 10.1L2.5 2.5Z"
-              fill="#F5F5F7"
-              stroke="#050507"
-              stroke-width="1.7"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
-
-      <!-- =====================================================================
-           PROTECTED LOWER-LEFT SAFE ZONE (Identity + Primary & Secondary CTAs)
-           ===================================================================== -->
-      <div class="safe-zone">
-        <div class="id-wrap">
-          <div class="id-row">
-            <span class="id-name">Samuel Tavonatti</span>
-            <span class="id-sep" aria-hidden="true">—</span>
-            <span class="id-role">UI/UX Designer &amp; Front-End</span>
-          </div>
-          <div class="id-actions">
-            <BaseButton to="/progetti" variant="primary" class="cta-gold">
-              <span>Explore Case Studies</span>
-              <AppIcon name="arrow-right" :size="15" />
-            </BaseButton>
-            <BaseButton :to="{ path: '/', hash: '#contatti' }" variant="secondary" class="cta-glass">
-              <span>Contact Me</span>
-            </BaseButton>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <style scoped>
-.vids-hero {
+/* ==========================================================================
+   1. DESIGN TOKENS — PURE 3-TONE APPLE KEYNOTE PALETTE (ZERO GREEN)
+   ========================================================================== */
+.showreel-host {
+  --bg-obsidian: #050507;
+  --bento-bg: #0D0F14;
+  --bento-surface: rgba(13, 15, 20, 0.84);
+  --surface-subtle: rgba(255, 255, 255, 0.035);
+  --border-hairline: rgba(255, 255, 255, 0.09);
+  --border-specular: rgba(255, 255, 255, 0.16);
+
+  --alabaster: #F5F5F7;
+  --titanium: #8E8E93;
+  --dim: #48484D;
+
+  --gold: #E2B878;
+  --gold-bright: #F2D29B;
+  --gold-soft: rgba(226, 184, 120, 0.12);
+  --gold-border: rgba(226, 184, 120, 0.44);
+  --gold-glow: rgba(226, 184, 120, 0.32);
+
+  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
   width: 100%;
-  margin: 0;
-  padding: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background-color: var(--bg-obsidian);
+  color: var(--alabaster);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.vids-stage {
-  position: relative;
-  width: 100%;
-  min-height: 94vh;
-  min-height: 94svh;
-  background-color: #050507;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 4.8rem 0 1.6rem;
-  color: #F5F5F7;
-  font-family: Inter, 'SF Pro Display', system-ui, -apple-system, sans-serif;
+.showreel-host *,
+.showreel-host *::before,
+.showreel-host *::after {
+  box-sizing: border-box;
 }
-@media (min-width: 768px) {
-  .vids-stage {
-    padding: 5.2rem 0 2.1rem;
-  }
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* Ambient Radial Blooms & Precision Guides */
-.ambient-bg {
+/* ==========================================================================
+   2. FULL-BLEED STAGE (100vw x 100vh) & AMBIENT LIGHT BLOOMS
+   ========================================================================== */
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  background-color: var(--bg-obsidian);
+  overflow: hidden;
+  isolation: isolate;
+  user-select: none;
+}
+
+.ambient-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-}
-.rad-bloom {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(115px);
-  animation: bloomDrift 15s ease-in-out infinite alternate;
-}
-.b-gold {
-  width: 52vw;
-  height: 52vw;
-  max-width: 740px;
-  max-height: 740px;
-  top: 4%;
-  left: 10%;
-  opacity: 0.075;
-  background: radial-gradient(circle, #E2B878 0%, transparent 68%);
-}
-.b-mint {
-  width: 46vw;
-  height: 46vw;
-  max-width: 650px;
-  max-height: 650px;
-  bottom: 4%;
-  right: 8%;
-  opacity: 0.065;
-  background: radial-gradient(circle, #34D399 0%, transparent 68%);
-  animation-direction: alternate-reverse;
-}
-.b-alabaster {
-  width: 40vw;
-  height: 40vw;
-  max-width: 560px;
-  max-height: 560px;
-  top: 28%;
-  right: 24%;
-  opacity: 0.045;
-  background: radial-gradient(circle, #F5F5F7 0%, transparent 68%);
-}
-@keyframes bloomDrift {
-  0% { transform: translate3d(-2%, -1%, 0) scale(0.96); }
-  100% { transform: translate3d(2%, 2%, 0) scale(1.06); }
+  z-index: 0;
 }
 
-.precision-guides {
+.bloom {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  will-change: transform, opacity;
+}
+
+.bloom-gold {
+  width: 54vw;
+  height: 54vw;
+  max-width: 800px;
+  max-height: 800px;
+  top: -24%;
+  right: -14%;
+  background: radial-gradient(circle, rgba(226, 184, 120, 0.10) 0%, rgba(226, 184, 120, 0) 70%);
+  animation: driftGold 16s ease-in-out infinite alternate;
+}
+
+.bloom-alabaster {
+  width: 50vw;
+  height: 50vw;
+  max-width: 740px;
+  max-height: 740px;
+  bottom: -26%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(245, 245, 247, 0.05) 0%, rgba(245, 245, 247, 0) 70%);
+  animation: driftAlabaster 20s ease-in-out infinite alternate;
+}
+
+@keyframes driftGold {
+  0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.72; }
+  100% { transform: translate3d(-7%, 9%, 0) scale(1.12); opacity: 1; }
+}
+
+@keyframes driftAlabaster {
+  0%   { transform: translate3d(0, 0, 0) scale(0.96); opacity: 0.55; }
+  100% { transform: translate3d(6%, -8%, 0) scale(1.08); opacity: 0.92; }
+}
+
+/* ==========================================================================
+   2B. OPENING IDENTITY INTRO -> DOCKS SMOOTHLY TO TOP-LEFT
+   ========================================================================== */
+.intro-brand {
+  position: absolute;
+  top: clamp(16px, 2.2vh, 24px);
+  left: clamp(20px, 3.6vw, 52px);
+  z-index: 30;
+  pointer-events: none;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+
+.intro-brand.is-docking {
+  opacity: 0;
+  transition: transform 1.05s var(--ease-apple), opacity 0.42s var(--ease-smooth) 0.52s;
+}
+
+.intro-name-mask {
+  overflow: hidden;
+  padding-bottom: 2px;
+}
+
+.intro-name {
+  display: inline-block;
+  font-size: clamp(0.96rem, 1.35vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  white-space: nowrap;
+  transform: translateY(115%);
+  opacity: 0;
+  transition: transform 0.85s var(--ease-apple), opacity 0.45s var(--ease-smooth);
+  will-change: transform, opacity;
+}
+
+.intro-name .metallic {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(245, 245, 247, 0.78) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.intro-name .gold {
+  background: linear-gradient(180deg, #F5DAB0 0%, #E2B878 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.intro-brand.is-revealed .intro-name {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+.intro-role {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  transform: translate3d(-50%, 8px, 0);
+  font-size: 0.48rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--titanium);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.55s var(--ease-smooth) 0.22s, transform 0.72s var(--ease-apple) 0.22s;
+}
+
+.intro-brand.is-revealed .intro-role {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0);
+}
+
+.intro-brand.is-docking .intro-role {
+  opacity: 0;
+  transform: translate3d(-50%, -6px, 0);
+  transition: opacity 0.32s var(--ease-smooth) 0s, transform 0.36s var(--ease-apple) 0s;
+}
+
+/* ==========================================================================
+   3. SCENE ISOLATION & APPLE-STYLE SPATIAL CROSS-MORPHS
+   ========================================================================== */
+.scene {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  padding: clamp(54px, 7.6vh, 80px) clamp(20px, 3.6vw, 52px) clamp(20px, 3.6vw, 52px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vh, 28px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.96);
+  filter: blur(6px);
+  transition:
+    opacity 0.44s var(--ease-apple),
+    transform 0.68s var(--ease-apple),
+    filter 0.48s var(--ease-apple),
+    visibility 0s linear 0.48s;
+  will-change: transform, opacity, filter;
+  z-index: 2;
 }
 
-/* Viewport & Scene Layers */
-.vids-viewport {
+.scene.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: scale(1);
+  filter: blur(0px);
+  transition:
+    opacity 0.44s var(--ease-apple),
+    transform 0.68s var(--ease-apple),
+    filter 0.48s var(--ease-apple),
+    visibility 0s linear 0s;
+  z-index: 5;
+}
+
+.scene.is-exiting {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.96);
+  filter: blur(6px);
+  z-index: 3;
+}
+
+/* Display Header */
+.scene-header {
+  position: relative;
+  z-index: 12;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.headline-mask {
+  overflow: hidden;
+  padding-bottom: 4px;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.headline-mask.is-docking {
+  transition: transform 0.78s var(--ease-apple);
+}
+
+.headline {
+  margin: 0;
+  font-size: clamp(2.1rem, 4.8vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  transform: translateY(112%);
+  opacity: 0;
+  transition: transform 0.62s var(--ease-apple), opacity 0.34s var(--ease-smooth);
+  will-change: transform, opacity;
+}
+
+.headline .metallic {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(245, 245, 247, 0.72) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.headline .gold {
+  background: linear-gradient(180deg, #F5DAB0 0%, #E2B878 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.scene.is-active .headline {
+  transform: translateY(0%);
+  opacity: 1;
+}
+
+.header-tag {
+  padding: 8px 15px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-hairline);
+  color: var(--titanium);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: transform 0.6s var(--ease-apple) 0.08s, opacity 0.4s var(--ease-smooth) 0.08s;
+}
+
+.scene.is-content-visible .header-tag {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Brushed Dark Glass Bento Surface */
+.bento {
+  position: relative;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0) 60%),
+    var(--bento-surface);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--border-hairline);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 1px 0 var(--border-specular),
+    0 24px 60px rgba(0, 0, 0, 0.52);
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
+.bento-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--titanium);
+}
+
+.bento-eyebrow.gold {
+  color: var(--gold);
+}
+
+/* Action Pill Button */
+.action-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  background: rgba(245, 245, 247, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--alabaster);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    transform 0.16s var(--ease-apple),
+    background-color 0.32s var(--ease-apple),
+    border-color 0.32s var(--ease-apple),
+    color 0.32s var(--ease-apple),
+    box-shadow 0.32s var(--ease-apple);
+  will-change: transform;
+}
+
+.action-pill.is-hovered {
+  background: rgba(245, 245, 247, 0.14);
+  border-color: var(--gold-border);
+}
+
+.action-pill.is-pressed {
+  transform: scale(0.92);
+}
+
+.action-pill.is-validated {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg-obsidian);
+  box-shadow: 0 0 32px rgba(226, 184, 120, 0.44);
+}
+
+/* Specular Sheen Sweep */
+.specular-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    108deg,
+    transparent 25%,
+    rgba(226, 184, 120, 0.16) 46%,
+    rgba(245, 245, 247, 0.14) 50%,
+    transparent 68%
+  );
+  transform: translateX(-120%);
+  z-index: 10;
+}
+
+.bento.is-swept .specular-sweep {
+  transition: transform 0.88s var(--ease-apple);
+  transform: translateX(120%);
+}
+
+/* ==========================================================================
+   4. SCENE 1: UX/UI DESIGNER — APPLE DESIGN SYSTEM BENTO
+   ========================================================================== */
+.stage-hairlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-apple) 0.12s;
+}
+
+.scene.is-content-visible .stage-hairlines {
+  opacity: 1;
+}
+
+.stage-hl {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.stage-hl.h-top { left: 0; right: 0; top: clamp(46px, 6.4vh, 66px); height: 1px; }
+.stage-hl.h-bot { left: 0; right: 0; bottom: clamp(20px, 3.6vw, 52px); height: 1px; }
+.stage-hl.v-left { top: 0; bottom: 0; left: clamp(20px, 3.6vw, 52px); width: 1px; }
+.stage-hl.v-right { top: 0; bottom: 0; right: clamp(20px, 3.6vw, 52px); width: 1px; }
+
+.s1-grid {
   position: relative;
   z-index: 2;
   flex: 1;
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
+  min-height: 0;
   display: grid;
-  place-items: center;
-  padding: 0.4rem 1rem;
-}
-@media (min-width: 768px) {
-  .vids-viewport {
-    padding: 0.7rem 2.25rem;
-  }
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr);
+  gap: clamp(16px, 2.2vw, 28px);
 }
 
-.scene-layer {
-  position: relative;
-  grid-area: 1 / 1;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  min-height: 460px;
+.s1-main-bento {
+  padding: clamp(20px, 2.4vw, 32px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.85rem;
-  will-change: transform, opacity;
+  justify-content: space-between;
+  gap: 18px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.72s var(--ease-apple) 0.06s, opacity 0.45s var(--ease-smooth) 0.06s;
 }
 
-/* Peripheral Top Bar & Pills */
-.periph-topbar {
-  width: 100%;
-  max-width: 1180px;
+.scene.is-content-visible .s1-main-bento {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.artboard-top {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-hairline);
 }
 
-.heuristic-pills-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-}
-
-.periph-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.32rem 0.74rem;
-  border-radius: 999px;
-  background: rgba(15, 17, 23, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
+.artboard-heading {
+  font-size: 0.98rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: #E5E7EB;
+  letter-spacing: -0.02em;
 }
 
-.pp-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-.pp-dot.gold {
-  background: #E2B878;
-  box-shadow: 0 0 8px rgba(226, 184, 120, 0.6);
-}
-.pp-dot.mint {
-  background: #34D399;
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
-}
-.pp-dot.alabaster {
-  background: #F5F5F7;
-}
-
-/* SCENE 01: Inline Pill + Vertical Word Carousel Opener */
-.opener-headline-bar {
+.spacing-badges {
   display: flex;
-  justify-content: center;
-  width: 100%;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.42s var(--ease-smooth), transform 0.56s var(--ease-apple);
 }
 
-.inline-pill-title {
-  margin: 0;
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.28em;
-  font-size: clamp(1.9rem, 5.1vw, 4.4rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.12;
-  color: #F5F5F7;
+.s1-main-bento.is-snapped .spacing-badges {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.inline-sys-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.32em;
-  padding: 0.14em 0.55em;
+.space-badge {
+  padding: 4px 10px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(24, 27, 36, 0.96) 0%, rgba(14, 16, 22, 0.96) 100%);
-  border: 1.5px solid rgba(226, 184, 120, 0.55);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 10px 28px -8px rgba(226, 184, 120, 0.35);
-  font-size: 0.52em;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #E2B878;
-  vertical-align: middle;
-}
-.isp-plus {
-  display: inline-grid;
-  place-items: center;
-  width: 1.35em;
-  height: 1.35em;
-  border-radius: 50%;
-  background: rgba(226, 184, 120, 0.18);
-  color: #F5F5F7;
-  font-weight: 800;
-}
-
-.word-carousel-viewport {
-  display: inline-block;
-  height: 1.18em;
-  overflow: hidden;
-  vertical-align: bottom;
-}
-.word-carousel-track {
-  display: flex;
-  flex-direction: column;
-  will-change: transform;
-}
-.wc-item {
-  height: 1.18em;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-.wc-item.muted {
-  color: #9CA3AF;
-}
-.wc-item.gold {
-  color: #E2B878;
-}
-
-/* Shared Display Titles for Scenes 02, 03, 04 */
-.scene-head {
-  text-align: center;
-}
-.display-title {
-  margin: 0;
-  font-size: clamp(1.9rem, 5.2vw, 4.5rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
-}
-.t-mask {
-  display: inline-block;
-  overflow: hidden;
-  padding: 0.04em 0.08em 0.1em;
-}
-.t-inner {
-  display: inline-flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.24em;
-  will-change: transform;
-}
-.c-alabaster {
-  color: #F5F5F7;
-}
-.c-gold {
-  color: #E2B878;
-}
-.c-mint {
-  color: #34D399;
-}
-
-/* Spatial Grids & Peripheral Depth Cards */
-.s1-spatial-grid,
-.s2-spatial-grid {
-  width: 100%;
-  max-width: 1180px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.9rem;
-  align-items: center;
-}
-@media (min-width: 1024px) {
-  .s1-spatial-grid,
-  .s2-spatial-grid {
-    grid-template-columns: 220px 1fr 220px;
-    gap: 1.15rem;
-  }
-}
-
-.periph-depth-card {
-  padding: 0.95rem 1.05rem;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(18, 20, 28, 0.88) 0%, rgba(11, 13, 18, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 20px 45px -20px rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  text-align: left;
-  transform: scale(0.94);
-  opacity: 0.86;
-}
-@media (max-width: 1023px) {
-  .periph-depth-card {
-    display: none;
-  }
-}
-
-.pdc-kicker {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #9CA3AF;
-}
-.pdc-title {
-  font-size: 0.96rem;
-  font-weight: 700;
-  color: #F5F5F7;
-}
-.pdc-big {
-  font-size: 1.85rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  color: #F5F5F7;
-}
-.pdc-mono {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.66rem;
-  color: #D1D5DB;
-}
-.pdc-chip {
-  align-self: flex-start;
-  padding: 0.16rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(52, 211, 153, 0.14);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  color: #86EFAC;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.65rem;
-  font-weight: 700;
-}
-
-.swatch-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  margin-top: 0.2rem;
-}
-.sw-row {
-  display: grid;
-  grid-template-columns: 14px auto 1fr;
-  align-items: center;
-  gap: 0.45rem;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
   font-size: 0.7rem;
-}
-.sw-circle {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-}
-.sw-circle.obs {
-  background: #050507;
-  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.45);
-}
-.sw-circle.gold {
-  background: #E2B878;
-}
-.sw-circle.mint {
-  background: #34D399;
-}
-.sw-hex {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  color: #F5F5F7;
-}
-.sw-name {
-  color: #9CA3AF;
-  text-align: right;
+  font-weight: 600;
 }
 
-.mini-eq-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 26px;
-  margin: 0.15rem 0;
-}
-.mini-eq-bars i {
-  flex: 1;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #86EFAC, #E2B878);
-}
-
-/* Center Figma Auto-Layout Frame */
-.figma-canvas-card {
+/* Interactive UI System Artboard with Magnetic 8pt Alignment Hairlines */
+.artboard-canvas {
   position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 18px;
   border-radius: 18px;
-  background: linear-gradient(180deg, #141720 0%, #0D0F15 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 26px 60px -22px rgba(0, 0, 0, 0.88);
+  background: rgba(5, 5, 7, 0.56);
+  border: 1px solid var(--border-hairline);
   overflow: hidden;
-  transition: border-color 240ms ease;
-}
-.figma-canvas-card.is-validated {
-  border-color: rgba(52, 211, 153, 0.55);
 }
 
-.fcc-toolbar {
+.guide-line {
+  position: absolute;
+  background: rgba(226, 184, 120, 0.34);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.48s var(--ease-apple);
+}
+
+.guide-line.h1 { left: 0; right: 0; top: 18px; height: 1px; }
+.guide-line.h2 { left: 0; right: 0; bottom: 18px; height: 1px; }
+.guide-line.v1 { top: 0; bottom: 0; left: 18px; width: 1px; }
+.guide-line.v2 { top: 0; bottom: 0; right: 18px; width: 1px; }
+
+.s1-main-bento.is-snapped .guide-line {
+  opacity: 1;
+}
+
+.ui-header-strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-hairline);
+  transform: translate3d(-12px, -10px, 0);
+  transition: transform 0.76s var(--ease-apple), border-color 0.48s var(--ease-apple);
 }
-.fcc-dots {
+
+.s1-main-bento.is-snapped .ui-header-strip {
+  transform: translate3d(0, 0, 0);
+  border-color: rgba(226, 184, 120, 0.32);
+}
+
+.ui-pill-row {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
 }
-.fcc-dots i {
+
+.mini-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-}
-.fcc-frame-name {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.7rem;
-  color: #D1D5DB;
-}
-.fcc-mode-chip {
-  padding: 0.14rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(226, 184, 120, 0.14);
-  border: 1px solid rgba(226, 184, 120, 0.4);
-  color: #E2B878;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.64rem;
-  font-weight: 700;
+  background: rgba(245, 245, 247, 0.22);
 }
 
-.fcc-stage {
-  position: relative;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.mini-dot.gold {
+  background: var(--gold);
 }
 
-.redline-h,
-.redline-v {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #E2B878;
-  pointer-events: none;
-}
-.redline-h.rl-24 {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 24px;
-  border-top: 1px dashed #E2B878;
-  text-align: center;
-}
-.redline-h.rl-24 span {
-  position: relative;
-  top: -12px;
-  font-size: 0.58rem;
-}
-.redline-v.rl-16 {
-  display: inline-flex;
-  align-items: center;
-  align-self: center;
-  gap: 6px;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: rgba(226, 184, 120, 0.12);
-  border: 1px dashed rgba(226, 184, 120, 0.45);
-}
-
-.mod-style-grid {
+.ui-card-row {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-@media (min-width: 600px) {
-  .mod-style-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.mod-tile {
-  padding: 0.85rem 1rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.22);
-  text-align: left;
+.sys-card {
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-hairline);
   display: flex;
   flex-direction: column;
-  gap: 0.28rem;
-  transition: background 260ms ease, border 260ms ease, box-shadow 260ms ease;
-}
-.mod-tile.tile-live {
-  background: rgba(20, 24, 34, 0.92);
-  border: 1px solid rgba(226, 184, 120, 0.42);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-.mt-top {
-  display: flex;
   justify-content: space-between;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.62rem;
-}
-.mt-tag {
-  color: #9CA3AF;
-}
-.mt-status {
-  color: #34D399;
-  font-weight: 700;
-}
-.mt-headline {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #F5F5F7;
-}
-.mt-sub {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
-  color: #D1D5DB;
-}
-
-.fcc-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  padding-top: 0.2rem;
-}
-.fcc-spec {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
-  color: #9CA3AF;
-}
-
-/* Multiplayer Live Cursors */
-.peer-cursor {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 12;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  pointer-events: none;
+  min-height: 112px;
+  transition: transform 0.76s var(--ease-apple), border-color 0.48s var(--ease-apple);
   will-change: transform;
 }
-.pc-badge {
-  padding: 1px 6px;
-  border-radius: 999px;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.58rem;
-  font-weight: 800;
-  color: #050507;
-}
-.pc-badge.gold {
-  background: #E2B878;
-}
-.pc-badge.mint {
-  background: #34D399;
-}
-.pc-badge.alabaster {
-  background: #F5F5F7;
+
+.sys-card.c1 { transform: translate3d(-16px, 16px, 0); }
+.sys-card.c2 { transform: translate3d(0, 22px, 0); }
+.sys-card.c3 { transform: translate3d(16px, -14px, 0); }
+
+.s1-main-bento.is-snapped .sys-card {
+  transform: translate3d(0, 0, 0);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
-/* Shared Interactive Pill CTAs */
-.pill-cta {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.58rem 1.15rem;
-  border-radius: 999px;
-  background: #E2B878;
-  color: #050507;
-  border: 1px solid #E2B878;
-  font-family: Inter, system-ui, sans-serif;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 130ms ease, background 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-}
-.pill-cta.compact {
-  padding: 0.45rem 0.92rem;
-  font-size: 0.76rem;
-}
-.pill-cta.ghost {
-  background: rgba(255, 255, 255, 0.08);
-  color: #F5F5F7;
-  border-color: rgba(255, 255, 255, 0.22);
-}
-.pill-cta.is-hover {
-  transform: translate3d(0, -2px, 0);
-  box-shadow: 0 0 24px rgba(226, 184, 120, 0.45);
-}
-.pill-cta.is-pressed {
-  transform: scale(0.93);
-}
-.pill-cta.is-flipped {
-  background: #34D399;
-  border-color: #34D399;
-  color: #04130C;
-}
-
-.p-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.btn-ripple {
-  position: absolute;
-  inset: -5px;
-  border-radius: 999px;
-  border: 2px solid #34D399;
-  animation: rippleExpand 540ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  pointer-events: none;
-}
-@keyframes rippleExpand {
-  0% { opacity: 0.75; transform: scale(0.95); }
-  100% { opacity: 0; transform: scale(1.18); }
-}
-
-/* Capsule Wave Bridge (Scene 01 -> Scene 02) */
-.capsule-wave-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 25;
-  display: grid;
-  place-items: center;
-}
-.cw-pill {
-  position: absolute;
-  width: 220px;
-  height: 26px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(226, 184, 120, 0.35), rgba(52, 211, 153, 0.35));
-  border: 1px solid rgba(226, 184, 120, 0.55);
-  backdrop-filter: blur(8px);
-}
-.cw-pill.mint {
-  border-color: rgba(52, 211, 153, 0.55);
-}
-
-/* SCENE 02: Staggered Dark-Glass UX Outline & Telemetry Stack */
-.ux-outline-stack {
-  width: 100%;
-  margin: 0 auto;
-  padding: 1rem 1.2rem;
-  background: linear-gradient(180deg, rgba(20, 23, 32, 0.95) 0%, rgba(12, 14, 20, 0.96) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 26px 60px -22px rgba(0, 0, 0, 0.88);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  transition: border-color 240ms ease;
-}
-
-.uos-header {
+/* Champagne-gold 16px / 24px spacing redlines between modular blocks */
+.redline-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
-}
-.uos-kicker {
-  color: #9CA3AF;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-}
-.uos-status {
-  color: #34D399;
-  font-weight: 700;
+  gap: 12px;
+  opacity: 0;
+  transform: scaleX(0.94);
+  transition: opacity 0.5s var(--ease-apple) 0.18s, transform 0.6s var(--ease-apple) 0.18s;
 }
 
-.uos-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.65rem;
-  padding: 0.68rem 0.9rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+.s1-main-bento.is-snapped .redline-row {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
-.ur-left {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  text-align: left;
-  flex: 1 1 240px;
-}
-.ur-index {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: rgba(226, 184, 120, 0.14);
-  border: 1px solid rgba(226, 184, 120, 0.35);
-  color: #E2B878;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
-  font-weight: 700;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-.ur-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.22rem;
+.redline-seg {
   flex: 1;
-}
-.ur-label {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #F5F5F7;
-}
-.ur-sub {
-  font-size: 0.72rem;
-  color: #9CA3AF;
-}
-
-.ur-right {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-}
-.ur-spark {
-  width: 78px;
-  height: 24px;
-}
-.ur-metric {
-  padding: 0.24rem 0.65rem;
-  border-radius: 999px;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-.ur-metric.mint {
-  background: rgba(52, 211, 153, 0.14);
-  border: 1px solid rgba(52, 211, 153, 0.38);
-  color: #86EFAC;
-}
-.ur-metric.gold {
-  background: rgba(226, 184, 120, 0.14);
-  border: 1px solid rgba(226, 184, 120, 0.38);
-  color: #E2B878;
+  gap: 6px;
 }
 
-.ur-progress-track {
-  width: 100%;
-  max-width: 180px;
-  height: 5px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-}
-.ur-progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #E2B878, #34D399);
+.redline-bar {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(226, 184, 120, 0.72) 0 4px,
+    transparent 4px 8px
+  );
 }
 
-.journey-nodes-inline {
+.redline-tag {
+  font-size: 0.66rem;
+  color: var(--gold);
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.sys-label {
+  font-size: 0.7rem;
+  color: var(--titanium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sk-line {
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(245, 245, 247, 0.14);
+  margin-top: 8px;
+}
+
+.sk-line.short {
+  width: 66%;
+  background: rgba(245, 245, 247, 0.08);
+}
+
+.sk-line.accent {
+  width: 42%;
+  background: rgba(226, 184, 120, 0.45);
+}
+
+.artboard-bottom {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.28rem;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-hairline);
 }
-.jn-chip {
-  padding: 0.12rem 0.48rem;
-  border-radius: 999px;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.64rem;
+
+/* Left Single Cohesive Design System Tokens Bento Card */
+.s1-tokens-bento {
+  padding: clamp(20px, 2.4vw, 30px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: transform 0.72s var(--ease-apple) 0.12s, opacity 0.45s var(--ease-smooth) 0.12s;
+}
+
+.scene.is-content-visible .s1-tokens-bento {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.type-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.type-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.specimen-aa {
+  font-size: clamp(2.8rem, 4.8vw, 4.2rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(245, 245, 247, 0.56) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.specimen-meta {
+  font-size: 0.72rem;
+  color: var(--titanium);
+}
+
+.type-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.type-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.74rem;
+}
+
+.type-row .tr-name {
+  color: var(--alabaster);
   font-weight: 600;
 }
-.jn-chip.ok {
-  background: rgba(52, 211, 153, 0.14);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  color: #86EFAC;
-}
-.jn-chip.tangled {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px dashed rgba(255, 255, 255, 0.25);
-  color: #9CA3AF;
-}
-.jn-arrow {
-  color: #6B7280;
-  font-size: 0.7rem;
+
+.type-row .tr-spec {
+  color: var(--titanium);
 }
 
-.ur-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.48rem;
+.swatch-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
 }
 
-/* SCENE 03: CREATIVE AI (Macro Caret Typing + Drag-and-Drop Chip + Concentric Submit Echo) */
-.s3-composer-stage {
-  position: relative;
-  width: 100%;
-  max-width: 1020px;
+.swatch-unit {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.15rem;
+  gap: 6px;
 }
 
-.s3-macro-camera {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  transform-origin: 38% 50%;
-  will-change: transform;
+.swatch-orb {
+  width: clamp(34px, 3.4vw, 44px);
+  height: clamp(34px, 3.4vw, 44px);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: transform 0.45s var(--ease-apple), box-shadow 0.45s var(--ease-apple);
 }
 
-.ai-prompt-pill {
-  position: relative;
-  z-index: 5;
-  width: 100%;
+.swatch-orb.obs {
+  background: radial-gradient(circle at 32% 28%, #1C1E26 0%, #050507 75%);
+}
+
+.swatch-orb.gls {
+  background: radial-gradient(circle at 32% 28%, #252A36 0%, #0D0F14 80%);
+}
+
+.swatch-orb.ala {
+  background: radial-gradient(circle at 32% 28%, #FFFFFF 0%, #D2D2D7 85%);
+  box-shadow: 0 0 18px rgba(245, 245, 247, 0.16);
+}
+
+.swatch-orb.gld {
+  background: radial-gradient(circle at 32% 28%, #F6DFB7 0%, #E2B878 80%);
+  border-color: var(--gold);
+  box-shadow: 0 0 24px rgba(226, 184, 120, 0.34);
+}
+
+.swatch-code {
+  font-size: 0.66rem;
+  color: var(--titanium);
+  text-align: center;
+}
+
+.swatch-name {
+  font-size: 0.64rem;
+  color: var(--dim);
+  text-align: center;
+}
+
+.contrast-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   5. SCENE 2: USER RESEARCH — DOUBLE DIAMOND & TELEMETRY
+   ========================================================================== */
+.s2-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.38fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1.18fr) minmax(0, 0.82fr);
+  gap: clamp(14px, 1.8vw, 22px);
+}
+
+.s2-card {
+  padding: clamp(16px, 2vw, 26px);
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: transform 0.68s var(--ease-apple) 0.06s, opacity 0.44s var(--ease-smooth) 0.06s;
+}
+
+.scene.is-content-visible .s2-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.s2-card.delay-2 { transition-delay: 0.15s; }
+.s2-card.delay-3 { transition-delay: 0.2s; }
+.s2-card.delay-4 { transition-delay: 0.24s; }
+
+.s2-card-head {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem 0.85rem 0.75rem 1.25rem;
-  background: #0F1117;
-  border: 1.5px solid rgba(226, 184, 120, 0.55);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0 36px rgba(226, 184, 120, 0.22),
-    0 26px 60px -20px rgba(0, 0, 0, 0.88);
-  transition: border-color 220ms ease, box-shadow 220ms ease;
-}
-.ai-prompt-pill.is-drop-ready {
-  border-color: #34D399;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 0 42px rgba(52, 211, 153, 0.32);
-}
-.ai-prompt-pill.is-generating {
-  justify-content: center;
-  padding: 0.85rem 1.6rem;
-  border-color: #34D399;
-  box-shadow:
-    0 0 45px rgba(52, 211, 153, 0.38),
-    0 20px 50px -15px rgba(0, 0, 0, 0.85);
-}
-
-.app-input-area {
-  flex: 1 1 260px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.55rem;
-  text-align: left;
-  min-width: 0;
-}
-.app-status-orb {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #E2B878;
-  box-shadow: 0 0 10px rgba(226, 184, 120, 0.8);
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.attached-context-chip {
+/* Top-Left: Interactive SVG Double Diamond */
+.diamond-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.diamond-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  overflow: visible;
+}
+
+.dd-outline {
+  fill: rgba(255, 255, 255, 0.025);
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+
+.dd-divider {
+  stroke: rgba(255, 255, 255, 0.09);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.dd-trace {
+  fill: none;
+  stroke: url(#ddGoldGrad);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px rgba(226, 184, 120, 0.52));
+}
+
+.dd-node {
+  fill: #0D0F14;
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 2;
+  transition: fill 0.4s var(--ease-apple), stroke 0.4s var(--ease-apple);
+}
+
+.dd-node.is-lit {
+  fill: var(--gold);
+  stroke: #F5F5F7;
+  filter: drop-shadow(0 0 10px rgba(226, 184, 120, 0.75));
+}
+
+.dd-phase-label {
+  fill: var(--titanium);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: fill 0.36s ease;
+}
+
+.dd-phase-label.is-lit {
+  fill: var(--gold);
+}
+
+.dd-sub-label {
+  fill: var(--dim);
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+}
+
+.dd-milestone {
+  fill: var(--titanium);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  transition: fill 0.4s ease;
+}
+
+.dd-milestone.is-lit {
+  fill: var(--alabaster);
+}
+
+.dd-tracer-halo {
+  fill: rgba(226, 184, 120, 0.28);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dd-tracer-dot {
+  fill: #F5F5F7;
+  stroke: var(--gold);
+  stroke-width: 2.5;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dd-tracer-halo.is-active,
+.dd-tracer-dot.is-active {
+  opacity: 1;
+}
+
+/* Top-Right: Combined Ring Gauge + Smooth Bezier Area Chart */
+.telemetry-combo {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.ring-mini-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ring-stage {
+  position: relative;
+  width: clamp(104px, 12.5vh, 136px);
+  height: clamp(104px, 12.5vh, 136px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 11;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: url(#ringGoldGrad);
+  stroke-width: 11;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px rgba(226, 184, 120, 0.44));
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.ring-value {
+  font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--alabaster);
+}
+
+.ring-label {
+  font-size: 0.62rem;
+  color: var(--titanium);
+  margin-top: 2px;
+}
+
+.sus-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-hairline);
+  color: var(--alabaster);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.sus-pill span {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.bezier-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 108px;
+  gap: 8px;
+}
+
+.friction-pill {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.bezier-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 76px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bezier-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.chart-grid-line {
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 1;
+}
+
+.area-fill {
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-apple) 0.18s;
+}
+
+.area-fill.is-visible {
+  opacity: 1;
+}
+
+.bezier-stroke {
+  fill: none;
+  stroke: url(#goldStrokeGrad);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px rgba(226, 184, 120, 0.45));
+}
+
+.tracer-halo {
+  fill: rgba(226, 184, 120, 0.28);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tracer-dot {
+  fill: #F5F5F7;
+  stroke: var(--gold);
+  stroke-width: 2.2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tracer-dot.is-active,
+.tracer-halo.is-active {
+  opacity: 1;
+}
+
+/* Bottom-Left: Stakeholder Alignment */
+.stakeholder-track {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+}
+
+.sh-node {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.22rem 0.62rem;
+  gap: 7px;
+  padding: 9px 14px;
   border-radius: 999px;
-  background: rgba(52, 211, 153, 0.16);
-  border: 1px solid rgba(52, 211, 153, 0.55);
-  color: #86EFAC;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.72rem;
-  font-weight: 700;
-  animation: chipPopIn 280ms cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--titanium);
+  font-size: clamp(0.72rem, 0.95vw, 0.84rem);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background-color 0.44s var(--ease-apple),
+    border-color 0.44s var(--ease-apple),
+    color 0.44s var(--ease-apple),
+    box-shadow 0.44s var(--ease-apple);
 }
-@keyframes chipPopIn {
-  0% { transform: scale(0.8); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-.acc-dot {
+
+.sh-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #34D399;
+  background: var(--dim);
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-.app-typed-wrap {
-  flex: 1 1 220px;
-  font-size: clamp(0.82rem, 1.35vw, 0.96rem);
-  line-height: 1.42;
-  color: #F5F5F7;
-}
-.app-caret {
-  display: inline-block;
-  margin-left: 2px;
-  color: #E2B878;
-  font-weight: 800;
-  animation: caretBlink 650ms steps(2, start) infinite;
-}
-@keyframes caretBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+.sh-node.is-aligned {
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
+  color: var(--alabaster);
+  box-shadow: 0 0 22px rgba(226, 184, 120, 0.16);
 }
 
-.submit-gen-btn {
-  flex-shrink: 0;
+.sh-node.is-aligned .sh-dot {
+  background: var(--gold);
+  box-shadow: 0 0 10px rgba(226, 184, 120, 0.85);
 }
 
-.generating-capsule-body {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #F5F5F7;
-}
-.gen-pulse-orb {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #34D399;
-  box-shadow: 0 0 12px #34D399;
-}
-.gen-bars {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 14px;
-}
-.gen-bars i {
-  width: 3px;
-  height: 12px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #34D399, #E2B878);
+.sh-conn {
+  flex: 1;
+  height: 2px;
+  min-width: 8px;
+  margin: 0 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Concentric Expanding Pill Outline Echoes */
-.echo-rings-layer {
+.sh-conn::after {
+  content: "";
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  display: grid;
-  place-items: center;
-  z-index: 1;
-}
-.concentric-pill-echo {
-  position: absolute;
-  border-radius: 999px;
-  border: 1.8px solid #E2B878;
-  box-shadow: 0 0 24px rgba(226, 184, 120, 0.25);
-  pointer-events: none;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.46s var(--ease-apple);
+  box-shadow: 0 0 10px rgba(226, 184, 120, 0.65);
 }
 
-/* Peripheral Context Asset Cards (Scene 03) */
-.s3-context-cards-row {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-@media (min-width: 768px) {
-  .s3-context-cards-row {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
+.sh-conn.is-lit::after {
+  transform: scaleX(1);
 }
 
-.context-asset-card {
-  padding: 0.8rem 1rem;
+/* Bottom-Right: Non-Negotiable Constraints */
+.constraints-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-content: center;
+}
+
+.constraint-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(20, 23, 32, 0.92) 0%, rgba(12, 14, 20, 0.94) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  text-align: left;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: var(--titanium);
+  font-size: clamp(0.7rem, 0.88vw, 0.8rem);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    background-color 0.44s var(--ease-apple),
+    border-color 0.44s var(--ease-apple),
+    color 0.44s var(--ease-apple),
+    box-shadow 0.44s var(--ease-apple);
+}
+
+.constraint-pill svg {
+  flex-shrink: 0;
+  color: var(--dim);
+  transition: color 0.4s ease;
+}
+
+.constraint-pill.is-locked {
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
+  color: var(--alabaster);
+  box-shadow: 0 0 18px rgba(226, 184, 120, 0.14);
+}
+
+.constraint-pill.is-locked svg {
+  color: var(--gold);
+}
+
+/* ==========================================================================
+   6. SCENE 3: CREATIVE AI — APPLE INTELLIGENCE PROMPT PILL
+   ========================================================================== */
+.s3-stage {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.26rem;
-  will-change: transform, opacity;
-}
-.periph-blur-card {
-  filter: blur(0.6px);
-  transform: scale(0.95);
-}
-@media (max-width: 767px) {
-  .periph-blur-card {
-    display: none;
-  }
-}
-.cac-top {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.62rem;
-}
-.cac-badge {
-  padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-  font-weight: 700;
-}
-.cac-badge.gold {
-  background: rgba(226, 184, 120, 0.16);
-  color: #E2B878;
-}
-.cac-badge.mint {
-  background: rgba(52, 211, 153, 0.16);
-  color: #86EFAC;
-}
-.cac-badge.alabaster {
-  background: rgba(255, 255, 255, 0.12);
-  color: #F5F5F7;
-}
-.cac-action {
-  color: #9CA3AF;
-}
-.cac-filename {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #F5F5F7;
-}
-.cac-meta {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
-  color: #D1D5DB;
+  justify-content: center;
+  position: relative;
+  opacity: 0;
+  transform: translateY(22px) scale(0.97);
+  transition: transform 0.72s var(--ease-apple), opacity 0.46s var(--ease-smooth);
 }
 
-/* Capsule-to-Equalizer Wave Bridge (Scene 03 -> Scene 04) */
-.equalizer-wave-bridge {
-  position: absolute;
-  inset: 0;
-  z-index: 28;
-  pointer-events: none;
+.scene.is-content-visible .s3-stage {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.s3-camera {
+  position: relative;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(5px, 1vw, 12px);
-  padding: 0 2rem;
-}
-.ewb-bar {
-  width: clamp(6px, 0.9vw, 11px);
-  border-radius: 999px;
-  will-change: height, opacity;
-}
-.ewb-bar.gold {
-  background: linear-gradient(180deg, #E2B878, rgba(226, 184, 120, 0.25));
-  box-shadow: 0 0 14px rgba(226, 184, 120, 0.45);
-}
-.ewb-bar.mint {
-  background: linear-gradient(180deg, #34D399, rgba(52, 211, 153, 0.25));
-  box-shadow: 0 0 14px rgba(52, 211, 153, 0.45);
+  transition: transform 0.85s var(--ease-apple);
+  will-change: transform;
 }
 
-/* SCENE 04: MOTION & FRONT-END (Voltrep Logger + Sliding Pill Navbar + Case Study) */
-.s4-spatial-grid {
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  max-width: 1200px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.9rem;
-  align-items: stretch;
-}
-@media (min-width: 768px) {
-  .s4-spatial-grid {
-    grid-template-columns: 1fr 1.15fr;
-  }
-}
-@media (min-width: 1120px) {
-  .s4-spatial-grid {
-    grid-template-columns: 195px 1fr 1.15fr 195px;
-    gap: 1rem;
-    align-items: center;
-  }
+.s3-camera.is-zoomed {
+  transform: scale(1.18);
 }
 
-.pdc-curve-svg {
-  width: 100%;
-  height: 36px;
+.s3-camera.is-dismissed {
+  opacity: 0;
+  transform: translateY(-22px) scale(0.92);
+  pointer-events: none;
+  transition: transform 0.56s var(--ease-apple), opacity 0.36s var(--ease-smooth);
 }
 
-.voltrep-logger-card,
-.case-study-card {
-  padding: 1.05rem 1.2rem;
-  border-radius: 16px;
-  background: #0E1015;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 24px 55px -20px rgba(0, 0, 0, 0.86);
-  text-align: left;
+/* Live Generated Website Preview Window (Scene 3 Reveal) */
+.ai-site-preview {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 0.55rem;
-  transition: border-color 240ms ease, transform 240ms ease;
-}
-.voltrep-logger-card.is-logged {
-  border-color: rgba(52, 211, 153, 0.55);
-}
-.case-study-card.is-elevated {
-  border-color: rgba(226, 184, 120, 0.55);
-  transform: translate3d(0, -3px, 0);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(28px) scale(0.95);
+  transition:
+    opacity 0.52s var(--ease-apple),
+    transform 0.78s var(--ease-apple),
+    border-color 0.5s var(--ease-apple);
+  will-change: transform, opacity;
 }
 
-.vlc-header,
-.csc-top {
+.ai-site-preview.is-built {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+  border-color: var(--gold-border);
+  box-shadow:
+    inset 0 1px 0 rgba(226, 184, 120, 0.32),
+    0 30px 80px rgba(0, 0, 0, 0.72),
+    0 0 48px rgba(226, 184, 120, 0.12);
+}
+
+.site-chrome {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.66rem;
-}
-.vlc-kicker,
-.csc-tag {
-  color: #9CA3AF;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-.vlc-set {
-  color: #E2B878;
-  font-weight: 700;
-}
-.csc-fps {
-  color: #34D399;
-  font-weight: 700;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-hairline);
+  background: rgba(255, 255, 255, 0.025);
+  flex-shrink: 0;
 }
 
-.vlc-exercise,
-.csc-title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: #F5F5F7;
-}
-.vlc-metrics {
-  font-size: 1.02rem;
-  font-weight: 700;
-  color: #34D399;
-}
-.vlc-bars {
+.site-dots {
   display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.site-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(245, 245, 247, 0.16);
+}
+
+.site-dot.gold {
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(226, 184, 120, 0.55);
+}
+
+.site-url {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(5, 5, 7, 0.62);
+  border: 1px solid var(--border-hairline);
+  font-size: 0.7rem;
+  color: var(--titanium);
+  letter-spacing: 0.01em;
+}
+
+.site-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-bright);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.site-body {
+  flex: 1;
+  min-height: 0;
+  padding: clamp(16px, 2.2vw, 28px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(14px, 2vh, 22px);
+  background:
+    radial-gradient(70% 60% at 85% 15%, rgba(226, 184, 120, 0.08) 0%, rgba(226, 184, 120, 0) 70%),
+    rgba(5, 5, 7, 0.44);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.46s var(--ease-apple) 0.14s, transform 0.56s var(--ease-apple) 0.14s;
+}
+
+.ai-site-preview.is-built .site-nav {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-brand {
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--alabaster);
+}
+
+.site-brand span {
+  color: var(--gold);
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 0.74rem;
+  color: var(--titanium);
+}
+
+.site-nav-cta {
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(245, 245, 247, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--alabaster);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.site-hero {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
+  gap: clamp(16px, 2.4vw, 32px);
+  align-items: center;
+}
+
+.site-hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.54s var(--ease-apple) 0.24s, transform 0.66s var(--ease-apple) 0.24s;
+}
+
+.ai-site-preview.is-built .site-hero-copy {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-hero-title {
+  font-size: clamp(1.45rem, 2.9vw, 2.55rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--alabaster);
+}
+
+.site-hero-title span {
+  background: linear-gradient(180deg, #F5DAB0 0%, #E2B878 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.site-hero-sub {
+  font-size: clamp(0.76rem, 1vw, 0.9rem);
+  line-height: 1.5;
+  color: var(--titanium);
+  max-width: 44ch;
+}
+
+.site-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.site-btn-primary {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #F5DAB0 0%, #E2B878 100%);
+  color: var(--bg-obsidian);
+  font-size: 0.76rem;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(226, 184, 120, 0.28);
+}
+
+.site-btn-ghost {
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-hairline);
+  color: var(--alabaster);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.site-hero-visual {
+  height: 100%;
+  min-height: 132px;
+  max-height: 220px;
+  border-radius: 18px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 75% 24%, rgba(226, 184, 120, 0.20) 0%, rgba(226, 184, 120, 0) 60%),
+    rgba(13, 15, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  transition: opacity 0.56s var(--ease-apple) 0.34s, transform 0.7s var(--ease-apple) 0.34s;
+}
+
+.ai-site-preview.is-built .site-hero-visual {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.site-vis-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 74px;
+}
+
+.site-vis-bar {
+  flex: 1;
+  border-radius: 8px 8px 3px 3px;
+  background: rgba(245, 245, 247, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transform-origin: bottom;
+  transform: scaleY(0.15);
+  transition: transform 0.72s var(--ease-apple) 0.46s;
+}
+
+.site-vis-bar.gold {
+  background: linear-gradient(180deg, #F5DAB0 0%, #E2B878 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(226, 184, 120, 0.32);
+}
+
+.ai-site-preview.is-built .site-vis-bar {
+  transform: scaleY(1);
+}
+
+.site-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.site-feat-card {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.48s var(--ease-apple), transform 0.6s var(--ease-apple);
+}
+
+.ai-site-preview.is-built .site-feat-card:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.42s; }
+.ai-site-preview.is-built .site-feat-card:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.50s; }
+.ai-site-preview.is-built .site-feat-card:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.58s; }
+
+.site-feat-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--alabaster);
+}
+
+.site-feat-meta {
+  font-size: 0.68rem;
+  color: var(--titanium);
+}
+
+/* 3 Concentric Expanding Rings */
+.echo-ring {
+  position: absolute;
+  width: min(76vw, 820px);
+  height: 78px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(226, 184, 120, 0.52);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.92);
+  will-change: transform, opacity;
+}
+
+.echo-ring.is-firing {
+  animation: echoExpand 1.15s var(--ease-apple) forwards;
+}
+
+.echo-ring.r2.is-firing {
+  animation-delay: 0.14s;
+  border-color: rgba(245, 245, 247, 0.34);
+}
+
+.echo-ring.r3.is-firing {
+  animation-delay: 0.28s;
+  border-color: rgba(226, 184, 120, 0.28);
+}
+
+@keyframes echoExpand {
+  0%   { transform: scale(0.96); opacity: 0.9; }
+  100% { transform: scale(2.65); opacity: 0; }
+}
+
+/* Sculptural Glassmorphic AI Prompt Pill with Rotating Halo */
+.pill-halo-wrap {
+  position: relative;
+  z-index: 4;
+  width: min(76vw, 820px);
+  height: 76px;
+  padding: 1.5px;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.72),
+    0 0 46px rgba(226, 184, 120, 0.16);
+  transition:
+    width 0.68s var(--ease-apple),
+    height 0.68s var(--ease-apple),
+    box-shadow 0.5s var(--ease-apple);
+  will-change: width, height;
+}
+
+.pill-halo-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -140%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(226, 184, 120, 0.08) 0deg,
+    rgba(245, 218, 176, 0.85) 68deg,
+    rgba(245, 245, 247, 0.68) 125deg,
+    rgba(226, 184, 120, 0.08) 210deg,
+    rgba(226, 184, 120, 0.55) 300deg,
+    rgba(226, 184, 120, 0.08) 360deg
+  );
+  animation: rotateHalo 6.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotateHalo {
+  to { transform: rotate(360deg); }
+}
+
+.pill-halo-wrap.is-synthesizing {
+  width: 248px;
+  height: 62px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 60px rgba(226, 184, 120, 0.38);
+}
+
+.ai-pill-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: rgba(11, 13, 18, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 12px 0 28px;
+  overflow: hidden;
+}
+
+.pill-input-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  transition: opacity 0.25s ease;
+}
+
+.prompt-text-wrap {
+  font-size: clamp(0.9rem, 1.35vw, 1.12rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--alabaster);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-flex;
+  align-items: center;
+}
+
+.gold-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  margin-left: 3px;
+  border-radius: 2px;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+  animation: blinkCaret 0.9s steps(2, start) infinite;
+  flex-shrink: 0;
+}
+
+@keyframes blinkCaret {
+  0%, 49%  { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.ai-submit-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(226, 184, 120, 0.45);
+  background: linear-gradient(180deg, #F5DAB0 0%, #E2B878 100%);
+  color: var(--bg-obsidian);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 6px 22px rgba(226, 184, 120, 0.34);
+  transition: transform 0.16s var(--ease-apple), box-shadow 0.28s var(--ease-apple), opacity 0.25s ease;
+}
+
+.ai-submit-btn.is-hovered {
+  box-shadow: 0 0 32px rgba(226, 184, 120, 0.58);
+  transform: scale(1.04);
+}
+
+.ai-submit-btn.is-pressed {
+  transform: scale(0.91);
+}
+
+.synth-view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--gold-bright);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.92);
+  transition: opacity 0.36s var(--ease-apple) 0.12s, transform 0.42s var(--ease-apple) 0.12s;
+}
+
+.pill-halo-wrap.is-synthesizing .pill-input-area,
+.pill-halo-wrap.is-synthesizing .ai-submit-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pill-halo-wrap.is-synthesizing .synth-view {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.wave-bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+}
+
+.wave-bar {
+  width: 3px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--gold);
+  animation: wavePulse 0.72s ease-in-out infinite alternate;
+}
+
+.wave-bar:nth-child(2) { animation-delay: 0.12s; }
+.wave-bar:nth-child(3) { animation-delay: 0.24s; }
+.wave-bar:nth-child(4) { animation-delay: 0.36s; }
+.wave-bar:nth-child(5) { animation-delay: 0.48s; }
+
+@keyframes wavePulse {
+  0%   { height: 5px; opacity: 0.55; }
+  100% { height: 18px; opacity: 1; }
+}
+
+/* ==========================================================================
+   7. SCENE 4: WEB DEVELOPER — XCODE / LINEAR TELEMETRY
+   ========================================================================== */
+.s4-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr);
+  gap: clamp(16px, 2.2vw, 28px);
+}
+
+.s4-left-stack {
+  display: grid;
+  grid-template-rows: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(14px, 1.8vw, 22px);
+  min-height: 0;
+}
+
+.code-bento {
+  padding: clamp(18px, 2.2vw, 28px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: transform 0.68s var(--ease-apple) 0.06s, opacity 0.44s var(--ease-smooth) 0.06s;
+}
+
+.scene.is-content-visible .code-bento {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-hairline);
+  font-size: 0.74rem;
+  color: var(--titanium);
+}
+
+.code-lines {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 4px 2px;
+  font-size: clamp(0.76rem, 1.02vw, 0.9rem);
+  line-height: 1.4;
+}
+
+.code-scanner {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: 18%;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(226, 184, 120, 0.14), rgba(226, 184, 120, 0.03));
+  border-left: 2px solid var(--gold);
+  pointer-events: none;
+  opacity: 0;
+  transition: top 0.48s var(--ease-apple), opacity 0.36s ease;
+}
+
+.code-scanner.is-on {
+  opacity: 1;
+}
+
+.c-line {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+
+.c-num {
+  width: 16px;
+  text-align: right;
+  color: var(--dim);
+  font-size: 0.72rem;
+}
+
+.t-tag  { color: var(--gold); }
+.t-attr { color: var(--alabaster); }
+.t-val  { color: var(--gold-bright); }
+
+.telemetry-bento {
+  padding: clamp(18px, 2.2vw, 28px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: transform 0.68s var(--ease-apple) 0.14s, opacity 0.44s var(--ease-smooth) 0.14s;
+}
+
+.scene.is-content-visible .telemetry-bento {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fps-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  height: 100%;
+}
+
+.fps-badge {
+  font-size: clamp(0.86rem, 1.15vw, 1rem);
+  font-weight: 700;
+  color: var(--alabaster);
+}
+
+.fps-badge span {
+  color: var(--gold);
+}
+
+.fps-svg {
+  width: 100%;
+  height: 64px;
+  display: block;
+  overflow: visible;
+}
+
+.lighthouse-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+}
+
+.lh-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
-.vlc-bars i {
-  flex: 1;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  transition: background 240ms ease;
-}
-.vlc-bars i.done {
-  background: linear-gradient(90deg, #E2B878, #34D399);
-}
 
-.vlc-footer,
-.csc-footer {
+.lh-ring-box {
+  position: relative;
+  width: clamp(50px, 5vw, 62px);
+  height: clamp(50px, 5vw, 62px);
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding-top: 0.25rem;
-}
-.vlc-rpe,
-.csc-a11y {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.68rem;
-  color: #9CA3AF;
+  justify-content: center;
 }
 
-.portfolio-showcase-col {
+.lh-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.lh-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 4.5;
+}
+
+.lh-fill {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-dasharray: 157.08;
+  stroke-dashoffset: 157.08;
+  transition: stroke-dashoffset 1.05s var(--ease-apple);
+  filter: drop-shadow(0 0 6px rgba(226, 184, 120, 0.42));
+}
+
+.lh-fill.alabaster {
+  stroke: var(--alabaster);
+  filter: drop-shadow(0 0 6px rgba(245, 245, 247, 0.28));
+}
+
+.lh-fill.is-full {
+  stroke-dashoffset: 0;
+}
+
+.lh-num {
+  position: absolute;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--alabaster);
+}
+
+.lh-label {
+  font-size: 0.64rem;
+  color: var(--titanium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.voltrep-bento {
+  padding: clamp(20px, 2.4vw, 32px);
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  justify-content: space-between;
+  gap: 18px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    transform 0.72s var(--ease-apple) 0.1s,
+    opacity 0.44s var(--ease-smooth) 0.1s,
+    border-color 0.48s var(--ease-apple),
+    box-shadow 0.48s var(--ease-apple);
 }
 
-.sliding-pill-navbar {
+.scene.is-content-visible .voltrep-bento {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.voltrep-bento.is-logged {
+  border-color: var(--gold-border);
+  box-shadow:
+    inset 0 1px 0 rgba(226, 184, 120, 0.34),
+    0 28px 70px rgba(0, 0, 0, 0.62),
+    0 0 42px rgba(226, 184, 120, 0.12);
+}
+
+.segmented-nav {
   position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   padding: 4px;
-  border-radius: 999px;
-  background: #0E1015;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--border-hairline);
 }
-.spn-indicator {
+
+.seg-indicator {
   position: absolute;
   top: 4px;
   bottom: 4px;
   left: 4px;
   width: calc((100% - 8px) / 3);
-  border-radius: 999px;
-  background: #E2B878;
-  transition: transform 380ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  border-radius: 9999px;
+  background: rgba(245, 245, 247, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  transition: transform 0.56s var(--ease-apple);
 }
-.spn-indicator.at-cases {
-  transform: translate3d(100%, 0, 0);
+
+.segmented-nav.at-liveset .seg-indicator {
+  transform: translateX(100%);
+  background: var(--gold-soft);
+  border-color: var(--gold-border);
 }
-.spn-tab {
+
+.seg-tab {
   position: relative;
   z-index: 1;
-  padding: 0.34rem 0.5rem;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #9CA3AF;
   text-align: center;
-  transition: color 200ms ease;
-}
-.spn-tab.active {
-  color: #050507;
-}
-
-.csc-desc {
-  font-size: 0.8rem;
-  line-height: 1.4;
-  color: #D1D5DB;
+  padding: 7px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--titanium);
+  transition: color 0.36s ease;
 }
 
-/* Pixel-Accurate Dynamic Vector Cursor */
-.vids-cursor {
+.segmented-nav.at-liveset .seg-tab:nth-child(3) {
+  color: var(--gold-bright);
+}
+
+.voltrep-mid {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.workout-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workout-title {
+  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  margin-top: 6px;
+  color: var(--alabaster);
+}
+
+.workout-stats {
+  margin-top: 6px;
+  font-size: clamp(0.88rem, 1.2vw, 1.05rem);
+  color: var(--titanium);
+}
+
+.workout-stats strong {
+  color: var(--alabaster);
+  font-weight: 600;
+}
+
+.pr-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-bright);
+  font-size: 0.74rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(8px) scale(0.92);
+  transition: opacity 0.42s var(--ease-apple), transform 0.48s var(--ease-apple);
+}
+
+.pr-badge.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.volume-chart {
+  flex: 1;
+  min-height: 110px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  align-items: end;
+  padding: 16px 14px 10px;
+  border-radius: 18px;
+  background: rgba(5, 5, 7, 0.54);
+  border: 1px solid var(--border-hairline);
+}
+
+.vol-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.vol-bar {
+  width: 100%;
+  max-width: 44px;
+  border-radius: 10px 10px 4px 4px;
+  background: rgba(245, 245, 247, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: height 0.68s var(--ease-apple), box-shadow 0.48s var(--ease-apple);
+}
+
+.vol-bar.peak {
+  background: linear-gradient(180deg, #F3D5A0 0%, #E2B878 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 24px rgba(226, 184, 120, 0.38);
+}
+
+.vol-lbl {
+  font-size: 0.66rem;
+  color: var(--dim);
+}
+
+.voltrep-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+/* Full-Screen Obsidian & Champagne Gold Loop Reset Sweep */
+.loop-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  background: linear-gradient(
+    112deg,
+    transparent 0%,
+    rgba(226, 184, 120, 0.22) 22%,
+    var(--bg-obsidian) 36%,
+    var(--bg-obsidian) 100%
+  );
+  transform: translate3d(118vw, 0, 0);
+  will-change: transform;
+}
+
+.loop-sweep.is-sweeping {
+  transition: transform 0.72s var(--ease-apple);
+  transform: translate3d(-16vw, 0, 0);
+}
+
+/* ==========================================================================
+   8. DYNAMIC HIGH-DPI VECTOR CURSOR & CHAMPAGNE-GOLD RIPPLE
+   ========================================================================== */
+.cursor {
   position: absolute;
   top: 0;
   left: 0;
-  width: 23px;
-  height: 23px;
-  z-index: 50;
+  z-index: 40;
   pointer-events: none;
-  transform-origin: 2px 2px;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.68));
+  opacity: 0;
+  transform: translate3d(-120px, -120px, 0);
   will-change: transform, opacity;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.68));
+  transition: opacity 0.24s ease;
 }
 
-/* Protected Lower-Left Safe Zone */
-.safe-zone {
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  max-width: 1320px;
-  margin: 0 auto;
-  padding: 0 1.25rem;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-}
-@media (min-width: 768px) {
-  .safe-zone {
-    padding: 0 2.5rem;
-  }
-}
-.id-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.55rem;
-}
-.id-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.1rem;
-  font-size: 0.9rem;
-}
-.id-name {
-  font-weight: 700;
-  color: #F5F5F7;
-}
-.id-sep {
-  display: none;
-  color: #9CA3AF;
-}
-@media (min-width: 520px) {
-  .id-row {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.45rem;
-  }
-  .id-sep {
-    display: inline;
-  }
-}
-.id-role {
-  color: #D1D5DB;
-}
-.id-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-.cta-gold {
-  background-color: #E2B878 !important;
-  color: #050507 !important;
-  border-color: #E2B878 !important;
-  padding: 0.56rem 1.05rem !important;
-  font-size: 0.84rem !important;
-  font-weight: 700 !important;
-}
-.cta-glass {
-  background-color: #121318 !important;
-  color: #F5F5F7 !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  padding: 0.56rem 1.05rem !important;
-  font-size: 0.84rem !important;
+.cursor.is-visible {
+  opacity: 1;
 }
 
+.cursor svg {
+  display: block;
+  transition: transform 0.14s var(--ease-apple);
+}
+
+.cursor.is-clicking svg {
+  transform: scale(0.86);
+}
+
+.ripple {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  pointer-events: none;
+  z-index: 39;
+  transform: translate(-50%, -50%) scale(0.4);
+  opacity: 0;
+}
+
+.ripple.is-popping {
+  animation: ripplePop 0.56s var(--ease-apple) forwards;
+}
+
+@keyframes ripplePop {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0.94; }
+  100% { transform: translate(-50%, -50%) scale(3.8); opacity: 0; }
+}
+
+/* ==========================================================================
+   9. RESPONSIVE ADAPTATION (TABLET 768px & MOBILE 390x844 — ZERO OVERLAP)
+   ========================================================================== */
+@media (max-width: 960px) {
+  .s1-grid,
+  .s2-grid,
+  .s4-grid {
+    grid-template-columns: 1fr;
+  }
+  .site-hero {
+    grid-template-columns: 1fr;
+  }
+  .site-hero-visual {
+    display: none;
+  }
+  .s2-grid {
+    grid-template-rows: auto;
+  }
+  .s4-left-stack {
+    grid-template-rows: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .scene-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .header-tag {
+    font-size: 0.66rem;
+    padding: 5px 11px;
+  }
+  .s1-tokens-bento,
+  .s4-left-stack {
+    display: none;
+  }
+  .site-nav-links,
+  .site-features {
+    display: none;
+  }
+  .ui-card-row {
+    grid-template-columns: 1fr;
+  }
+  .sys-card {
+    min-height: 68px;
+    padding: 12px;
+  }
+  .s2-card.telemetry-card {
+    display: none;
+  }
+  .stakeholder-track {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .sh-node {
+    padding: 6px 9px;
+    font-size: 0.66rem;
+  }
+  .pill-halo-wrap {
+    height: 64px;
+  }
+  .ai-submit-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ==========================================================================
+   10. PREFERS-REDUCED-MOTION CLEAN STATIC FALLBACK
+   ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  .rad-bloom,
-  .app-caret,
-  .btn-ripple {
+  .bloom, .pill-halo-wrap::before, .wave-bar, .gold-caret {
     animation: none !important;
+  }
+  .cursor, .ripple, .echo-ring, .loop-sweep {
+    display: none !important;
+  }
+  .intro-brand {
+    transform: none !important;
+  }
+  .intro-name {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .intro-role {
+    display: none !important;
+  }
+  #scene1 {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  #scene1 .headline-mask,
+  #scene1 .headline,
+  #scene1 .header-tag,
+  #scene1 .s1-main-bento,
+  #scene1 .s1-tokens-bento,
+  #scene1 .ui-header-strip,
+  #scene1 .sys-card,
+  #scene1 .spacing-badges,
+  #scene1 .redline-row,
+  #scene1 .guide-line {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 </style>
