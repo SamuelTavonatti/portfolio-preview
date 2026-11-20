@@ -757,99 +757,84 @@ onUnmounted(() => {
                 </button>
               </div>
 
-              <!-- State B: Elaborate Generated Luxury Web Application Interface -->
-              <div class="webapp-view" aria-label="Generated Minimalist Workout and Habit OS">
+              <!-- State B: 100% Full-Width Monochrome Skeleton UI (Apple / Notion / Linear) -->
+              <div class="webapp-view" aria-label="Generated Minimalist Workout and Habit OS Skeleton">
                 <div class="wa-topbar">
-                  <div class="wa-brand">
-                    <span class="wa-dot"></span>
-                    <strong>Aether OS</strong>
-                    <span class="mono wa-pill">8pt Grid · 60fps</span>
+                  <div class="wa-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
                   </div>
-                  <div class="wa-top-tabs mono" aria-hidden="true">
+                  <div class="wa-cmd mono" aria-hidden="true">
+                    <span class="sk-bone sk-cmd-bar"></span>
+                    <span class="wa-kbd">⌘K</span>
+                  </div>
+                  <div class="wa-top-tabs" aria-hidden="true">
                     <span class="is-active">Overview</span>
-                    <span>Training</span>
+                    <span>Workouts</span>
                     <span>Habits</span>
-                  </div>
-                  <div class="wa-top-right">
-                    <span class="wa-kbd mono">⌘K</span>
-                    <div class="wa-status mono">Generated Live</div>
                   </div>
                 </div>
 
                 <div class="wa-body">
                   <aside class="wa-sidebar" aria-hidden="true">
-                    <div class="wa-side-group">
-                      <span class="wa-side-lbl mono">Workspace</span>
-                      <span class="wa-nav-item is-on">Dashboard</span>
-                      <span class="wa-nav-item">Workouts <em class="mono">4</em></span>
-                      <span class="wa-nav-item">Habits <em class="mono">6</em></span>
-                      <span class="wa-nav-item">Recovery</span>
-                    </div>
-                    <div class="wa-side-footer">
-                      <span class="mono wa-side-lbl">Readiness</span>
-                      <strong class="tabular t-ice">96% · Optimal</strong>
-                    </div>
+                    <span class="wa-nav-item is-on">Dashboard</span>
+                    <span class="wa-nav-item">Routines</span>
+                    <span class="wa-nav-item">Analytics</span>
+                    <span class="wa-nav-item">Settings</span>
                   </aside>
 
                   <div class="wa-main">
                     <div class="wa-metrics">
                       <div class="wa-metric-card">
-                        <div class="wa-m-top">
-                          <span class="mono wa-m-lbl">Weekly Volume</span>
-                          <span class="mono wa-delta is-up">+12.4%</span>
-                        </div>
-                        <strong class="tabular wa-m-val t-gold">14,820 kg</strong>
+                        <span class="sk-bone sk-lbl"></span>
+                        <strong class="tabular wa-m-val">14,820 kg</strong>
+                        <span class="sk-bone sk-sub"></span>
                       </div>
                       <div class="wa-metric-card">
-                        <div class="wa-m-top">
-                          <span class="mono wa-m-lbl">Habit Streak</span>
-                          <span class="mono wa-delta is-ice">Best</span>
-                        </div>
-                        <strong class="tabular wa-m-val t-ice">21 days</strong>
+                        <span class="sk-bone sk-lbl"></span>
+                        <strong class="tabular wa-m-val">21 days</strong>
+                        <span class="sk-bone sk-sub"></span>
                       </div>
                       <div class="wa-metric-card">
-                        <div class="wa-m-top">
-                          <span class="mono wa-m-lbl">Session Focus</span>
-                          <span class="mono wa-delta">Zero Lag</span>
-                        </div>
-                        <strong class="tabular wa-m-val">54 min</strong>
+                        <span class="sk-bone sk-lbl"></span>
+                        <strong class="tabular wa-m-val">96%</strong>
+                        <span class="sk-bone sk-sub"></span>
                       </div>
                     </div>
 
                     <div class="wa-bottom-grid">
                       <div class="wa-chart-card">
                         <div class="wa-chart-head">
-                          <span class="mono wa-m-lbl">Progressive Overload Curve</span>
-                          <span class="mono wa-badge">+1,640 kg</span>
+                          <span class="sk-bone sk-chart-title"></span>
+                          <span class="sk-bone sk-chart-pill"></span>
                         </div>
                         <div class="wa-bars" aria-hidden="true">
-                          <div class="wa-bar-col"><span style="height:38%"></span><em class="mono">M</em></div>
-                          <div class="wa-bar-col"><span style="height:52%"></span><em class="mono">T</em></div>
-                          <div class="wa-bar-col"><span style="height:48%"></span><em class="mono">W</em></div>
-                          <div class="wa-bar-col"><span style="height:68%"></span><em class="mono">T</em></div>
-                          <div class="wa-bar-col"><span style="height:76%"></span><em class="mono">F</em></div>
-                          <div class="wa-bar-col"><span class="is-ice" style="height:84%"></span><em class="mono">S</em></div>
-                          <div class="wa-bar-col"><span class="is-gold" style="height:94%"></span><em class="mono t-gold">S</em></div>
+                          <div class="wa-bar-col"><span style="height:36%"></span></div>
+                          <div class="wa-bar-col"><span style="height:50%"></span></div>
+                          <div class="wa-bar-col"><span style="height:44%"></span></div>
+                          <div class="wa-bar-col"><span style="height:64%"></span></div>
+                          <div class="wa-bar-col"><span style="height:74%"></span></div>
+                          <div class="wa-bar-col"><span style="height:82%"></span></div>
+                          <div class="wa-bar-col"><span class="is-gold" style="height:92%"></span></div>
                         </div>
                       </div>
 
                       <div class="wa-checklist-card">
                         <div class="wa-chart-head">
-                          <span class="mono wa-m-lbl">Today’s Stack</span>
-                          <span class="mono wa-badge">2 / 3</span>
+                          <span class="sk-bone sk-chart-title"></span>
+                          <span class="sk-bone sk-chart-pill"></span>
                         </div>
                         <div class="wa-task-list">
-                          <div class="wa-task is-done">
-                            <span class="wa-check">✓</span>
-                            <span>Hack Squat · 120kg × 6</span>
-                          </div>
-                          <div class="wa-task is-done">
-                            <span class="wa-check">✓</span>
-                            <span>Deep Work · 90m</span>
+                          <div class="wa-task">
+                            <span class="wa-sk-dot is-done"></span>
+                            <span class="sk-bone sk-task-bar"></span>
                           </div>
                           <div class="wa-task">
-                            <span class="wa-ring"></span>
-                            <span>Mobility · 15m</span>
+                            <span class="wa-sk-dot is-done"></span>
+                            <span class="sk-bone sk-task-bar short"></span>
+                          </div>
+                          <div class="wa-task">
+                            <span class="wa-sk-dot"></span>
+                            <span class="sk-bone sk-task-bar"></span>
                           </div>
                         </div>
                       </div>
@@ -975,6 +960,7 @@ onUnmounted(() => {
   --ease-spatial: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
   width: 100%;
+  overflow: hidden;
   color: var(--alabaster);
 }
 
@@ -991,6 +977,7 @@ onUnmounted(() => {
   right: 0;
   width: 100%;
   max-width: 100vw;
+  margin: 0;
   min-height: 93vh;
   overflow: hidden;
   box-sizing: border-box;
@@ -1472,10 +1459,13 @@ onUnmounted(() => {
 }
 
 .ai-morph-shell.is-app-generated {
-  width: min(1060px, 100%);
-  height: 440px;
+  width: 100%;
+  max-width: 100%;
+  height: clamp(340px, 46vh, 430px);
   border-radius: 24px;
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(11, 17, 32, 0.78);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 .prompt-view {
@@ -1535,7 +1525,7 @@ onUnmounted(() => {
 .submit-orb.is-hovered { background: var(--gold-bright); }
 .submit-orb.is-pressed { transform: scale(0.93); }
 
-/* Generated Full Luxury Web App Interface */
+/* 100% Full-Width Monochrome Skeleton UI */
 .webapp-view {
   position: absolute;
   inset: 0;
@@ -1553,153 +1543,119 @@ onUnmounted(() => {
   pointer-events: auto;
 }
 
+@keyframes skShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.sk-bone {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(245, 247, 250, 0.06) 25%, rgba(245, 247, 250, 0.14) 50%, rgba(245, 247, 250, 0.06) 75%);
+  background-size: 200% 100%;
+  animation: skShimmer 2.8s ease-in-out infinite;
+}
+
 .wa-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.78rem 1.25rem;
-  border-bottom: 1px solid var(--border-subtle-w);
-  background: rgba(4, 6, 12, 0.55);
+  gap: 1rem;
+  padding: 0.78rem 1.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(4, 6, 12, 0.45);
 }
 
-.wa-brand {
+.wa-dots {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-size: 0.9rem;
+  gap: 6px;
 }
 
-.wa-dot {
-  width: 9px;
-  height: 9px;
+.wa-dots span {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--gold);
+  background: rgba(245, 247, 250, 0.16);
 }
 
-.wa-pill {
-  font-size: 0.68rem;
-  color: var(--slate);
-  border: 1px solid var(--border-subtle-w);
+.wa-cmd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: min(280px, 34%);
+  padding: 0.32rem 0.65rem;
   border-radius: 999px;
-  padding: 0.15rem 0.55rem;
+  background: rgba(245, 247, 250, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sk-cmd-bar {
+  width: 68%;
+  height: 8px;
+}
+
+.wa-kbd {
+  font-size: 0.65rem;
+  color: var(--slate);
 }
 
 .wa-top-tabs {
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.25rem;
   padding: 3px;
   border-radius: 999px;
-  background: rgba(11, 17, 32, 0.9);
-  border: 1px solid var(--border-subtle-w);
-  font-size: 0.7rem;
+  background: rgba(4, 6, 12, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
   color: var(--slate);
 }
 
 .wa-top-tabs span {
-  padding: 0.24rem 0.7rem;
+  padding: 0.26rem 0.75rem;
   border-radius: 999px;
 }
 
 .wa-top-tabs span.is-active {
-  background: var(--ice-soft);
-  border: 1px solid var(--ice-border);
   color: var(--alabaster);
-}
-
-.wa-top-right {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.wa-kbd {
-  font-size: 0.68rem;
-  color: var(--slate);
-  border: 1px solid var(--border-subtle-w);
-  background: rgba(11, 17, 32, 0.75);
-  border-radius: 7px;
-  padding: 0.18rem 0.45rem;
-}
-
-.wa-status {
-  font-size: 0.72rem;
-  color: var(--emerald);
-  background: var(--emerald-soft);
-  border: 1px solid rgba(52, 211, 153, 0.34);
-  border-radius: 999px;
-  padding: 0.2rem 0.65rem;
+  border-bottom: 1px solid var(--ice);
+  background: rgba(245, 247, 250, 0.06);
 }
 
 .wa-body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 184px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
 }
 
 .wa-sidebar {
-  border-right: 1px solid var(--border-subtle-w);
-  padding: 1rem 0.85rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 0.9rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background: rgba(4, 6, 12, 0.32);
-}
-
-.wa-side-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.wa-side-lbl {
-  font-size: 0.64rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--slate);
-  padding: 0 0.55rem 0.25rem;
+  gap: 0.4rem;
+  background: rgba(4, 6, 12, 0.26);
 }
 
 .wa-nav-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.46rem 0.7rem;
+  padding: 0.5rem 0.8rem;
   border-radius: 10px;
   font-size: 0.8rem;
   color: var(--slate);
 }
 
-.wa-nav-item em {
-  font-style: normal;
-  font-size: 0.68rem;
-  opacity: 0.75;
-}
-
 .wa-nav-item.is-on {
-  background: var(--ice-soft);
-  border: 1px solid var(--ice-border);
+  background: rgba(245, 247, 250, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--alabaster);
   font-weight: 600;
 }
 
-.wa-side-footer {
-  padding: 0.7rem 0.75rem;
-  border-radius: 12px;
-  background: rgba(11, 17, 32, 0.72);
-  border: 1px solid var(--border-subtle-w);
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.wa-side-footer .wa-side-lbl { padding: 0; }
-.wa-side-footer strong { font-size: 0.84rem; }
-
 .wa-main {
-  padding: 1.05rem 1.25rem;
+  padding: 1.05rem 1.35rem;
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
@@ -1708,35 +1664,22 @@ onUnmounted(() => {
 .wa-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  gap: 0.85rem;
 }
 
 .wa-metric-card {
-  padding: 0.78rem 0.95rem;
+  padding: 0.85rem 1rem;
   border-radius: 14px;
-  background: rgba(4, 6, 12, 0.55);
-  border: 1px solid var(--border-subtle-w);
+  background: rgba(4, 6, 12, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.45rem;
 }
 
-.wa-m-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
-}
-
-.wa-m-lbl { font-size: 0.66rem; color: var(--slate); text-transform: uppercase; }
-.wa-m-val { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; }
-
-.wa-delta {
-  font-size: 0.64rem;
-  color: var(--slate);
-}
-.wa-delta.is-up { color: var(--emerald); }
-.wa-delta.is-ice { color: var(--ice); }
+.sk-lbl { width: 52%; height: 7px; }
+.sk-sub { width: 38%; height: 6px; opacity: 0.65; }
+.wa-m-val { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.025em; color: var(--alabaster); }
 
 .wa-bottom-grid {
   flex: 1;
@@ -1749,14 +1692,14 @@ onUnmounted(() => {
 .wa-chart-card,
 .wa-checklist-card {
   min-height: 0;
-  padding: 0.9rem 1.05rem;
+  padding: 0.95rem 1.1rem;
   border-radius: 14px;
-  background: rgba(4, 6, 12, 0.55);
-  border: 1px solid var(--border-subtle-w);
+  background: rgba(4, 6, 12, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.65rem;
+  gap: 0.7rem;
 }
 
 .wa-chart-head {
@@ -1765,17 +1708,15 @@ onUnmounted(() => {
   justify-content: space-between;
 }
 
-.wa-badge {
-  font-size: 0.7rem;
-  color: var(--emerald);
-}
+.sk-chart-title { width: 44%; height: 8px; }
+.sk-chart-pill { width: 18%; height: 8px; }
 
 .wa-bars {
   flex: 1;
   min-height: 112px;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.55rem;
+  gap: 0.6rem;
   align-items: end;
 }
 
@@ -1785,64 +1726,50 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  gap: 0.35rem;
 }
 
 .wa-bar-col span {
   display: block;
   width: 100%;
   border-radius: 6px;
-  background: rgba(148, 197, 255, 0.2);
+  background: rgba(245, 247, 250, 0.14);
 }
 
-.wa-bar-col span.is-ice { background: var(--ice); }
-.wa-bar-col span.is-gold { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
-.wa-bar-col em { font-style: normal; font-size: 0.62rem; color: var(--slate); }
+.wa-bar-col span.is-gold { background: var(--gold); }
 
 .wa-task-list {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
 .wa-task {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.52rem 0.7rem;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
   border-radius: 10px;
-  background: rgba(11, 17, 32, 0.72);
-  border: 1px solid var(--border-subtle-w);
-  font-size: 0.78rem;
-  color: var(--alabaster);
+  background: rgba(245, 247, 250, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.wa-task.is-done {
-  border-color: rgba(52, 211, 153, 0.28);
-  color: var(--slate);
-}
-
-.wa-check {
-  width: 18px;
-  height: 18px;
+.wa-sk-dot {
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: var(--emerald-soft);
-  color: var(--emerald);
-  font-size: 0.68rem;
-  display: grid;
-  place-items: center;
+  border: 1.5px solid rgba(245, 247, 250, 0.28);
   flex-shrink: 0;
 }
 
-.wa-ring {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1.5px solid var(--ice);
-  flex-shrink: 0;
+.wa-sk-dot.is-done {
+  background: rgba(245, 247, 250, 0.22);
+  border-color: rgba(245, 247, 250, 0.35);
 }
+
+.sk-task-bar { width: 72%; height: 8px; }
+.sk-task-bar.short { width: 54%; }
 
 .pill-echo {
   position: absolute;
@@ -1973,14 +1900,24 @@ onUnmounted(() => {
 /* 3. PROTECTED LOWER-LEFT SAFE ZONE */
 .hero-safe-zone {
   position: absolute;
-  left: clamp(24px, 4.5vw, 64px);
+  left: 0;
+  right: 0;
   bottom: clamp(28px, 4.5vh, 48px);
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding-inline: clamp(24px, 4.5vw, 64px);
+  box-sizing: border-box;
   z-index: 40;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.7rem;
-  max-width: calc(100% - 48px);
+  pointer-events: none;
+}
+
+.hero-safe-zone > * {
+  pointer-events: auto;
 }
 
 .safe-identity { margin: 0; font-size: 0.88rem; line-height: 1.35; color: var(--slate); }
@@ -2068,18 +2005,18 @@ onUnmounted(() => {
   .mod-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
   .mod-card { padding: 0.65rem 0.55rem; gap: 0.5rem; }
   .mod-label { font-size: 0.62rem; }
-  .s3-camera.is-zoomed { transform: scale(1.04); }
-  .ai-morph-shell { width: min(92vw, 820px); max-width: calc(100vw - 32px); min-height: 92px; height: auto; border-radius: 28px; }
-  .ai-morph-shell.is-app-generated { height: 390px; }
+  .s3-camera.is-zoomed { transform: scale(1.03); }
+  .ai-morph-shell { width: calc(100vw - 32px); max-width: 100%; min-height: 92px; height: auto; border-radius: 28px; }
+  .ai-morph-shell.is-app-generated { width: 100%; height: 370px; }
   .prompt-view { padding: 12px 14px 12px 18px; }
   .prompt-line { overflow-wrap: break-word; word-break: normal; text-align: left; }
   .wa-body { grid-template-columns: 1fr; }
-  .wa-sidebar, .wa-top-tabs, .wa-kbd, .wa-checklist-card { display: none; }
+  .wa-sidebar, .wa-cmd, .wa-checklist-card { display: none; }
   .wa-bottom-grid { grid-template-columns: 1fr; }
   .wa-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .wa-metrics .wa-metric-card:last-child { display: none; }
   .vol-bars { height: 92px; }
-  .hero-safe-zone { left: 20px; bottom: 20px; max-width: calc(100% - 40px); }
+  .hero-safe-zone { bottom: 20px; padding-inline: 20px; }
   .safe-cta { padding: 0 1.05rem; font-size: 0.82rem; }
 }
 

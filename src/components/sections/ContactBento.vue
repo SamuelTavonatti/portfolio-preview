@@ -29,48 +29,52 @@ const copyEmail = async () => {
         <h2 class="section-heading">{{ t('sections.contactTitle') }}</h2>
       </div>
 
-      <p class="contact-lead">{{ t('contact.lead') }}</p>
+      <div class="contact-split">
+        <div class="contact-left">
+          <p class="contact-lead">{{ t('contact.lead') }}</p>
 
-      <div class="contact-pills" role="group" :aria-label="t('sections.contactTitle')">
-        <BaseButton :href="`mailto:${profileData.email}`" variant="primary" class="contact-pill">
-          <AppIcon name="mail" :size="17" />
-          <span>Email</span>
-        </BaseButton>
+          <div class="contact-pills" role="group" :aria-label="t('sections.contactTitle')">
+            <BaseButton :href="`mailto:${profileData.email}`" variant="primary" class="contact-pill">
+              <AppIcon name="mail" :size="17" />
+              <span>Email</span>
+            </BaseButton>
 
-        <BaseButton :href="profileData.links.linkedin" external variant="secondary" class="contact-pill">
-          <AppIcon name="linkedin" :size="17" />
-          <span>LinkedIn</span>
-          <AppIcon name="arrow-up-right" :size="15" />
-        </BaseButton>
+            <BaseButton :href="profileData.links.linkedin" external variant="secondary" class="contact-pill">
+              <AppIcon name="linkedin" :size="17" />
+              <span>LinkedIn</span>
+              <AppIcon name="arrow-up-right" :size="15" />
+            </BaseButton>
 
-        <BaseButton :href="profileData.links.github" external variant="secondary" class="contact-pill">
-          <AppIcon name="github" :size="17" />
-          <span>GitHub</span>
-          <AppIcon name="arrow-up-right" :size="15" />
-        </BaseButton>
+            <BaseButton :href="profileData.links.github" external variant="secondary" class="contact-pill">
+              <AppIcon name="github" :size="17" />
+              <span>GitHub</span>
+              <AppIcon name="arrow-up-right" :size="15" />
+            </BaseButton>
 
-        <BaseButton :href="profileData.links.instagram" external variant="secondary" class="contact-pill">
-          <AppIcon name="instagram" :size="17" />
-          <span>Instagram</span>
-          <AppIcon name="arrow-up-right" :size="15" />
-        </BaseButton>
-      </div>
+            <BaseButton :href="profileData.links.instagram" external variant="secondary" class="contact-pill">
+              <AppIcon name="instagram" :size="17" />
+              <span>Instagram</span>
+              <AppIcon name="arrow-up-right" :size="15" />
+            </BaseButton>
+          </div>
+        </div>
 
-      <div class="glass-card email-bar">
-        <span class="email-label">{{ t('contact.directEmail') }}</span>
-        <button
-          type="button"
-          class="email-copy-row"
-          :class="{ copied }"
-          :aria-label="t('contact.copyAria')"
-          @click="copyEmail"
-        >
-          <span class="email-text">{{ profileData.email }}</span>
-          <span class="copy-pill">
-            <AppIcon :name="copied ? 'check' : 'copy'" :size="15" />
-            <span>{{ copied ? t('contact.copied') : t('contact.copy') }}</span>
-          </span>
-        </button>
+        <div class="glass-card email-bar">
+          <span class="email-label">{{ t('contact.directEmail') }}</span>
+          <button
+            type="button"
+            class="email-copy-row"
+            :class="{ copied }"
+            :aria-label="t('contact.copyAria')"
+            @click="copyEmail"
+          >
+            <span class="email-text">{{ profileData.email }}</span>
+            <span class="copy-pill">
+              <AppIcon :name="copied ? 'check' : 'copy'" :size="15" />
+              <span>{{ copied ? t('contact.copied') : t('contact.copy') }}</span>
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -82,33 +86,51 @@ const copyEmail = async () => {
   padding-bottom: 2.5rem;
 }
 
+.contact-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: end;
+}
+
+@media (min-width: 960px) {
+  .contact-split {
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3rem;
+  }
+}
+
+.contact-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
 .contact-lead {
   font-size: clamp(1.1rem, 2vw, 1.35rem);
   color: var(--text-primary);
   font-weight: 500;
-  line-height: 1.5;
-  margin-bottom: 1.75rem;
-  max-width: 62ch;
+  line-height: 1.55;
+  max-width: 58ch;
 }
 
 .contact-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.85rem;
-  margin-bottom: 1.5rem;
 }
 
 .contact-pill {
   border-radius: 999px;
-  padding-inline: 1.5rem;
+  padding-inline: 1.45rem;
 }
 
 .email-bar {
-  max-width: 560px;
-  padding: 1.1rem 1.25rem;
+  width: 100%;
+  padding: 1.35rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.85rem;
 }
 
 .email-label {
@@ -116,13 +138,13 @@ const copyEmail = async () => {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent);
+  color: var(--accent-lumina-bright);
   font-weight: 600;
 }
 
 .email-copy-row {
   width: 100%;
-  min-height: 48px;
+  min-height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -130,19 +152,19 @@ const copyEmail = async () => {
   background: var(--bg-base);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
   cursor: pointer;
   color: var(--text-primary);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s var(--ease-spring);
   text-align: left;
 }
 
 .email-copy-row:hover,
 .email-copy-row.copied {
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
+  border-color: var(--accent-azure-border);
+  background: var(--accent-azure-soft);
 }
 
 .email-copy-row:active {

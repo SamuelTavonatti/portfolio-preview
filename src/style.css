@@ -71,6 +71,7 @@ html {
   scroll-behavior: smooth;
   background-color: var(--bg-base);
   color-scheme: dark;
+  overflow-x: clip;
 }
 
 body {
@@ -111,13 +112,7 @@ section[id] {
   width: 100%;
   max-width: var(--grid-max);
   margin: 0 auto;
-  padding: 0 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .container {
-    padding: 0 2.5rem;
-  }
+  padding-inline: clamp(24px, 4.5vw, 64px);
 }
 
 /* 60fps GPU-Accelerated Entrance Choreography */
