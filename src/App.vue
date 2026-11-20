@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { provide, ref } from 'vue'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 import PrivacyModal from './components/modals/PrivacyModal.vue'
@@ -12,6 +12,8 @@ const policyModal = ref({
 const openPolicy = (tab = 'privacy') => {
   policyModal.value = { open: true, tab }
 }
+
+provide('openPolicy', openPolicy)
 </script>
 
 <template>

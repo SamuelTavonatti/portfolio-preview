@@ -150,6 +150,7 @@ const closeMobile = () => {
 .header-bar {
   pointer-events: auto;
   position: relative;
+  z-index: 105;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -366,9 +367,9 @@ const closeMobile = () => {
   position: fixed;
   inset: 0;
   z-index: 90;
-  background: rgba(4, 6, 12, 0.92);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  background: rgba(8, 13, 26, 0.76);
+  backdrop-filter: blur(26px) saturate(170%);
+  -webkit-backdrop-filter: blur(26px) saturate(170%);
   display: flex;
   align-items: flex-end;
   padding: 0 1.25rem 3rem;
@@ -400,9 +401,9 @@ const closeMobile = () => {
   min-height: 54px;
   padding: 0 1.5rem;
   border-radius: var(--radius-3xl);
-  background: rgba(11, 17, 32, 0.9);
-  border: 1px solid rgba(56, 189, 248, 0.22);
-  box-shadow: var(--specular);
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  box-shadow: var(--specular), 0 12px 32px rgba(0, 0, 0, 0.45);
   text-decoration: none;
   color: var(--text-primary);
   font-size: 1.15rem;
