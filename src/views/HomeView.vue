@@ -76,7 +76,15 @@ useScrollReveal()
                 <span class="dec-kicker mono">{{ lang === 'it' ? 'FOCUS ERGONOMIA SUL CAMPO' : 'FIELD ERGONOMICS FOCUS' }}</span>
               </div>
               <h3 class="dec-title">{{ profileData.domains.item.title[lang] }}</h3>
-              <p class="dec-body">{{ profileData.domains.item.body[lang] }}</p>
+              <div class="dec-paragraphs">
+                <p
+                  v-for="(p, pIdx) in profileData.domains.item.paragraphs[lang]"
+                  :key="pIdx"
+                  class="dec-body"
+                >
+                  {{ p }}
+                </p>
+              </div>
               <div class="dec-tags">
                 <span v-for="tag in profileData.domains.item.tags" :key="tag" class="domain-tag mono">{{ tag }}</span>
               </div>
@@ -84,23 +92,15 @@ useScrollReveal()
 
             <aside class="dec-sidebar">
               <div class="dec-sidebar-inner">
-                <div class="dec-origin-top">
-                  <span class="dec-origin-dot" aria-hidden="true"></span>
-                  <span class="dec-origin-label mono">{{ lang === 'it' ? 'IMPATTO DIRETTO SU VOLTREP' : 'DIRECT IMPACT ON VOLTREP' }}</span>
-                </div>
-                <h4 class="dec-origin-heading">
-                  {{ lang === 'it' ? 'Zero distrazioni sotto carico massimale' : 'Zero distraction under maximal load' }}
-                </h4>
-                <p class="dec-origin-desc">
-                  {{
-                    lang === 'it'
-                      ? 'Timer di recupero reattivi a colpo d’occhio, contrasto ottimizzato per visione periferica e registrazione delle serie in un solo tap.'
-                      : 'Glanceable rest timers, peripheral contrast optimization, and single-tap set logging engineered for extreme fatigue.'
-                  }}
-                </p>
-                <div class="dec-origin-metric mono tabular-nums">
-                  <span class="metric-val">0.4s</span>
-                  <span class="metric-lbl">{{ lang === 'it' ? 'Tempo per loggare una serie' : 'Time to log a set' }}</span>
+                <div class="dec-proof-stack">
+                  <div
+                    v-for="(stat, sIdx) in profileData.domains.item.stats[lang]"
+                    :key="sIdx"
+                    class="dec-proof-row"
+                  >
+                    <span class="proof-val tabular-nums">{{ stat.val }}</span>
+                    <span class="proof-lbl">{{ stat.lbl }}</span>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -460,7 +460,7 @@ useScrollReveal()
 }
 
 .domain-editorial-card {
-  padding: 2.2rem 2.4rem;
+  padding: clamp(1.4rem, 2.5vw, 2.25rem);
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
@@ -478,7 +478,7 @@ useScrollReveal()
 
 @media (min-width: 860px) {
   .domain-editorial-card {
-    grid-template-columns: 1.4fr 0.6fr;
+    grid-template-columns: 1.45fr 0.55fr;
   }
 }
 
@@ -498,14 +498,14 @@ useScrollReveal()
 }
 
 .domain-badge {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: var(--accent-azure);
-  background: var(--accent-azure-soft);
-  border: 1px solid var(--accent-azure-border);
+  color: var(--accent-lumina-bright);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.32);
   border-radius: 9999px;
-  padding: 0.32rem 0.85rem;
+  padding: 0.35rem 0.9rem;
 }
 
 .dec-kicker {
@@ -523,12 +523,18 @@ useScrollReveal()
   margin: 0;
 }
 
+.dec-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+}
+
 .dec-body {
   font-size: 0.98rem;
   line-height: 1.65;
   color: var(--text-secondary);
   margin: 0;
-  flex: 1;
 }
 
 .dec-tags {
@@ -555,71 +561,57 @@ useScrollReveal()
 
 .dec-sidebar-inner {
   width: 100%;
-  padding: 1.5rem;
+  height: 100%;
+  padding: 1.5rem 1.6rem;
   border-radius: var(--radius-xl);
   background: rgba(4, 6, 12, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1rem;
   box-sizing: border-box;
 }
 
-.dec-origin-top {
+.dec-proof-stack {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
   gap: 0.5rem;
 }
 
-.dec-origin-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent-azure);
-  box-shadow: 0 0 6px var(--accent-azure);
-}
-
-.dec-origin-label {
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  color: var(--accent-azure);
-  font-weight: 600;
-}
-
-.dec-origin-heading {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1.35;
-  margin: 0;
-}
-
-.dec-origin-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.55;
-  margin: 0;
+.dec-proof-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex: 1;
 }
 
-.dec-origin-metric {
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+.dec-proof-row:first-child {
+  padding-top: 0.2rem;
 }
 
-.metric-val {
-  font-size: 1.5rem;
+.dec-proof-row:last-child {
+  padding-bottom: 0.2rem;
+  border-bottom: none;
+}
+
+.proof-val {
+  font-family: var(--font-mono);
+  font-size: clamp(1.4rem, 2vw, 1.7rem);
   font-weight: 700;
   color: var(--accent-lumina-bright);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
-.metric-lbl {
-  font-size: 0.72rem;
-  color: var(--text-tertiary);
+.proof-lbl {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 @media (prefers-reduced-motion: reduce) {

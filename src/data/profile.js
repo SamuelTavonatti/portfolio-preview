@@ -59,31 +59,49 @@ export const profileData = {
   domains: {
     header: {
       it: {
-        kicker: '02.B / Domini & Passioni',
-        title: 'Conoscenza sul Campo',
+        kicker: '02.B / Sul Campo',
+        title: 'Oltre lo Schermo',
         subtitle: 'L’esperienza personale diretta che guida il mio modo di progettare interfacce e prodotti.',
       },
       en: {
-        kicker: '02.B / Domains & Passions',
-        title: 'Domain Knowledge',
+        kicker: '02.B / Field Experience',
+        title: 'Beyond the Screen',
         subtitle: 'Personal domain experience that directly informs how I architect interfaces and digital products.',
       },
     },
     item: {
       id: 'strength',
       badge: {
-        it: 'Dominio • Product Origin',
-        en: 'Domain • Product Origin',
+        it: '5 Anni in Sala Pesi • Product Origin',
+        en: '5 Years in the Gym • Product Origin',
       },
       title: {
-        it: 'Strength Training & Performance Tracking',
-        en: 'Strength Training & Performance Tracking',
+        it: 'Allenamento, Esperienza Reale e Perché è Nato VoltRep',
+        en: 'Training, Real-World Experience & Why I Built VoltRep',
       },
-      body: {
-        it: 'Pratico allenamento contro resistenze e progressive overload da anni: vivere la sessione in prima persona mi ha insegnato cosa significhi davvero la frizione cognitiva. Quando sei sotto carico o a fine serie con pulsazioni elevate, non puoi decifrare UI complesse o navigazioni a tre livelli. Da questa esigenza reale è nata l’architettura di VoltRep: input numerici minimi, timer di recupero reattivi a colpo d’occhio e registrazione del carico in un solo tap.',
-        en: 'Practicing progressive overload and strength training for years gave me firsthand exposure to cognitive friction under physical strain. Mid-set with elevated heart rates, athletes cannot decipher multi-level navigation or cluttered tables. This authentic domain problem directly shaped VoltRep: single-tap set logging, glanceable rest timers, and zero-distraction telemetry designed for extreme fatigue.',
+      paragraphs: {
+        it: [
+          'Mi alleno in palestra da cinque anni. Ho girato diverse sale pesi e provato decine di app per segnare carichi, ripetizioni e recuperi — ma quasi tutte finivano per rallentarmi tra una serie e l’altra con schermate piene di funzioni inutili o abbonamenti bloccati.',
+          'Conoscere quel contesto da dentro cambia tutto quando progetti un prodotto: sai esattamente quanta attenzione hai sotto sforzo, quali dati servono al volo e dove nasce la frizione. È da questa esperienza diretta sul campo che ho progettato e sviluppato VoltRep da zero.',
+        ],
+        en: [
+          'I have been training in the gym for five years. I have trained across different gyms and tested dozens of apps to log weights, reps, and rest times — yet almost all of them slowed me down between sets with cluttered screens or paywalled history.',
+          'Knowing a domain from the inside changes how you design for it: you understand how little cognitive bandwidth you have mid-workout, which numbers matter at a glance, and where friction happens. That firsthand experience is why I designed and built VoltRep from scratch.',
+        ],
       },
       tags: ['Progressive Overload', 'Zero Friction', 'VoltRep Origin'],
+      stats: {
+        it: [
+          { val: '5 Anni', lbl: 'Allenamento costante in palestra' },
+          { val: '10+ App', lbl: 'Analizzate e testate sul campo' },
+          { val: 'VoltRep', lbl: 'Progettato per zero frizione' },
+        ],
+        en: [
+          { val: '5 Years', lbl: 'Consistent strength training' },
+          { val: '10+ Apps', lbl: 'Tested & benchmarked in real sessions' },
+          { val: 'VoltRep', lbl: 'Built for zero-friction logging' },
+        ],
+      },
     },
   },
   skills: [
