@@ -68,22 +68,42 @@ useScrollReveal()
           <p class="section-subtitle">{{ profileData.domains.header[lang].subtitle }}</p>
         </div>
 
-        <div class="domains-bento">
-          <article
-            v-for="(domain, idx) in profileData.domains.items"
-            :key="domain.id"
-            class="glass-card domain-card"
-            :class="{ 'domain-card--lead': idx === 0 }"
-          >
-            <div class="domain-top">
-              <span class="domain-badge mono">{{ domain.badge[lang] }}</span>
-              <span class="domain-num mono tabular-nums">0{{ idx + 1 }}</span>
+        <div class="domain-single-wrap">
+          <article class="glass-card domain-editorial-card">
+            <div class="dec-main">
+              <div class="dec-badge-row">
+                <span class="domain-badge mono">{{ profileData.domains.item.badge[lang] }}</span>
+                <span class="dec-kicker mono">{{ lang === 'it' ? 'FOCUS ERGONOMIA SUL CAMPO' : 'FIELD ERGONOMICS FOCUS' }}</span>
+              </div>
+              <h3 class="dec-title">{{ profileData.domains.item.title[lang] }}</h3>
+              <p class="dec-body">{{ profileData.domains.item.body[lang] }}</p>
+              <div class="dec-tags">
+                <span v-for="tag in profileData.domains.item.tags" :key="tag" class="domain-tag mono">{{ tag }}</span>
+              </div>
             </div>
-            <h3 class="domain-title">{{ domain.title[lang] }}</h3>
-            <p class="domain-body">{{ domain.body[lang] }}</p>
-            <div class="domain-tags">
-              <span v-for="tag in domain.tags" :key="tag" class="domain-tag mono">{{ tag }}</span>
-            </div>
+
+            <aside class="dec-sidebar">
+              <div class="dec-sidebar-inner">
+                <div class="dec-origin-top">
+                  <span class="dec-origin-dot" aria-hidden="true"></span>
+                  <span class="dec-origin-label mono">{{ lang === 'it' ? 'IMPATTO DIRETTO SU VOLTREP' : 'DIRECT IMPACT ON VOLTREP' }}</span>
+                </div>
+                <h4 class="dec-origin-heading">
+                  {{ lang === 'it' ? 'Zero distrazioni sotto carico massimale' : 'Zero distraction under maximal load' }}
+                </h4>
+                <p class="dec-origin-desc">
+                  {{
+                    lang === 'it'
+                      ? 'Timer di recupero reattivi a colpo d’occhio, contrasto ottimizzato per visione periferica e registrazione delle serie in un solo tap.'
+                      : 'Glanceable rest timers, peripheral contrast optimization, and single-tap set logging engineered for extreme fatigue.'
+                  }}
+                </p>
+                <div class="dec-origin-metric mono tabular-nums">
+                  <span class="metric-val">0.4s</span>
+                  <span class="metric-lbl">{{ lang === 'it' ? 'Tempo per loggare una serie' : 'Time to log a set' }}</span>
+                </div>
+              </div>
+            </aside>
           </article>
         </div>
       </div>
@@ -169,20 +189,23 @@ useScrollReveal()
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
+  align-items: stretch;
 }
 
 @media (min-width: 960px) {
   .about-grid {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr);
+    align-items: stretch;
   }
 }
 
 .about-main {
-  padding: 2rem;
+  padding: 2.2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .about-header-row {
@@ -223,25 +246,30 @@ useScrollReveal()
 }
 
 .about-highlights {
-  padding: 1.5rem 1.75rem;
+  padding: 2rem 2.2rem;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .highlight-row {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--border-subtle);
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex: 1;
 }
 
 .highlight-row:first-child {
-  padding-top: 0.25rem;
+  padding-top: 0.2rem;
 }
 
 .highlight-row:last-child {
-  padding-bottom: 0.25rem;
+  padding-bottom: 0.2rem;
   border-bottom: none;
 }
 
@@ -427,37 +455,45 @@ useScrollReveal()
   line-height: 1.5;
 }
 
-.domains-bento {
+.domain-single-wrap {
+  width: 100%;
+}
+
+.domain-editorial-card {
+  padding: 2.2rem 2.4rem;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
-}
-
-@media (min-width: 860px) {
-  .domains-bento {
-    grid-template-columns: 1.25fr 1fr;
-  }
-}
-
-.domain-card {
-  padding: 2rem 2.2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1.25rem;
+  gap: 2rem;
+  align-items: stretch;
+  width: 100%;
   border-radius: var(--radius-2xl);
-  transition: transform 0.25s var(--ease-spring), border-color 0.2s ease;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, transform 0.25s var(--ease-spring);
 }
 
-.domain-card:hover {
+.domain-editorial-card:hover {
   transform: translateY(-2px);
   border-color: rgba(56, 189, 248, 0.35);
 }
 
-.domain-top {
+@media (min-width: 860px) {
+  .domain-editorial-card {
+    grid-template-columns: 1.4fr 0.6fr;
+  }
+}
+
+.dec-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.dec-badge-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -472,28 +508,30 @@ useScrollReveal()
   padding: 0.32rem 0.85rem;
 }
 
-.domain-num {
-  font-size: 0.82rem;
+.dec-kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   color: var(--text-tertiary);
-  font-weight: 600;
 }
 
-.domain-title {
-  font-size: clamp(1.22rem, 1.8vw, 1.45rem);
+.dec-title {
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.025em;
   color: var(--text-primary);
-  line-height: 1.3;
+  line-height: 1.25;
+  margin: 0;
 }
 
-.domain-body {
-  font-size: 0.95rem;
+.dec-body {
+  font-size: 0.98rem;
   line-height: 1.65;
   color: var(--text-secondary);
+  margin: 0;
   flex: 1;
 }
 
-.domain-tags {
+.dec-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -510,9 +548,83 @@ useScrollReveal()
   padding: 0.28rem 0.65rem;
 }
 
+.dec-sidebar {
+  display: flex;
+  align-items: stretch;
+}
+
+.dec-sidebar-inner {
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  background: rgba(4, 6, 12, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+.dec-origin-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dec-origin-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-azure);
+  box-shadow: 0 0 6px var(--accent-azure);
+}
+
+.dec-origin-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--accent-azure);
+  font-weight: 600;
+}
+
+.dec-origin-heading {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.dec-origin-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+  flex: 1;
+}
+
+.dec-origin-metric {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.metric-val {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-lumina-bright);
+}
+
+.metric-lbl {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .skill-card:hover,
-  .domain-card:hover {
+  .domain-editorial-card:hover {
     transform: none;
   }
 }

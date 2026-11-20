@@ -61,48 +61,30 @@ export const profileData = {
       it: {
         kicker: '02.B / Domini & Passioni',
         title: 'Conoscenza sul Campo',
-        subtitle: 'Le passioni personali che guidano il mio modo di progettare interfacce e prodotti.',
+        subtitle: 'L’esperienza personale diretta che guida il mio modo di progettare interfacce e prodotti.',
       },
       en: {
         kicker: '02.B / Domains & Passions',
         title: 'Domain Knowledge',
-        subtitle: 'Personal pursuits that directly inform how I architect interfaces and digital products.',
+        subtitle: 'Personal domain experience that directly informs how I architect interfaces and digital products.',
       },
     },
-    items: [
-      {
-        id: 'strength',
-        badge: {
-          it: 'Dominio #1 • Product Origin',
-          en: 'Domain #1 • Product Origin',
-        },
-        title: {
-          it: 'Strength Training & Performance Tracking',
-          en: 'Strength Training & Performance Tracking',
-        },
-        body: {
-          it: 'Pratico allenamento contro resistenze e progressive overload da anni: vivere la sessione in prima persona mi ha insegnato cosa significhi davvero la frizione cognitiva. Quando sei sotto carico o a fine serie con pulsazioni elevate, non puoi decifrare UI complesse o navigazioni a tre livelli. Da questa esigenza reale è nata l’architettura di VoltRep: input numerici minimi, timer di recupero reattivi a colpo d’occhio e registrazione del carico in un solo tap.',
-          en: 'Practicing progressive overload and strength training for years gave me firsthand exposure to cognitive friction under physical strain. Mid-set with elevated heart rates, athletes cannot decipher multi-level navigation or cluttered tables. This authentic domain problem directly shaped VoltRep: single-tap set logging, glanceable rest timers, and zero-distraction telemetry designed for extreme fatigue.',
-        },
-        tags: ['Progressive Overload', 'Zero Friction', 'VoltRep Origin'],
+    item: {
+      id: 'strength',
+      badge: {
+        it: 'Dominio • Product Origin',
+        en: 'Domain • Product Origin',
       },
-      {
-        id: 'photography',
-        badge: {
-          it: 'Dominio #2 • Visual Craft',
-          en: 'Domain #2 • Visual Craft',
-        },
-        title: {
-          it: 'Fotografia Digitale & Motion Design',
-          en: 'Digital Photography & Motion Design',
-        },
-        body: {
-          it: 'La fotografia digitale e la post-produzione RAW mi hanno educato alla disciplina cromatica, alla gestione millimetrica della luce e alla gerarchia visiva. Nel motion design traduco questa sensibilità in curve di transizione fisiche (spring physics) e timing fluidi: ogni animazione non è un ornamento, ma un segnale spaziale continuo che guida l’occhio dell’utente senza mai distrarlo.',
-          en: 'Digital photography and RAW post-processing trained my eye for tonal discipline, specular lighting, and visual hierarchy. In interface motion design, I translate this craft into physics-based spring curves and continuous spatial choreography: animations never serve as superficial decoration, but as functional cues that preserve user focus.',
-        },
-        tags: ['RAW Color Grading', 'Spring Physics', 'Spatial Hierarchy'],
+      title: {
+        it: 'Strength Training & Performance Tracking',
+        en: 'Strength Training & Performance Tracking',
       },
-    ],
+      body: {
+        it: 'Pratico allenamento contro resistenze e progressive overload da anni: vivere la sessione in prima persona mi ha insegnato cosa significhi davvero la frizione cognitiva. Quando sei sotto carico o a fine serie con pulsazioni elevate, non puoi decifrare UI complesse o navigazioni a tre livelli. Da questa esigenza reale è nata l’architettura di VoltRep: input numerici minimi, timer di recupero reattivi a colpo d’occhio e registrazione del carico in un solo tap.',
+        en: 'Practicing progressive overload and strength training for years gave me firsthand exposure to cognitive friction under physical strain. Mid-set with elevated heart rates, athletes cannot decipher multi-level navigation or cluttered tables. This authentic domain problem directly shaped VoltRep: single-tap set logging, glanceable rest timers, and zero-distraction telemetry designed for extreme fatigue.',
+      },
+      tags: ['Progressive Overload', 'Zero Friction', 'VoltRep Origin'],
+    },
   },
   skills: [
     {

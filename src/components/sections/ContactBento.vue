@@ -83,22 +83,19 @@ const handleSubmit = async () => {
       : 'Email client opened and message copied to clipboard ✓'
 }
 
-const channels = [
+const socialLinks = [
   {
-    name: 'LINKEDIN',
-    handle: '@samuel-tavonatti',
+    name: 'LinkedIn',
     href: profileData.links.linkedin,
     icon: 'linkedin',
   },
   {
-    name: 'GITHUB',
-    handle: '@SamuelTavonatti',
+    name: 'GitHub',
     href: profileData.links.github,
     icon: 'github',
   },
   {
-    name: 'INSTAGRAM',
-    handle: '@samuel.tavonatti',
+    name: 'Instagram',
     href: profileData.links.instagram,
     icon: 'instagram',
   },
@@ -108,132 +105,140 @@ const channels = [
 <template>
   <section id="contatti" class="section-block section-block--closing">
     <div class="container scroll-reveal">
-      <!-- 1. Top Status Header Row -->
-      <div class="contact-top-row">
-        <div class="section-head">
-          <span class="section-kicker tabular-nums">{{ t('sections.contactKicker') }}</span>
-          <h2 class="section-heading">{{ t('sections.contactTitle') }}</h2>
-        </div>
+      <div class="contact-split-bento">
+        <!-- LEFT COLUMN: Editorial Direct Info & Channels -->
+        <article class="glass-card contact-info-card">
+          <div class="info-top-block">
+            <span class="section-kicker tabular-nums">{{ t('sections.contactKicker') }}</span>
+            <h2 class="contact-title">{{ t('sections.contactTitle') }}</h2>
+            <p class="contact-subtitle">{{ t('contact.lead') }}</p>
 
-        <div class="status-pill mono">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>
-            {{
-              lang === 'it'
-                ? 'STATUS: DISPONIBILE PER PROGETTI & STAGE'
-                : 'STATUS: AVAILABLE FOR SELECT PROJECTS & INTERNSHIPS'
-            }}
-          </span>
-        </div>
-      </div>
+            <div class="status-pill mono">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span>
+                {{
+                  lang === 'it'
+                    ? 'Disponibile per progetti & stage'
+                    : 'Available for projects & internships'
+                }}
+              </span>
+            </div>
+          </div>
 
-      <!-- 2. Hero 1-Click Copy Email Banner -->
-      <div class="glass-card email-banner">
-        <span class="email-banner-addr">{{ profileData.email.toUpperCase() }}</span>
-        <button
-          type="button"
-          class="copy-cta mono"
-          :class="{ 'is-copied': copied }"
-          :aria-label="t('contact.copyAria')"
-          @click="copyEmail"
-        >
-          <AppIcon :name="copied ? 'check' : 'copy'" :size="15" />
-          <span>{{ copied ? (lang === 'it' ? 'Copiato ✓' : 'Copied ✓') : (lang === 'it' ? '1-CLICK COPY' : '1-CLICK COPY') }}</span>
-        </button>
-      </div>
-
-      <!-- 3. Direct Transmission Form (100% Free Client-Side mailto: + Clipboard) -->
-      <form class="glass-card tx-form" novalidate @submit.prevent="handleSubmit">
-        <div class="tx-grid-2">
-          <label class="tx-field">
-            <span class="tx-label mono">{{ lang === 'it' ? 'NOME / AZIENDA' : 'NAME / COMPANY' }}</span>
-            <input
-              v-model="nameInput"
-              type="text"
-              required
-              :placeholder="lang === 'it' ? 'Mario Rossi — Studio' : 'Alex Morgan — Studio'"
-              class="tx-input"
-            />
-          </label>
-
-          <label class="tx-field">
-            <span class="tx-label mono">EMAIL</span>
-            <input
-              v-model="emailInput"
-              type="email"
-              required
-              placeholder="name@company.com"
-              class="tx-input"
-            />
-          </label>
-        </div>
-
-        <label class="tx-field">
-          <span class="tx-label mono">{{ lang === 'it' ? 'OGGETTO' : 'SUBJECT' }}</span>
-          <select v-model="subjectInput" class="tx-input tx-select">
-            <option value="" disabled>
-              {{ lang === 'it' ? 'Seleziona un argomento…' : 'Select a subject…' }}
-            </option>
-            <option v-for="sub in subjects" :key="sub" :value="sub">{{ sub }}</option>
-          </select>
-        </label>
-
-        <label class="tx-field">
-          <span class="tx-label mono">{{ lang === 'it' ? 'MESSAGGIO' : 'MESSAGE' }}</span>
-          <textarea
-            v-model="messageInput"
-            required
-            rows="4"
-            :placeholder="lang === 'it' ? 'Raccontami il tuo progetto o opportunità…' : 'Tell me about your project or opportunity…'"
-            class="tx-input tx-textarea"
-          />
-        </label>
-
-        <div class="tx-consent-row">
-          <label class="gdpr-check-label">
-            <input v-model="gdprAccepted" type="checkbox" class="gdpr-checkbox" />
-            <span>
-              {{ lang === 'it' ? 'Ho letto e accetto l’' : 'I have read and accept the ' }}
+          <div class="info-bottom-block">
+            <!-- Normal-Scale Lowercase Email Row -->
+            <div class="contact-email-row">
+              <a :href="`mailto:${profileData.email}`" class="email-address mono">
+                {{ profileData.email.toLowerCase() }}
+              </a>
               <button
                 type="button"
-                class="inline-policy-link"
-                @click="openPolicy ? openPolicy('privacy') : null"
+                class="copy-btn mono"
+                :class="{ 'is-copied': copied }"
+                :aria-label="t('contact.copyAria')"
+                @click="copyEmail"
               >
-                {{ t('footer.privacy') }}
+                <AppIcon :name="copied ? 'check' : 'copy'" :size="14" />
+                <span>{{ copied ? (lang === 'it' ? 'Copiato ✓' : 'Copied ✓') : (lang === 'it' ? 'Copia' : 'Copy') }}</span>
               </button>
-              {{ lang === 'it' ? ' (invio diretto client-side, nessun dato salvato).' : ' (client-side mailto only, no data stored).' }}
-            </span>
-          </label>
-        </div>
+            </div>
 
-        <p v-if="formError" class="tx-feedback is-error" role="alert">{{ formError }}</p>
-        <p v-if="sentNotice" class="tx-feedback is-ok" role="status">{{ sentNotice }}</p>
-
-        <div class="tx-actions">
-          <button type="submit" class="tx-submit">
-            <span>{{ lang === 'it' ? 'Invia Messaggio →' : 'Send Message →' }}</span>
-          </button>
-        </div>
-      </form>
-
-      <!-- 4. Full-Width Social Channels Directory -->
-      <div class="channels-list" role="list" :aria-label="t('contact.profiles')">
-        <a
-          v-for="ch in channels"
-          :key="ch.name"
-          :href="ch.href"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="glass-card channel-row"
-          role="listitem"
-        >
-          <div class="channel-left">
-            <AppIcon :name="ch.icon" :size="18" class="channel-icon" />
-            <span class="channel-name mono">{{ ch.name }}</span>
-            <span class="channel-handle">{{ ch.handle }}</span>
+            <!-- Minimalist Social Pills Row -->
+            <div class="social-pills-row" role="list" :aria-label="t('contact.profiles')">
+              <a
+                v-for="item in socialLinks"
+                :key="item.name"
+                :href="item.href"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-pill"
+                role="listitem"
+              >
+                <AppIcon :name="item.icon" :size="14" class="social-icon" />
+                <span>{{ item.name }}</span>
+                <span class="social-arrow" aria-hidden="true">↗</span>
+              </a>
+            </div>
           </div>
-          <AppIcon name="arrow-up-right" :size="18" class="channel-arrow" />
-        </a>
+        </article>
+
+        <!-- RIGHT COLUMN: Clean Minimalist Message Form -->
+        <form class="glass-card contact-form-card" novalidate @submit.prevent="handleSubmit">
+          <div class="form-header">
+            <span class="form-kicker mono">{{ lang === 'it' ? 'TRASMISSIONE DIRETTA' : 'DIRECT TRANSMISSION' }}</span>
+          </div>
+
+          <div class="tx-grid-2">
+            <label class="tx-field">
+              <span class="tx-label mono">{{ lang === 'it' ? 'NOME / AZIENDA' : 'NAME / COMPANY' }}</span>
+              <input
+                v-model="nameInput"
+                type="text"
+                required
+                :placeholder="lang === 'it' ? 'Mario Rossi — Studio' : 'Alex Morgan — Studio'"
+                class="tx-input"
+              />
+            </label>
+
+            <label class="tx-field">
+              <span class="tx-label mono">EMAIL</span>
+              <input
+                v-model="emailInput"
+                type="email"
+                required
+                placeholder="name@company.com"
+                class="tx-input"
+              />
+            </label>
+          </div>
+
+          <label class="tx-field">
+            <span class="tx-label mono">{{ lang === 'it' ? 'OGGETTO' : 'SUBJECT' }}</span>
+            <select v-model="subjectInput" class="tx-input tx-select">
+              <option value="" disabled>
+                {{ lang === 'it' ? 'Seleziona un argomento…' : 'Select a subject…' }}
+              </option>
+              <option v-for="sub in subjects" :key="sub" :value="sub">{{ sub }}</option>
+            </select>
+          </label>
+
+          <label class="tx-field">
+            <span class="tx-label mono">{{ lang === 'it' ? 'MESSAGGIO' : 'MESSAGE' }}</span>
+            <textarea
+              v-model="messageInput"
+              required
+              rows="4"
+              :placeholder="lang === 'it' ? 'Raccontami il tuo progetto o opportunità…' : 'Tell me about your project or opportunity…'"
+              class="tx-input tx-textarea"
+            />
+          </label>
+
+          <div class="tx-consent-row">
+            <label class="gdpr-check-label">
+              <input v-model="gdprAccepted" type="checkbox" class="gdpr-checkbox" />
+              <span>
+                {{ lang === 'it' ? 'Ho letto e accetto l’' : 'I have read and accept the ' }}
+                <button
+                  type="button"
+                  class="inline-policy-link"
+                  @click="openPolicy ? openPolicy('privacy') : null"
+                >
+                  {{ t('footer.privacy') }}
+                </button>
+                {{ lang === 'it' ? ' (invio diretto client-side, nessun dato salvato).' : ' (client-side mailto only, no data stored).' }}
+              </span>
+            </label>
+          </div>
+
+          <p v-if="formError" class="tx-feedback is-error" role="alert">{{ formError }}</p>
+          <p v-if="sentNotice" class="tx-feedback is-ok" role="status">{{ sentNotice }}</p>
+
+          <div class="tx-actions">
+            <button type="submit" class="tx-submit">
+              <span>{{ lang === 'it' ? 'Invia Messaggio →' : 'Send Message →' }}</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </section>
@@ -242,112 +247,225 @@ const channels = [
 <style scoped>
 .section-block--closing {
   border-bottom: none;
-  padding-bottom: 3rem;
+  padding-bottom: 4rem;
 }
 
-.contact-top-row {
+.contact-split-bento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .contact-split-bento {
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+}
+
+/* Left Card: Info & Editorial */
+.contact-info-card {
+  padding: clamp(1.75rem, 3vw, 2.5rem);
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-direction: column;
   justify-content: space-between;
-  gap: 1rem 2rem;
-  margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+  gap: 2rem;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius-2xl);
 }
 
-.contact-top-row .section-head {
-  margin-bottom: 0;
+.info-top-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.contact-title {
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.contact-subtitle {
+  font-size: 0.98rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 44ch;
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.48rem 0.95rem;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 9999px;
-  background: rgba(11, 17, 32, 0.78);
-  border: 1px solid rgba(52, 211, 153, 0.34);
+  background: rgba(11, 17, 32, 0.75);
+  border: 1px solid rgba(52, 211, 153, 0.3);
   font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  color: var(--text-primary);
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  width: fit-content;
+  margin-top: 0.4rem;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--status-live);
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.65);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
 }
 
-/* Hero 1-Click Copy Email Banner */
-.email-banner {
-  width: 100%;
-  padding: 1.5rem 1.75rem;
-  margin-bottom: 1.5rem;
+.info-bottom-block {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Normal-Scale Lowercase Email Row */
+.contact-email-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-lg);
+  background: rgba(4, 6, 12, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.2s ease;
 }
 
-.email-banner-addr {
-  font-size: clamp(1.1rem, 2.8vw, 2.15rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+.contact-email-row:hover {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.email-address {
+  font-size: 0.92rem;
   color: var(--text-primary);
-  word-break: break-all;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.copy-cta {
+.email-address:hover {
+  color: var(--accent-lumina-bright);
+}
+
+.copy-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  min-height: 48px;
-  padding: 0 1.25rem;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 9999px;
   border: 1px solid var(--accent-azure-border);
   background: var(--accent-azure-soft);
   color: var(--accent-lumina-bright);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   cursor: pointer;
+  flex-shrink: 0;
   transition: transform 0.18s var(--ease-spring), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.copy-cta:hover {
+.copy-btn:hover {
   border-color: var(--accent-lumina);
   transform: translateY(-1px);
 }
 
-.copy-cta:active {
+.copy-btn:active {
   transform: scale(0.95);
 }
 
-.copy-cta.is-copied {
+.copy-btn.is-copied {
   background: var(--status-live);
   border-color: var(--status-live);
   color: #04060C;
 }
 
-/* Direct Transmission Form */
-.tx-form {
-  width: 100%;
-  padding: clamp(1.5rem, 3vw, 2.25rem);
-  margin-bottom: 1.5rem;
+/* Minimalist Social Pills */
+.social-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.social-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.social-pill:hover {
+  color: var(--text-primary);
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.06);
+  transform: translateY(-1px);
+}
+
+.social-icon {
+  color: var(--accent-lumina-bright);
+}
+
+.social-arrow {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  transition: transform 0.2s var(--ease-spring);
+}
+
+.social-pill:hover .social-arrow {
+  opacity: 1;
+  transform: translate(1px, -1px);
+}
+
+/* Right Card: Clean Minimalist Message Form */
+.contact-form-card {
+  padding: clamp(1.75rem, 3vw, 2.5rem);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.15rem;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius-2xl);
+}
+
+.form-header {
+  margin-bottom: 0.25rem;
+}
+
+.form-kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--accent-lumina-bright);
+  font-weight: 600;
 }
 
 .tx-grid-2 {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: 1.15rem;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 640px) {
   .tx-grid-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -356,27 +474,28 @@ const channels = [
 .tx-field {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
 .tx-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 0.06em;
-  color: var(--accent-lumina-bright);
+  color: var(--text-tertiary);
   font-weight: 600;
 }
 
 .tx-input {
   width: 100%;
-  min-height: 48px;
-  padding: 0.75rem 1rem;
+  min-height: 44px;
+  padding: 0.7rem 0.95rem;
   border-radius: var(--radius-md);
-  background: rgba(4, 6, 12, 0.72);
-  border: 1px solid rgba(148, 197, 255, 0.14);
+  background: rgba(4, 6, 12, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
 }
 
 .tx-input::placeholder {
@@ -389,30 +508,35 @@ const channels = [
   box-shadow: 0 0 0 3px var(--accent-lumina-glow);
 }
 
+.tx-select {
+  cursor: pointer;
+}
+
 .tx-textarea {
-  min-height: 140px;
+  min-height: 116px;
   resize: vertical;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 .tx-consent-row {
   display: flex;
   align-items: flex-start;
+  margin-top: 0.2rem;
 }
 
 .gdpr-check-label {
   display: inline-flex;
   align-items: flex-start;
-  gap: 0.65rem;
-  font-size: 0.85rem;
+  gap: 0.6rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
   line-height: 1.5;
   cursor: pointer;
 }
 
 .gdpr-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   margin-top: 2px;
   accent-color: var(--accent-lumina);
   flex-shrink: 0;
@@ -432,8 +556,9 @@ const channels = [
 }
 
 .tx-feedback {
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   font-weight: 500;
+  margin: 0;
 }
 .tx-feedback.is-error { color: #FCA5A5; }
 .tx-feedback.is-ok { color: var(--status-live); }
@@ -441,20 +566,21 @@ const channels = [
 .tx-actions {
   display: flex;
   justify-content: flex-start;
+  padding-top: 0.25rem;
 }
 
 .tx-submit {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 0 1.65rem;
+  min-height: 46px;
+  padding: 0 1.6rem;
   border-radius: 9999px;
   border: none;
   background: var(--accent);
   color: #04060C;
   font-family: var(--font-sans);
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
@@ -468,69 +594,5 @@ const channels = [
 
 .tx-submit:active {
   transform: scale(0.96);
-}
-
-/* Full-Width Social Channels Directory */
-.channels-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  width: 100%;
-}
-
-.channel-row {
-  width: 100%;
-  min-height: 60px;
-  padding: 0.95rem 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  text-decoration: none;
-  color: var(--text-primary);
-  border-radius: var(--radius-xl);
-}
-
-.channel-row:hover {
-  transform: translateX(4px);
-  border-color: var(--accent-azure-border);
-  background: var(--surface-2);
-}
-
-.channel-left {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  min-width: 0;
-}
-
-.channel-icon {
-  color: var(--accent-lumina-bright);
-  flex-shrink: 0;
-}
-
-.channel-name {
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--text-primary);
-}
-
-.channel-handle {
-  font-size: 0.88rem;
-  color: var(--text-secondary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.channel-arrow {
-  color: var(--accent-lumina-bright);
-  flex-shrink: 0;
-  transition: transform 0.2s var(--ease-spring);
-}
-
-.channel-row:hover .channel-arrow {
-  transform: translate(2px, -2px);
 }
 </style>
