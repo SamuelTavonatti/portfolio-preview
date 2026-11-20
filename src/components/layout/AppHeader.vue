@@ -225,8 +225,8 @@ const closeMobile = () => {
   height: calc(100% - 8px);
   border-radius: 9999px;
   background: var(--accent-azure-soft);
-  border: 1px solid var(--accent-azure-border);
-  box-shadow: var(--specular);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  box-shadow: var(--specular), 0 0 18px var(--accent-lumina-glow);
   opacity: 0;
   transition:
     transform 0.5s var(--ease-spring),
@@ -292,9 +292,9 @@ const closeMobile = () => {
   width: calc(50% - 3px);
   height: calc(100% - 6px);
   border-radius: 9999px;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  box-shadow: var(--specular);
+  background: var(--accent-azure-soft);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  box-shadow: var(--specular), 0 0 14px var(--accent-lumina-glow);
   transition: transform 0.45s var(--ease-spring);
 }
 
@@ -325,7 +325,7 @@ const closeMobile = () => {
 
 .lang-switch button.active,
 .lang-switch button:hover {
-  color: var(--accent-hover);
+  color: var(--accent-lumina-bright);
 }
 
 .mobile-toggle {
@@ -365,16 +365,16 @@ const closeMobile = () => {
   pointer-events: auto;
   position: fixed;
   inset: 0;
-  background: rgba(5, 5, 7, 0.94);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  z-index: 95;
+  z-index: 90;
+  background: rgba(4, 6, 12, 0.92);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
   display: flex;
   align-items: flex-end;
   padding: 0 1.25rem 3rem;
 }
 
-/* Thumb-zone: mobile navigation anchored to the lower reach area */
+/* Thumb-zone: mobile navigation anchored to the lower reach area with 45ms staggered reveal */
 .mobile-nav {
   display: flex;
   flex-direction: column;
@@ -383,34 +383,51 @@ const closeMobile = () => {
   width: 100%;
 }
 
+@keyframes mobilePillIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .mobile-nav a {
   display: flex;
   align-items: center;
-  min-height: 56px;
+  min-height: 54px;
   padding: 0 1.5rem;
   border-radius: var(--radius-3xl);
-  background: var(--surface-1);
-  border: 1px solid var(--border-subtle);
+  background: rgba(11, 17, 32, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.22);
   box-shadow: var(--specular);
   text-decoration: none;
   color: var(--text-primary);
   font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: var(--track-display);
+  animation: mobilePillIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
   transition: transform 0.14s var(--ease-out-expo), border-color 0.2s var(--ease-effects);
 }
+
+.mobile-nav a:nth-child(1) { animation-delay: 0ms; }
+.mobile-nav a:nth-child(2) { animation-delay: 45ms; }
+.mobile-nav a:nth-child(3) { animation-delay: 90ms; }
+.mobile-nav a:nth-child(4) { animation-delay: 135ms; }
 
 .mobile-nav a:active {
   transform: scale(0.96);
 }
 
 .mobile-nav a:hover {
-  border-color: var(--accent-border);
+  border-color: rgba(56, 189, 248, 0.48);
 }
 
 .drawer-enter-active,
 .drawer-leave-active {
-  transition: opacity 0.2s var(--ease-effects);
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .drawer-enter-from,
 .drawer-leave-to {
@@ -421,6 +438,9 @@ const closeMobile = () => {
   .nav-pill,
   .lang-thumb {
     transition: none;
+  }
+  .mobile-nav a {
+    animation: none;
   }
 }
 </style>

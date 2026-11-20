@@ -154,7 +154,7 @@ const previewMetrics = (project) => {
 
 .work-card:hover {
   transform: translateY(-2px);
-  border-color: var(--accent-border);
+  border-color: var(--accent-azure-border);
   background: var(--surface-2);
 }
 
@@ -249,9 +249,9 @@ const previewMetrics = (project) => {
 
 .m-val {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-lumina-bright);
 }
 
 .m-lbl {

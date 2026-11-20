@@ -1446,20 +1446,23 @@ onUnmounted(() => {
   will-change: transform;
 }
 
-.s3-camera.is-zoomed { transform: scale(1.26); }
+.s3-camera.is-zoomed { transform: scale(1.24); }
 .s3-camera.is-pulled-back { transform: scale(1); }
 
 /* Anti-distortion geometric morph on width, height, and border-radius */
 .ai-morph-shell {
   position: relative;
-  width: min(820px, 100%);
+  width: min(92vw, 820px);
+  max-width: calc(100vw - 32px);
+  margin-inline: auto;
+  box-sizing: border-box;
   height: 78px;
   border-radius: 9999px;
   background: rgba(11, 17, 32, 0.9);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid var(--ice-border);
-  box-shadow: var(--specular-w), 0 0 36px rgba(56, 189, 248, 0.14), 0 0 56px rgba(226, 184, 120, 0.08);
+  box-shadow: var(--specular-w), 0 0 36px rgba(56, 189, 248, 0.16), 0 0 56px rgba(226, 184, 120, 0.08);
   overflow: hidden;
   transition:
     width 0.72s var(--ease-spatial),
@@ -2065,9 +2068,11 @@ onUnmounted(() => {
   .mod-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
   .mod-card { padding: 0.65rem 0.55rem; gap: 0.5rem; }
   .mod-label { font-size: 0.62rem; }
-  .ai-morph-shell { height: 96px; border-radius: 28px; }
+  .s3-camera.is-zoomed { transform: scale(1.04); }
+  .ai-morph-shell { width: min(92vw, 820px); max-width: calc(100vw - 32px); min-height: 92px; height: auto; border-radius: 28px; }
   .ai-morph-shell.is-app-generated { height: 390px; }
-  .prompt-view { padding: 0.75rem 0.9rem; }
+  .prompt-view { padding: 12px 14px 12px 18px; }
+  .prompt-line { overflow-wrap: break-word; word-break: normal; text-align: left; }
   .wa-body { grid-template-columns: 1fr; }
   .wa-sidebar, .wa-top-tabs, .wa-kbd, .wa-checklist-card { display: none; }
   .wa-bottom-grid { grid-template-columns: 1fr; }

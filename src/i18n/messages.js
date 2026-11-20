@@ -84,6 +84,7 @@ export const messages = {
     footer: {
       privacy: 'Informativa Privacy',
       cookie: 'Cookie Policy',
+      terms: 'Termini e Condizioni',
     },
   },
   en: {
@@ -171,6 +172,7 @@ export const messages = {
     footer: {
       privacy: 'Privacy Policy',
       cookie: 'Cookie Policy',
+      terms: 'Terms of Use',
     },
   },
 }

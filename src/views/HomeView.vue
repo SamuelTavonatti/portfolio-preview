@@ -219,7 +219,7 @@ useScrollReveal()
   font-family: var(--font-mono);
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-lumina-bright);
 }
 
 .highlight-lbl {
@@ -353,7 +353,7 @@ useScrollReveal()
 
 .tl-org {
   font-size: 0.92rem;
-  color: var(--accent);
+  color: var(--accent-lumina-bright);
   margin-top: 0.2rem;
 }
 

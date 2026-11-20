@@ -26,6 +26,10 @@ const emit = defineEmits(['open-policy'])
         <button type="button" class="policy-trigger" @click="emit('open-policy', 'cookie')">
           {{ t('footer.cookie') }}
         </button>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <button type="button" class="policy-trigger" @click="emit('open-policy', 'terms')">
+          {{ t('footer.terms') }}
+        </button>
       </div>
     </div>
   </footer>
