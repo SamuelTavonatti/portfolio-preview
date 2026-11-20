@@ -1,41 +1,58 @@
 :root {
-  /* Core Surfaces (Revolut / Apple dark editorial) */
-  --bg-base: #0B0C0E;
-  --surface-1: #13151A;
-  --surface-2: #1A1D24;
-  --surface-glass: rgba(11, 12, 14, 0.84);
+  /* Tonal dark elevation — Midnight Obsidian & Electric Ice (Apple Keynote + Google + Linear) */
+  --bg-base: #04060C;
+  --surface-1: #0B1120;
+  --surface-2: #111A2E;
+  --surface-3: #18233C;
+  --surface-glass: rgba(11, 17, 32, 0.76);
 
-  /* Accent: Warm Titanium Sandstone */
-  --accent: #C2A57E;
-  --accent-hover: #D4B992;
-  --accent-soft: rgba(194, 165, 126, 0.12);
-  --accent-border: rgba(194, 165, 126, 0.34);
+  /* Accent: Champagne Gold (primary CTA) + Electric Ice (focus / tech) + Emerald (validated) */
+  --accent: #E2B878;
+  --accent-hover: #F5D59E;
+  --accent-soft: rgba(226, 184, 120, 0.12);
+  --accent-border: rgba(226, 184, 120, 0.36);
+  --on-accent: #04060C;
 
-  /* Status */
+  --accent-azure: #38BDF8;
+  --accent-azure-soft: rgba(56, 189, 248, 0.12);
+  --accent-azure-border: rgba(56, 189, 248, 0.34);
+
   --status-live: #34D399;
   --status-live-soft: rgba(52, 211, 153, 0.12);
 
-  /* Typography & Borders (WCAG AA compliant contrast) */
-  --text-primary: #F3F4F6;
-  --text-secondary: #A1A7B3;
-  --text-tertiary: #737986;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  /* Text hierarchy (WCAG AA/AAA on #04060C) */
+  --text-primary: #F5F7FA;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
 
-  /* Radii */
-  --radius-md: 10px;
-  --radius-xl: 14px;
-  --radius-2xl: 20px;
+  /* Liquid Glass dividers + specular highlight */
+  --border-subtle: rgba(148, 197, 255, 0.12);
+  --border-strong: rgba(148, 197, 255, 0.22);
+  --specular: inset 0 1px 0 0 rgba(224, 242, 254, 0.16);
+  --glass-blur: blur(28px) saturate(185%);
+
+  /* Squircle geometry */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 28px;
 
   /* Typography */
-  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: 'Inter Variable', 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --track-display: -0.04em;
+  --track-body: -0.011em;
 
-  /* Motion */
+  /* Motion: spatial springs overshoot, effects never do */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --ease-effects: cubic-bezier(0.34, 0.8, 0.34, 1);
   --transition-fast: 180ms var(--ease-out-expo);
   --transition-base: 280ms var(--ease-out-expo);
+
+  /* Layout */
+  --grid-max: 1360px;
 }
 
 *,
@@ -56,7 +73,8 @@ body {
   font-family: var(--font-sans);
   color: var(--text-primary);
   background-color: var(--bg-base);
-  line-height: 1.6;
+  line-height: 1.65;
+  letter-spacing: var(--track-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -64,7 +82,7 @@ body {
 
 ::selection {
   background: var(--accent);
-  color: #0B0C0E;
+  color: var(--on-accent);
 }
 
 :focus {
@@ -87,7 +105,7 @@ section[id] {
 
 .container {
   width: 100%;
-  max-width: 1320px;
+  max-width: var(--grid-max);
   margin: 0 auto;
   padding: 0 1.25rem;
 }
@@ -204,5 +222,70 @@ section[id] {
   .page-fade-enter-active,
   .page-fade-leave-active {
     transition: none;
+  }
+}
+/* ==========================================================================
+   Shared editorial primitives (Notion editorial x Apple Liquid Glass)
+   ========================================================================== */
+.section-block {
+  padding-block: clamp(104px, 13vh, 156px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.section-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+  text-align: left;
+}
+
+.section-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.section-heading {
+  font-size: clamp(1.9rem, 3.8vw, 2.9rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.glass-card {
+  position: relative;
+  background: rgba(11, 17, 32, 0.74);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-2xl);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms cubic-bezier(0.16, 1, 0.3, 1), background-color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .glass-card--blur {
+    background: rgba(11, 17, 32, 0.74);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-card--blur,
+  .site-header * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }

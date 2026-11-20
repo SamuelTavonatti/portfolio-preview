@@ -4,7 +4,14 @@ import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 import PrivacyModal from './components/modals/PrivacyModal.vue'
 
-const isPrivacyOpen = ref(false)
+const policyModal = ref({
+  open: false,
+  tab: 'privacy',
+})
+
+const openPolicy = (tab = 'privacy') => {
+  policyModal.value = { open: true, tab }
+}
 </script>
 
 <template>
@@ -19,8 +26,12 @@ const isPrivacyOpen = ref(false)
       </router-view>
     </main>
 
-    <AppFooter @open-privacy="isPrivacyOpen = true" />
-    <PrivacyModal :is-open="isPrivacyOpen" @close="isPrivacyOpen = false" />
+    <AppFooter @open-policy="openPolicy" />
+    <PrivacyModal
+      :is-open="policyModal.open"
+      :active-tab="policyModal.tab"
+      @close="policyModal.open = false"
+    />
   </div>
 </template>
 

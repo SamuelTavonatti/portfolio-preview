@@ -172,7 +172,7 @@ const filteredProjects = computed(() => {
 .filter-pill.active {
   background: var(--accent);
   border-color: var(--accent);
-  color: #0B0C0E;
+  color: var(--on-accent);
   font-weight: 600;
 }
 

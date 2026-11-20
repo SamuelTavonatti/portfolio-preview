@@ -44,6 +44,7 @@ defineProps({
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  min-height: 48px;
   font-family: var(--font-sans);
   font-size: 0.925rem;
   font-weight: 600;
@@ -52,17 +53,18 @@ defineProps({
   border: 1px solid transparent;
   text-decoration: none;
   cursor: pointer;
-  transition: transform var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  transition: transform 0.2s var(--ease-spring), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   white-space: nowrap;
 }
 
 .btn:active {
-  transform: scale(0.98);
+  transform: scale(0.96);
 }
 
 .btn--primary {
   background-color: var(--accent);
-  color: #0B0C0E;
+  color: var(--on-accent);
+  box-shadow: var(--specular);
 }
 
 .btn--primary:hover {
@@ -74,6 +76,7 @@ defineProps({
   background-color: var(--surface-1);
   border-color: var(--border-strong);
   color: var(--text-primary);
+  box-shadow: var(--specular);
 }
 
 .btn--secondary:hover {
@@ -85,7 +88,7 @@ defineProps({
 .btn--ghost {
   background-color: transparent;
   color: var(--text-secondary);
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.85rem;
 }
 
 .btn--ghost:hover {

@@ -17,8 +17,9 @@ export const projects = [
     },
     metrics: [
       { value: '0 €', label: { it: 'Accesso gratuito', en: 'Free access' } },
-      { value: 'PWA', label: { it: 'Mobile-first', en: 'Mobile-first' } },
-      { value: '100%', label: { it: 'Zero paywall', en: 'Zero paywall' } },
+      { value: '60 FPS', label: { it: 'Target fluidità UI', en: 'Target UI fluidity' } },
+      { value: 'Firestore', label: { it: 'Database Firebase', en: 'Firebase database' } },
+      { value: 'AA', label: { it: 'Target contrasto WCAG', en: 'WCAG contrast target' } },
     ],
     content: {
       it: {

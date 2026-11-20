@@ -22,42 +22,53 @@ useScrollReveal()
 
     <!-- 02. CHI SONO -->
     <section id="chi-sono" class="section-block">
-      <div class="container grid-layout scroll-reveal">
-        <div class="col-left">
+      <div class="container scroll-reveal">
+        <div class="section-head">
           <span class="section-kicker tabular-nums">{{ t('sections.aboutKicker') }}</span>
           <h2 class="section-heading">{{ t('sections.aboutTitle') }}</h2>
         </div>
 
-        <div class="col-right about-stack">
-          <div class="about-header-row">
-            <img
-              :src="`${baseUrl}assets/avatar.webp`"
-              alt="Samuel Tavonatti"
-              width="56"
-              height="56"
-              loading="lazy"
-              class="about-avatar"
-            />
-            <p class="about-lead">{{ profileData.about[lang].lead }}</p>
+        <div class="about-grid">
+          <div class="glass-card about-main">
+            <div class="about-header-row">
+              <img
+                :src="`${baseUrl}assets/avatar.webp`"
+                alt="Samuel Tavonatti"
+                width="60"
+                height="60"
+                loading="lazy"
+                class="about-avatar"
+              />
+              <p class="about-lead">{{ profileData.about[lang].lead }}</p>
+            </div>
+
+            <div class="about-paragraphs">
+              <p v-for="(p, idx) in profileData.about[lang].paragraphs" :key="idx" class="about-body">
+                {{ p }}
+              </p>
+            </div>
           </div>
 
-          <p v-for="(p, idx) in profileData.about[lang].paragraphs" :key="idx" class="about-body">
-            {{ p }}
-          </p>
+          <aside class="glass-card about-highlights" aria-label="Highlights">
+            <div v-for="item in profileData.highlights" :key="item.value" class="highlight-row">
+              <span class="highlight-val tabular-nums">{{ item.value }}</span>
+              <span class="highlight-lbl">{{ item.label[lang] }}</span>
+            </div>
+          </aside>
         </div>
       </div>
     </section>
 
     <!-- 03. METODO & COMPETENZE (3-STEP UX PROCESS) -->
     <section id="competenze" class="section-block">
-      <div class="container grid-layout scroll-reveal">
-        <div class="col-left">
+      <div class="container scroll-reveal">
+        <div class="section-head">
           <span class="section-kicker tabular-nums">{{ t('sections.processKicker') }}</span>
           <h2 class="section-heading">{{ t('sections.processTitle') }}</h2>
         </div>
 
-        <div class="col-right skills-grid">
-          <article v-for="(skill, idx) in profileData.skills" :key="skill.icon" class="skill-card">
+        <div class="skills-grid">
+          <article v-for="(skill, idx) in profileData.skills" :key="skill.icon" class="glass-card skill-card">
             <div class="skill-top-row">
               <div class="skill-icon-box">
                 <AppIcon :name="skill.icon" :size="20" />
@@ -74,14 +85,14 @@ useScrollReveal()
 
     <!-- 04. PERCORSO & ESPERIENZE -->
     <section id="percorso" class="section-block">
-      <div class="container grid-layout scroll-reveal">
-        <div class="col-left">
+      <div class="container scroll-reveal">
+        <div class="section-head">
           <span class="section-kicker tabular-nums">{{ t('sections.timelineKicker') }}</span>
           <h2 class="section-heading">{{ t('sections.timelineTitle') }}</h2>
         </div>
 
-        <div class="col-right timeline-stack">
-          <article v-for="exp in experiences.slice(0, 1)" :key="exp.id" class="timeline-card is-featured">
+        <div class="timeline-stack">
+          <article v-for="exp in experiences.slice(0, 1)" :key="exp.id" class="glass-card timeline-card is-featured">
             <div class="tl-head">
               <div>
                 <h3 class="tl-role">{{ exp.role[lang] }}</h3>
@@ -94,11 +105,22 @@ useScrollReveal()
             </ul>
           </article>
 
-          <article v-for="edu in profileData.education" :key="edu.degree.it" class="timeline-card">
+          <article v-for="edu in profileData.education" :key="edu.degree.it" class="glass-card timeline-card">
             <div class="tl-head">
-              <div>
-                <h3 class="tl-role">{{ edu.institution[lang] }}</h3>
-                <p class="tl-org">{{ edu.degree[lang] }}</p>
+              <div class="tl-edu-head">
+                <img
+                  v-if="edu.logo"
+                  :src="edu.logo"
+                  :alt="edu.institution[lang]"
+                  width="40"
+                  height="40"
+                  loading="lazy"
+                  class="tl-logo"
+                />
+                <div>
+                  <h3 class="tl-role">{{ edu.institution[lang] }}</h3>
+                  <p class="tl-org">{{ edu.degree[lang] }}</p>
+                </div>
               </div>
               <BaseBadge variant="neutral">{{ lang === 'it' ? edu.period : edu.periodEn }}</BaseBadge>
             </div>
@@ -113,57 +135,35 @@ useScrollReveal()
 </template>
 
 <style scoped>
-.section-block {
-  padding: 4.5rem 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.grid-layout {
+.about-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.25rem;
 }
 
-@media (min-width: 860px) {
-  .grid-layout {
-    grid-template-columns: 260px 1fr;
-    gap: 3.5rem;
+@media (min-width: 960px) {
+  .about-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: start;
   }
 }
 
-.section-kicker {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--accent);
-  font-weight: 600;
-  margin-bottom: 0.35rem;
-}
-
-.section-heading {
-  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  color: var(--text-primary);
-}
-
-.about-stack {
+.about-main {
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  max-width: 68ch;
+  gap: 1.5rem;
 }
 
 .about-header-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.25rem;
+  gap: 1.1rem;
 }
 
 .about-avatar {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
   object-position: center top;
@@ -172,15 +172,58 @@ useScrollReveal()
 }
 
 .about-lead {
-  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  font-size: clamp(1.12rem, 2vw, 1.35rem);
   font-weight: 600;
   line-height: 1.4;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
+}
+
+.about-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 68ch;
 }
 
 .about-body {
   font-size: 0.98rem;
-  line-height: 1.7;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.about-highlights {
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.highlight-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.highlight-row:first-child {
+  padding-top: 0.25rem;
+}
+
+.highlight-row:last-child {
+  padding-bottom: 0.25rem;
+  border-bottom: none;
+}
+
+.highlight-val {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.highlight-lbl {
+  font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
@@ -190,25 +233,24 @@ useScrollReveal()
   gap: 1.25rem;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 820px) {
   .skills-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 .skill-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-2xl);
-  padding: 1.5rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  transition: border-color var(--transition-fast);
+  gap: 0.85rem;
+  transition: transform 0.25s var(--ease-spring), border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .skill-card:hover {
+  transform: translateY(-2px);
   border-color: var(--accent-border);
+  background: var(--surface-2);
 }
 
 .skill-top-row {
@@ -218,10 +260,11 @@ useScrollReveal()
 }
 
 .skill-icon-box {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
   background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
   color: var(--accent);
   display: grid;
   place-items: center;
@@ -229,19 +272,21 @@ useScrollReveal()
 
 .step-num {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
+  font-weight: 600;
   color: var(--text-tertiary);
 }
 
 .skill-title {
-  font-size: 1.02rem;
+  font-size: 1.08rem;
   font-weight: 600;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
   line-height: 1.35;
 }
 
 .skill-desc {
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   color: var(--text-secondary);
   line-height: 1.6;
   flex: 1;
@@ -251,7 +296,7 @@ useScrollReveal()
   font-family: var(--font-mono);
   font-size: 0.74rem;
   color: var(--text-tertiary);
-  padding-top: 0.65rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -262,10 +307,7 @@ useScrollReveal()
 }
 
 .timeline-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-2xl);
-  padding: 1.5rem 1.75rem;
+  padding: 1.75rem 2rem;
 }
 
 .timeline-card.is-featured {
@@ -275,8 +317,8 @@ useScrollReveal()
 .tl-head {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  margin-bottom: 0.9rem;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 @media (min-width: 640px) {
@@ -287,14 +329,30 @@ useScrollReveal()
   }
 }
 
+.tl-edu-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.tl-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.25rem;
+  flex-shrink: 0;
+}
+
 .tl-role {
-  font-size: 1.08rem;
+  font-size: 1.12rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .tl-org {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--accent);
   margin-top: 0.2rem;
 }
@@ -303,17 +361,17 @@ useScrollReveal()
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding-top: 0.9rem;
+  gap: 0.6rem;
+  padding-top: 1rem;
   border-top: 1px solid var(--border-subtle);
 }
 
 .tl-list li {
   position: relative;
-  padding-left: 1.2rem;
-  font-size: 0.92rem;
+  padding-left: 1.25rem;
+  font-size: 0.94rem;
   color: var(--text-secondary);
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .tl-list li::before {
@@ -324,8 +382,16 @@ useScrollReveal()
 }
 
 .tl-detail {
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   color: var(--text-secondary);
-  line-height: 1.55;
+  line-height: 1.6;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-card:hover {
+    transform: none;
+  }
 }
 </style>

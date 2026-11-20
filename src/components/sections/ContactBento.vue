@@ -22,150 +22,101 @@ const copyEmail = async () => {
 </script>
 
 <template>
-  <section id="contatti" class="section-block">
+  <section id="contatti" class="section-block section-block--closing">
     <div class="container scroll-reveal">
-      <div class="grid-layout">
-        <div class="col-left">
-          <span class="section-kicker tabular-nums">{{ t('sections.contactKicker') }}</span>
-          <h2 class="section-heading">{{ t('sections.contactTitle') }}</h2>
-        </div>
+      <div class="section-head">
+        <span class="section-kicker tabular-nums">{{ t('sections.contactKicker') }}</span>
+        <h2 class="section-heading">{{ t('sections.contactTitle') }}</h2>
+      </div>
 
-        <div class="col-right">
-          <p class="contact-lead">{{ t('contact.lead') }}</p>
+      <p class="contact-lead">{{ t('contact.lead') }}</p>
 
-          <div class="bento-grid">
-            <div class="bento-card">
-              <span class="card-label">{{ t('contact.directEmail') }}</span>
-              <button
-                type="button"
-                class="email-copy-row"
-                :class="{ copied }"
-                :aria-label="t('contact.copyAria')"
-                @click="copyEmail"
-              >
-                <span class="email-text">{{ profileData.email }}</span>
-                <span class="copy-pill">
-                  <AppIcon :name="copied ? 'check' : 'copy'" :size="15" />
-                  <span>{{ copied ? t('contact.copied') : t('contact.copy') }}</span>
-                </span>
-              </button>
+      <div class="contact-pills" role="group" :aria-label="t('sections.contactTitle')">
+        <BaseButton :href="`mailto:${profileData.email}`" variant="primary" class="contact-pill">
+          <AppIcon name="mail" :size="17" />
+          <span>Email</span>
+        </BaseButton>
 
-              <div class="mail-actions">
-                <BaseButton :href="`mailto:${profileData.email}`" variant="primary">
-                  <AppIcon name="mail" :size="16" />
-                  <span>{{ t('contact.sendEmail') }}</span>
-                </BaseButton>
-              </div>
-            </div>
+        <BaseButton :href="profileData.links.linkedin" external variant="secondary" class="contact-pill">
+          <AppIcon name="linkedin" :size="17" />
+          <span>LinkedIn</span>
+          <AppIcon name="arrow-up-right" :size="15" />
+        </BaseButton>
 
-            <div class="bento-card">
-              <span class="card-label">{{ t('contact.profiles') }}</span>
-              <div class="social-list">
-                <a :href="profileData.links.github" target="_blank" rel="noopener noreferrer" class="social-row">
-                  <span class="social-left">
-                    <AppIcon name="github" :size="17" />
-                    <span>GitHub</span>
-                  </span>
-                  <AppIcon name="arrow-up-right" :size="16" class="ext-arrow" />
-                </a>
-                <a :href="profileData.links.linkedin" target="_blank" rel="noopener noreferrer" class="social-row">
-                  <span class="social-left">
-                    <AppIcon name="linkedin" :size="17" />
-                    <span>LinkedIn</span>
-                  </span>
-                  <AppIcon name="arrow-up-right" :size="16" class="ext-arrow" />
-                </a>
-                <a :href="profileData.links.instagram" target="_blank" rel="noopener noreferrer" class="social-row">
-                  <span class="social-left">
-                    <AppIcon name="instagram" :size="17" />
-                    <span>Instagram</span>
-                  </span>
-                  <AppIcon name="arrow-up-right" :size="16" class="ext-arrow" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
+        <BaseButton :href="profileData.links.github" external variant="secondary" class="contact-pill">
+          <AppIcon name="github" :size="17" />
+          <span>GitHub</span>
+          <AppIcon name="arrow-up-right" :size="15" />
+        </BaseButton>
+      </div>
+
+      <div class="glass-card email-bar">
+        <span class="email-label">{{ t('contact.directEmail') }}</span>
+        <button
+          type="button"
+          class="email-copy-row"
+          :class="{ copied }"
+          :aria-label="t('contact.copyAria')"
+          @click="copyEmail"
+        >
+          <span class="email-text">{{ profileData.email }}</span>
+          <span class="copy-pill">
+            <AppIcon :name="copied ? 'check' : 'copy'" :size="15" />
+            <span>{{ copied ? t('contact.copied') : t('contact.copy') }}</span>
+          </span>
+        </button>
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.section-block {
-  padding: 4.5rem 0 2rem;
-}
-
-.grid-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-}
-
-@media (min-width: 860px) {
-  .grid-layout {
-    grid-template-columns: 260px 1fr;
-    gap: 3.5rem;
-  }
-}
-
-.section-kicker {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--accent);
-  font-weight: 600;
-  margin-bottom: 0.35rem;
-}
-
-.section-heading {
-  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
-  font-weight: 700;
-  letter-spacing: -0.025em;
+.section-block--closing {
+  border-bottom: none;
+  padding-bottom: 2.5rem;
 }
 
 .contact-lead {
-  font-size: clamp(1.08rem, 2vw, 1.3rem);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
   color: var(--text-primary);
   font-weight: 500;
   line-height: 1.5;
   margin-bottom: 1.75rem;
-  max-width: 58ch;
+  max-width: 62ch;
 }
 
-.bento-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
+.contact-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
 }
 
-@media (min-width: 720px) {
-  .bento-grid {
-    grid-template-columns: 1.25fr 1fr;
-  }
+.contact-pill {
+  border-radius: 999px;
+  padding-inline: 1.5rem;
 }
 
-.bento-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-2xl);
-  padding: 1.5rem;
+.email-bar {
+  max-width: 560px;
+  padding: 1.1rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
+  gap: 0.65rem;
 }
 
-.card-label {
+.email-label {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--accent);
   font-weight: 600;
 }
 
 .email-copy-row {
   width: 100%;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -173,12 +124,12 @@ const copyEmail = async () => {
   background: var(--bg-base);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 0.8rem 0.95rem;
+  padding: 0.75rem 1rem;
   cursor: pointer;
   color: var(--text-primary);
   font-family: var(--font-mono);
-  font-size: 0.83rem;
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  font-size: 0.85rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s var(--ease-spring);
   text-align: left;
 }
 
@@ -186,6 +137,10 @@ const copyEmail = async () => {
 .email-copy-row.copied {
   border-color: var(--accent-border);
   background: var(--accent-soft);
+}
+
+.email-copy-row:active {
+  transform: scale(0.98);
 }
 
 .email-text {
@@ -203,52 +158,5 @@ const copyEmail = async () => {
   font-weight: 600;
   color: var(--accent);
   flex-shrink: 0;
-}
-
-.mail-actions {
-  margin-top: auto;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.social-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.social-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.78rem 0.95rem;
-  background: var(--bg-base);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  text-decoration: none;
-  color: var(--text-primary);
-  font-size: 0.92rem;
-  font-weight: 500;
-  transition: border-color var(--transition-fast), transform var(--transition-fast);
-}
-
-.social-row:hover {
-  border-color: var(--accent-border);
-  transform: translateY(-1px);
-}
-
-.social-left {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: var(--text-primary);
-}
-
-.social-left :deep(.app-icon) {
-  color: var(--accent);
-}
-
-.ext-arrow {
-  color: var(--text-tertiary);
 }
 </style>

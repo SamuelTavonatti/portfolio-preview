@@ -68,8 +68,9 @@ export const messages = {
       problem: '01. Il Problema',
       objectives: '02. Obiettivi',
       designChoices: '03. Scelte di Design & Architettura',
-      techSolution: '04. Soluzione Tecnica',
+      techSolution: '04. Soluzioni Tecniche',
       results: '05. Risultati',
+      tldrLabel: 'TL;DR',
     },
     experiencePage: {
       kicker: '02 / Background',
@@ -81,7 +82,8 @@ export const messages = {
       certTitle: 'Certificazioni & Corsi',
     },
     footer: {
-      privacy: 'Privacy & Cookie Policy',
+      privacy: 'Informativa Privacy',
+      cookie: 'Cookie Policy',
     },
   },
   en: {
@@ -153,8 +155,9 @@ export const messages = {
       problem: '01. The Problem',
       objectives: '02. Objectives',
       designChoices: '03. Design & Architecture Decisions',
-      techSolution: '04. Technical Solution',
+      techSolution: '04. Technical Solutions',
       results: '05. Outcomes',
+      tldrLabel: 'TL;DR',
     },
     experiencePage: {
       kicker: '02 / Background',
@@ -166,7 +169,8 @@ export const messages = {
       certTitle: 'Certifications',
     },
     footer: {
-      privacy: 'Privacy & Cookie Policy',
+      privacy: 'Privacy Policy',
+      cookie: 'Cookie Policy',
     },
   },
 }

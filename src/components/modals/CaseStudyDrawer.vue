@@ -1,10 +1,11 @@
 <script setup>
+import { onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from '../../i18n/useI18n'
 import BaseBadge from '../ui/BaseBadge.vue'
 import BaseButton from '../ui/BaseButton.vue'
 import AppIcon from '../ui/AppIcon.vue'
 
-defineProps({
+const props = defineProps({
   project: {
     type: Object,
     default: null,
@@ -13,6 +14,32 @@ defineProps({
 
 const emit = defineEmits(['close'])
 const { lang, t } = useI18n()
+
+const handleKeydown = (e) => {
+  if (e.key === 'Escape' && props.project) {
+    emit('close')
+  }
+}
+
+watch(
+  () => props.project,
+  (val) => {
+    if (typeof document === 'undefined') return
+    document.body.style.overflow = val ? 'hidden' : ''
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = ''
+  }
+})
 </script>
 
 <template>
@@ -37,7 +64,11 @@ const { lang, t } = useI18n()
         <div class="drawer-body">
           <h2 class="drawer-title">{{ project.content[lang].title }}</h2>
           <p class="drawer-outcome">{{ project.content[lang].outcomeHeadline }}</p>
-          <p class="drawer-tldr">{{ project.content[lang].tldr }}</p>
+
+          <div class="drawer-tldr-box">
+            <span class="tldr-kicker">{{ t('caseStudyPage.tldrLabel') }}</span>
+            <p class="drawer-tldr">{{ project.content[lang].tldr }}</p>
+          </div>
 
           <div class="drawer-metrics">
             <div v-for="m in project.metrics" :key="m.value" class="dm-item">
@@ -51,11 +82,28 @@ const { lang, t } = useI18n()
             <p>{{ project.content[lang].problem }}</p>
           </div>
 
+          <div v-if="project.content[lang].objectives?.length" class="drawer-sec">
+            <h3>{{ t('caseStudyPage.objectives') }}</h3>
+            <ul>
+              <li v-for="(obj, i) in project.content[lang].objectives" :key="i">{{ obj }}</li>
+            </ul>
+          </div>
+
           <div class="drawer-sec">
             <h3>{{ t('caseStudyPage.designChoices') }}</h3>
             <ul>
               <li v-for="(c, i) in project.content[lang].designChoices" :key="i">{{ c }}</li>
             </ul>
+          </div>
+
+          <div v-if="project.content[lang].techArchitecture" class="drawer-sec">
+            <h3>{{ t('caseStudyPage.techSolution') }}</h3>
+            <div class="tech-pills">
+              <span v-for="item in project.content[lang].techArchitecture.stack" :key="item" class="tech-pill">
+                {{ item }}
+              </span>
+            </div>
+            <p>{{ project.content[lang].techArchitecture.details }}</p>
           </div>
 
           <div class="drawer-sec">
@@ -86,18 +134,19 @@ const { lang, t } = useI18n()
   position: fixed;
   inset: 0;
   z-index: 220;
-  background: rgba(5, 6, 8, 0.78);
-  backdrop-filter: blur(8px);
+  background: rgba(5, 5, 7, 0.8);
+  backdrop-filter: blur(12px);
   display: flex;
   justify-content: flex-end;
 }
 
 .drawer-panel {
   width: 100%;
-  max-width: 560px;
+  max-width: 600px;
   height: 100%;
   background: var(--surface-1);
   border-left: 1px solid var(--border-strong);
+  box-shadow: var(--specular);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -108,7 +157,7 @@ const { lang, t } = useI18n()
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1.15rem 1.5rem;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -119,8 +168,8 @@ const { lang, t } = useI18n()
 }
 
 .btn-close {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
   background: var(--surface-2);
@@ -128,11 +177,16 @@ const { lang, t } = useI18n()
   display: grid;
   place-items: center;
   cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s var(--ease-spring);
 }
 
 .btn-close:hover {
   color: var(--text-primary);
   border-color: var(--accent-border);
+}
+
+.btn-close:active {
+  transform: scale(0.96);
 }
 
 .drawer-body {
@@ -141,13 +195,13 @@ const { lang, t } = useI18n()
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.35rem;
 }
 
 .drawer-title {
-  font-size: 1.65rem;
+  font-size: 1.7rem;
   font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: var(--track-display);
   color: var(--text-primary);
 }
 
@@ -157,15 +211,33 @@ const { lang, t } = useI18n()
   color: var(--accent);
 }
 
+.drawer-tldr-box {
+  padding: 1rem 1.15rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+}
+
+.tldr-kicker {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
 .drawer-tldr {
   font-size: 0.94rem;
   color: var(--text-secondary);
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 .drawer-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   gap: 0.75rem;
   padding: 1rem;
   background: var(--bg-base);
@@ -180,26 +252,27 @@ const { lang, t } = useI18n()
 }
 
 .dm-val {
-  font-size: 1.02rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
 .dm-lbl {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-tertiary);
 }
 
 .drawer-sec h3 {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.5rem;
 }
 
 .drawer-sec p,
 .drawer-sec li {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
   line-height: 1.6;
 }
@@ -213,7 +286,7 @@ const { lang, t } = useI18n()
 
 .drawer-sec li {
   position: relative;
-  padding-left: 1.1rem;
+  padding-left: 1.15rem;
 }
 
 .drawer-sec li::before {
@@ -221,6 +294,23 @@ const { lang, t } = useI18n()
   position: absolute;
   left: 0;
   color: var(--accent);
+}
+
+.tech-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.tech-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
 }
 
 .drawer-footer {
@@ -239,5 +329,12 @@ const { lang, t } = useI18n()
 .drawer-fade-enter-from,
 .drawer-fade-leave-to {
   opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-fade-enter-active,
+  .drawer-fade-leave-active {
+    transition: none;
+  }
 }
 </style>

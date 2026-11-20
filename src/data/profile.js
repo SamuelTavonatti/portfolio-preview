@@ -58,42 +58,42 @@ export const profileData = {
   },
   skills: [
     {
-      icon: 'layers',
+      icon: 'database',
       it: {
-        title: 'UI/UX Design & Ergonomia Cognitiva',
-        desc: 'Architettura dell’informazione, wireframing, prototipazione interattiva su Figma, design thinking e test di usabilità orientati alla riduzione del carico cognitivo.',
+        title: 'User Research & Ergonomia Cognitiva',
+        desc: 'Valutazione euristica, semplificazione dei task-flow e riduzione del carico cognitivo attraverso modelli mentali chiari e gerarchie visive essenziali.',
         context: 'UniTrento (DiPSCo) • VoltRep',
       },
       en: {
-        title: 'UI/UX Design & Cognitive Ergonomics',
-        desc: 'Information architecture, wireframing, interactive Figma prototyping, design thinking, and usability testing aimed at reducing cognitive load.',
+        title: 'User Research & Cognitive Ergonomics',
+        desc: 'Heuristic evaluation, task-flow simplification, and cognitive-load reduction through clear mental models and essential visual hierarchies.',
         context: 'UniTrento (DiPSCo) • VoltRep',
+      },
+    },
+    {
+      icon: 'layers',
+      it: {
+        title: 'UI Systems & Prototipazione',
+        desc: 'Design system in Figma con Auto-Layout, griglie 8pt, token semantici conformi a WCAG AA/AAA e prototipi interattivi pronti per la validazione.',
+        context: 'Figma • Design Tokens • WCAG',
+      },
+      en: {
+        title: 'UI Systems & Prototyping',
+        desc: 'Figma design systems with Auto-Layout, 8pt spatial grids, WCAG AA/AAA semantic tokens, and interactive prototypes ready for validation.',
+        context: 'Figma • Design Tokens • WCAG',
       },
     },
     {
       icon: 'code',
       it: {
-        title: 'Front-End & Prototyping Handoff',
-        desc: 'Sviluppo di interfacce web con HTML, CSS, JavaScript e Vue.js; dialogo tecnico efficace con gli sviluppatori per garantire fedeltà visiva e performance.',
-        context: 'Portfolio • VoltRep Web App',
+        title: 'Front-End & Motion Engineering',
+        desc: 'Sviluppo semantico HTML/CSS/JavaScript e Vue.js, micro-interazioni GPU-accelerated a 60fps e zero bloat per tempi di risposta immediati.',
+        context: 'HTML/CSS/JS • Vue.js • 60fps',
       },
       en: {
-        title: 'Front-End & Prototyping Handoff',
-        desc: 'Web interface implementation with HTML, CSS, JavaScript, and Vue.js; smooth collaboration with engineers for visual fidelity and performance.',
-        context: 'Portfolio • VoltRep Web App',
-      },
-    },
-    {
-      icon: 'database',
-      it: {
-        title: 'CMS Enterprise, Content Flow & QA',
-        desc: 'Amministrazione Pimcore CMS, progettazione di flussi di navigazione tramite interlinking strategico, monitoraggio errori 404 e gestione asset DAM.',
-        context: 'Trentino Marketing',
-      },
-      en: {
-        title: 'Enterprise CMS, Content Flow & QA',
-        desc: 'Pimcore CMS administration, navigation flow design via strategic interlinking, 404 auditing, and DAM asset workflows.',
-        context: 'Trentino Marketing',
+        title: 'Front-End & Motion Engineering',
+        desc: 'Semantic HTML/CSS/JavaScript and Vue.js engineering, 60fps GPU-accelerated micro-interactions, and zero-bloat architecture.',
+        context: 'HTML/CSS/JS • Vue.js • 60fps',
       },
     },
   ],
@@ -103,12 +103,12 @@ export const profileData = {
       period: '2024 — Presente',
       periodEn: '2024 — Present',
       degree: {
-        it: 'Laurea in Interfacce e Tecnologie della Comunicazione (L-20)',
+        it: 'Laurea Triennale in Interfacce e Tecnologie della Comunicazione (L-20)',
         en: 'BSc in Interfaces and Communication Technologies (L-20)',
       },
       detail: {
-        it: 'Dipartimento di Psicologia e Scienze Cognitive (DiPSCo) — Focus su UX, HCI e sistemi digitali.',
-        en: 'Department of Psychology and Cognitive Science (DiPSCo) — Focus on UX, HCI, and digital systems.',
+        it: 'Dipartimento di Psicologia e Scienze Cognitive (DiPSCo) — Focus su ergonomia cognitiva, interaction design, usabilità e tecnologie web.',
+        en: 'Department of Psychology and Cognitive Science (DiPSCo) — Focus on cognitive ergonomics, interaction design, usability, and web technologies.',
       },
       logo: `${import.meta.env.BASE_URL}logounitn.png`,
     },

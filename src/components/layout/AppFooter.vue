@@ -2,7 +2,7 @@
 import { useI18n } from '../../i18n/useI18n'
 
 const { lang, t } = useI18n()
-const emit = defineEmits(['open-privacy'])
+const emit = defineEmits(['open-policy'])
 </script>
 
 <template>
@@ -19,8 +19,12 @@ const emit = defineEmits(['open-privacy'])
         </span>
       </div>
       <div class="footer-links">
-        <button type="button" class="privacy-trigger" @click="emit('open-privacy')">
+        <button type="button" class="policy-trigger" @click="emit('open-policy', 'privacy')">
           {{ t('footer.privacy') }}
+        </button>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <button type="button" class="policy-trigger" @click="emit('open-policy', 'cookie')">
+          {{ t('footer.cookie') }}
         </button>
       </div>
     </div>
@@ -30,8 +34,8 @@ const emit = defineEmits(['open-privacy'])
 <style scoped>
 .site-footer {
   border-top: 1px solid var(--border-subtle);
-  padding: 2rem 0;
-  margin-top: 4rem;
+  padding: 2rem 0 2.5rem;
+  margin-top: 2rem;
 }
 
 .footer-inner {
@@ -39,12 +43,12 @@ const emit = defineEmits(['open-privacy'])
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.85rem;
+  gap: 1rem;
   font-size: 0.85rem;
   color: var(--text-tertiary);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 820px) {
   .footer-inner {
     flex-direction: row;
     align-items: center;
@@ -65,22 +69,40 @@ const emit = defineEmits(['open-privacy'])
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
-  padding: 0.25rem 0.7rem;
+  padding: 0.3rem 0.75rem;
 }
 
-.privacy-trigger {
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.footer-sep {
+  color: var(--text-tertiary);
+}
+
+.policy-trigger {
+  min-height: 44px;
+  padding: 0.4rem 0.6rem;
   background: none;
   border: none;
+  border-radius: var(--radius-md);
   color: var(--text-secondary);
   font-family: inherit;
   font-size: inherit;
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 4px;
-  transition: color var(--transition-fast);
+  transition: color 0.2s ease, transform 0.2s var(--ease-spring);
 }
 
-.privacy-trigger:hover {
+.policy-trigger:hover {
   color: var(--accent);
+}
+
+.policy-trigger:active {
+  transform: scale(0.96);
 }
 </style>

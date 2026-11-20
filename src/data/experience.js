@@ -2,23 +2,23 @@ export const experiences = [
   {
     id: 'trentino-marketing',
     role: {
-      it: 'Digital Operations & CMS Specialist (Tirocinio)',
-      en: 'Digital Operations & CMS Specialist (Internship)',
+      it: 'Tirocinio Curriculare — Area Content',
+      en: 'Curricular Internship — Content Area',
     },
-    company: 'Trentino Marketing',
+    company: 'Trentino Marketing s.r.l.',
     location: 'Trento, IT',
     period: { it: 'Ago 2026 — Ott 2026', en: 'Aug 2026 — Oct 2026' },
     featured: true,
     highlights: {
       it: [
-        'Amministrazione contenuti su CMS enterprise Pimcore: creazione articoli editoriali e ottimizzazione dell’interlinking per flussi di navigazione chiari.',
-        'Audit sistematico e risoluzione di errori 404 per preservare l’integrità SEO e l’esperienza utente.',
-        'Aggiornamento dati logistici e geolocalizzazione per grandi eventi (I Suoni delle Dolomiti, TrentoDoc Festival) e presidio operativo sul territorio per Il Festival dello Sport.',
+        'Pianificazione e pubblicazione di piani editoriali su CMS enterprise Pimcore, con localizzazione multilingua e audit dei percorsi di navigazione.',
+        'Analisi SEO/GEO e monitoraggio delle metriche di fruizione tramite Google Analytics 4 per ottimizzare visibilità e interlinking.',
+        'Progettazione di layout in staging per visittrentino.info e osservazione diretta degli utenti sul campo durante grandi eventi territoriali.',
       ],
       en: [
-        'Content administration on Pimcore enterprise CMS: editorial publishing and strategic interlinking for intuitive navigation flows.',
-        'Systematic 404 error auditing and link resolution to protect SEO integrity and user experience.',
-        'Logistics and geolocation updates for major events (I Suoni delle Dolomiti, TrentoDoc Festival) and on-site coordination for Il Festival dello Sport.',
+        'Editorial planning and publishing on enterprise Pimcore CMS, including multilingual localization and navigation-path auditing.',
+        'SEO/GEO analysis and user-behavior monitoring via Google Analytics 4 to improve discoverability and strategic interlinking.',
+        'Staging layout design for visittrentino.info paired with field user observation during major regional events.',
       ],
     },
   },
