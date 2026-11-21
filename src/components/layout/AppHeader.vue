@@ -254,11 +254,14 @@ const closeMobile = () => {
 <style scoped>
 .site-header {
   position: fixed;
-  top: 10px;
+  top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 160;
+  padding-top: 10px;
+  padding-bottom: 14px;
   pointer-events: none;
+  background: linear-gradient(180deg, #04060C 0%, rgba(5, 8, 17, 0.96) 62%, rgba(5, 8, 17, 0) 100%);
 }
 
 .header-shell {
@@ -269,7 +272,7 @@ const closeMobile = () => {
 .header-bar {
   pointer-events: auto;
   position: relative;
-  z-index: 105;
+  z-index: 165;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -277,17 +280,17 @@ const closeMobile = () => {
   min-height: 52px;
   padding: 0.25rem 0.5rem 0.25rem 0.6rem;
   border-radius: 9999px;
-  background: rgba(4, 6, 12, 0.78);
-  border: 1px solid rgba(148, 197, 255, 0.12);
-  box-shadow: var(--specular), 0 10px 30px -12px rgba(4, 6, 12, 0.75);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: rgba(5, 8, 17, 0.94);
+  border: 1px solid rgba(148, 197, 255, 0.14);
+  box-shadow: var(--specular), 0 12px 32px -10px rgba(4, 6, 12, 0.88);
+  backdrop-filter: blur(20px) saturate(185%);
+  -webkit-backdrop-filter: blur(20px) saturate(185%);
   transition: background-color var(--transition-base), border-color var(--transition-base);
 }
 
 .site-header.is-scrolled .header-bar {
-  background: rgba(4, 6, 12, 0.88);
-  border-color: rgba(148, 197, 255, 0.18);
+  background: rgba(5, 8, 17, 0.97);
+  border-color: rgba(148, 197, 255, 0.22);
 }
 
 .brand {

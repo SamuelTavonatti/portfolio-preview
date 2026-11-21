@@ -192,16 +192,20 @@ const filteredProjects = computed(() => {
 .projects-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.75rem;
+  gap: 1.5rem;
+  align-items: stretch;
 }
 
-@media (min-width: 820px) {
+@media (min-width: 960px) {
   .projects-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 .project-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   background: var(--surface-1);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-2xl);
@@ -318,6 +322,7 @@ const filteredProjects = computed(() => {
 }
 
 .card-cta {
+  margin-top: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;

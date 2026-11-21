@@ -141,37 +141,19 @@ const previewMetrics = (project) => {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
+  align-items: stretch;
 }
 
 @media (min-width: 960px) {
   .work-bento {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-
-  .work-card--lead {
-    grid-column: span 7;
-  }
-
-  .work-card--secondary {
-    grid-column: span 5;
-  }
-
-  .work-card--tertiary {
-    grid-column: span 12;
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-  }
-
-  .work-card--tertiary .card-media {
-    border-bottom: none;
-    border-right: 1px solid var(--border-subtle);
-    height: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 .work-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -188,6 +170,7 @@ const previewMetrics = (project) => {
   overflow: hidden;
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .card-cover {
@@ -206,7 +189,7 @@ const previewMetrics = (project) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 1.75rem;
+  padding: 1.5rem;
 }
 
 .card-top {
@@ -214,7 +197,7 @@ const previewMetrics = (project) => {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .card-badges {
@@ -233,35 +216,37 @@ const previewMetrics = (project) => {
 
 .year {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-tertiary);
+  white-space: nowrap;
 }
 
 .card-title {
-  font-size: clamp(1.3rem, 2vw, 1.55rem);
+  font-size: clamp(1.22rem, 1.5vw, 1.4rem);
   font-weight: 700;
   letter-spacing: -0.025em;
   color: var(--text-primary);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.25;
 }
 
 .card-outcome {
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-weight: 500;
   color: var(--accent);
-  line-height: 1.45;
-  margin-bottom: 1.35rem;
+  line-height: 1.48;
+  margin-bottom: 1.25rem;
   flex: 1;
 }
 
 .card-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-  padding: 0.95rem 0;
+  gap: 0.65rem;
+  padding: 0.85rem 0;
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.25rem;
 }
 
 .card-metric {
@@ -272,21 +257,24 @@ const previewMetrics = (project) => {
 
 .m-val {
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: var(--accent-lumina-bright);
 }
 
 .m-lbl {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-tertiary);
+  line-height: 1.3;
 }
 
 .card-actions {
+  margin-top: auto;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
+  gap: 0.65rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

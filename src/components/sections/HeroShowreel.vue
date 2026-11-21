@@ -3,21 +3,33 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 /**
  * =========================================================================
- * 20.5s FULL-WIDTH (100vw) LUXURY EDITORIAL HERO SHOWREEL ENGINE
- * Apple · Notion · Linear · Google · 60fps rAF · Dynamic getBoundingClientRect()
+ * 17.66s FULL-WIDTH (100vw) LUXURY EDITORIAL HERO SHOWREEL ENGINE
+ * Apple · Notion · Linear · Google · 60fps rAF · Cached Layout Geometry
+ * Matches exact choreography & pacing of 20261120-2223-26.0720959.mp4
  * =========================================================================
  */
 const rootRef = ref(null)
+const isUserPaused = ref(false)
 
 let rafId = null
 let cleanupShowreel = null
+let togglePauseFn = null
+let restartLoopFn = null
+
+const handleTogglePause = () => {
+  if (togglePauseFn) togglePauseFn()
+}
+
+const handleRestartLoop = () => {
+  if (restartLoopFn) restartLoopFn()
+}
 
 onMounted(() => {
   const root = rootRef.value
   if (!root || typeof window === 'undefined') return
 
   const q = (id) => root.querySelector(`#${id}`)
-  const LOOP_MS = 20500
+  const LOOP_MS = 17660
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   const stage = q('stage')
@@ -32,12 +44,12 @@ onMounted(() => {
     4: q('scene4'),
   }
 
-  // Scene 1 refs
+  // Scene 1 refs (UX/UI [ + System ] DESIGN)
   const s1Carousel = q('s1Carousel')
   const s1Artboard = q('s1Artboard')
   const btnValidate = q('btnValidate')
 
-  // Scene 2 refs
+  // Scene 2 refs (USER RESEARCH — Double Diamond + Telemetry)
   const ddTracePath = q('ddTracePath')
   const DD_LEN = ddTracePath ? ddTracePath.getTotalLength() : 0
   if (ddTracePath) {
@@ -56,7 +68,7 @@ onMounted(() => {
   const btnAlign = q('btnAlign')
   const shNodes = [q('sh1'), q('sh2'), q('sh3')].filter(Boolean)
 
-  // Scene 3 refs (Prompt Pill -> Physical Morph into Full Luxury Web App, NO drag-and-drop)
+  // Scene 3 refs (CREATIVE AI — Prompt Pill -> Physical Morph into Full Luxury Web App)
   const s3Camera = q('s3Camera')
   const aiMorphShell = q('aiMorphShell')
   const promptTyped = q('promptTyped')
@@ -65,7 +77,7 @@ onMounted(() => {
   const PROMPT_COPY =
     'Design and build a minimalist luxury workout & habit OS with 8pt grid and 60fps motion.'
 
-  // Scene 4 refs
+  // Scene 4 refs (MOTION & FRONT-END — VoltRep Live Set Logger + Production System)
   const voltrepCard = q('voltrepCard')
   const volPeakBar = q('volPeakBar')
   const prBadge = q('prBadge')
@@ -78,7 +90,27 @@ onMounted(() => {
 
   const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3)
 
-  // Dynamic cursor tracking via live getBoundingClientRect()
+  // Cached stage dimensions to prevent synchronous layout thrashing during rAF
+  let stageBox = { left: 0, top: 0, width: 1440, height: 820 }
+  function refreshStageCache() {
+    if (!stage) return
+    const r = stage.getBoundingClientRect()
+    stageBox = {
+      left: r.left,
+      top: r.top,
+      width: r.width || 1440,
+      height: r.height || 820,
+    }
+  }
+  refreshStageCache()
+
+  let resizeTimer = null
+  const handleResize = () => {
+    if (resizeTimer) clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(refreshStageCache, 120)
+  }
+  window.addEventListener('resize', handleResize, { passive: true })
+
   const cursor = {
     x: -100,
     y: -100,
@@ -88,13 +120,17 @@ onMounted(() => {
     targetY: -100,
     targetEl: null,
     moveStart: 0,
-    duration: 420,
+    duration: 400,
     moving: false,
   }
 
   function getCenter(el) {
     if (!el || !stage) return { x: 0, y: 0 }
     const sRect = stage.getBoundingClientRect()
+    stageBox.left = sRect.left
+    stageBox.top = sRect.top
+    stageBox.width = sRect.width || stageBox.width
+    stageBox.height = sRect.height || stageBox.height
     const r = el.getBoundingClientRect()
     return {
       x: r.left - sRect.left + r.width / 2,
@@ -237,80 +273,22 @@ onMounted(() => {
 
   function renderTimeline(t, now, isFastForward = false) {
     /* =====================================================================
-       INTRO (0.0s – 2.2s): BRAND KINETIC LOCK-UP -> GLIDE TO LOWER-LEFT
+       BEAT 1 (0.0s – 4.3s): USER RESEARCH — DOUBLE DIAMOND + TELEMETRY
+       Matches 20261120-2223-26.0720959.mp4 (~0.5s – 4.0s)
        ===================================================================== */
-    cue('intro_in', t >= 0, () => {
-      if (introOverlay) introOverlay.classList.add('is-revealed')
-    })
-    cue('intro_dock', t >= 1350, () => {
-      if (introOverlay) introOverlay.classList.add('is-docking')
-    })
-    cue('intro_hide', t >= 2150, () => {
+    cue('s2_in', t >= 0, () => {
       if (introOverlay) introOverlay.classList.add('is-hidden')
-    })
-
-    /* =====================================================================
-       SCENE 01 (2.2s – 6.7s): UX/UI DESIGN — INLINE PILL + FIGMA CANVAS
-       ===================================================================== */
-    cue('s1_in', t >= 2200, () => {
-      setActiveScene(1)
-    })
-    cue('s1_word1', t >= 2480, () => {
-      if (s1Carousel) s1Carousel.dataset.step = '1'
-    })
-    cue('s1_word2', t >= 2820, () => {
-      if (s1Carousel) s1Carousel.dataset.step = '2'
-    })
-    // Text-before-UI 180ms lead
-    cue('s1_ui', t >= 2380, () => {
-      scenes[1].classList.add('is-ui-visible')
-    })
-    cue('s1_snap', t >= 3050, () => {
-      if (s1Artboard) s1Artboard.classList.add('is-snapped')
-    })
-    cue('s1_glide', t >= 5100, () => {
-      const r = stage.getBoundingClientRect()
-      placeCursor(r.width * 0.48, r.height * 0.42)
-      if (isFastForward) snapCursorTo(btnValidate)
-      else glideTo(btnValidate, 450, now)
-    })
-    cue('s1_hover', t >= 5540, () => {
-      if (btnValidate) btnValidate.classList.add('is-hovered')
-    })
-    cue('s1_click', t >= 5620, () => {
-      cursorEl.classList.add('is-clicking')
-      if (btnValidate) btnValidate.classList.add('is-pressed')
-      if (!isFastForward) fireRipple(btnValidate)
-    })
-    cue('s1_valid', t >= 5760, () => {
-      cursorEl.classList.remove('is-clicking')
-      if (btnValidate) {
-        btnValidate.classList.remove('is-pressed', 'is-hovered')
-        btnValidate.classList.add('is-validated')
-        btnValidate.textContent = 'Validated ✓'
-      }
-      if (s1Artboard) s1Artboard.classList.add('is-validated-frame')
-    })
-    cue('s1_pan', t >= 6280, () => {
-      cursorEl.classList.remove('is-visible')
-      scenes[1].classList.add('is-panning-out')
-    })
-
-    /* =====================================================================
-       SCENE 02 (6.7s – 11.2s): USER RESEARCH — DOUBLE DIAMOND + TELEMETRY
-       ===================================================================== */
-    cue('s2_in', t >= 6700, () => {
       setActiveScene(2)
     })
-    cue('s2_ui', t >= 6880, () => {
+    cue('s2_ui', t >= 120, () => {
       scenes[2].classList.add('is-ui-visible')
       if (ddNodeStart) ddNodeStart.classList.add('is-lit')
       if (ddTracerDot) ddTracerDot.classList.add('is-active')
       if (ddTracerHalo) ddTracerHalo.classList.add('is-active')
     })
 
-    if (t >= 6940 && t <= 9200 && ddTracePath) {
-      const p = easeOutCubic(Math.min(1, (t - 6940) / 2050))
+    if (t >= 180 && t <= 2450 && ddTracePath) {
+      const p = easeOutCubic(Math.min(1, (t - 180) / 2100))
       ddTracePath.style.strokeDashoffset = `${DD_LEN * (1 - p)}`
       const pt = ddTracePath.getPointAtLength(p * DD_LEN)
       if (ddTracerDot) {
@@ -330,27 +308,26 @@ onMounted(() => {
 
       if (frictionCounter) frictionCounter.textContent = `-${Math.round(p * 42)}% Cognitive Friction`
       if (successCounter) successCounter.textContent = `${(p * 98.4).toFixed(1)}%`
-    } else if (t > 9200 && t < 11200) {
+    } else if (t > 2450 && t < 4400) {
       if (ddTracePath) ddTracePath.style.strokeDashoffset = '0'
       if (frictionCounter) frictionCounter.textContent = '-42% Cognitive Friction'
       if (successCounter) successCounter.textContent = '98.4%'
     }
 
-    cue('s2_glide', t >= 9250, () => {
-      const r = stage.getBoundingClientRect()
-      placeCursor(r.width * 0.62, r.height * 0.45)
+    cue('s2_glide', t >= 2500, () => {
+      placeCursor(stageBox.width * 0.62, stageBox.height * 0.45)
       if (isFastForward) snapCursorTo(btnAlign)
       else glideTo(btnAlign, 420, now)
     })
-    cue('s2_hover', t >= 9660, () => {
+    cue('s2_hover', t >= 2920, () => {
       if (btnAlign) btnAlign.classList.add('is-hovered')
     })
-    cue('s2_click', t >= 9740, () => {
+    cue('s2_click', t >= 3020, () => {
       cursorEl.classList.add('is-clicking')
       if (btnAlign) btnAlign.classList.add('is-pressed')
       if (!isFastForward) fireRipple(btnAlign)
     })
-    cue('s2_aligned', t >= 9880, () => {
+    cue('s2_aligned', t >= 3160, () => {
       cursorEl.classList.remove('is-clicking')
       if (btnAlign) {
         btnAlign.classList.remove('is-pressed', 'is-hovered')
@@ -359,87 +336,87 @@ onMounted(() => {
       }
       shNodes.forEach((n) => n.classList.add('is-aligned'))
     })
-    cue('s2_morph', t >= 10550, () => {
+    cue('s2_morph', t >= 3920, () => {
       cursorEl.classList.remove('is-visible')
       if (s2RightCard) s2RightCard.classList.add('is-morphing')
       scenes[2].classList.add('is-exiting')
     })
 
     /* =====================================================================
-       SCENE 03 (11.2s – 16.0s): CREATIVE AI — MACRO TYPING -> FULL WEB APP
+       BEAT 2 (4.4s – 9.2s): CREATIVE AI — PROMPT -> LIVE WORKSPACE APP
+       Matches 20261120-2223-26.0720959.mp4 (~4.5s – 8.8s)
        ===================================================================== */
-    cue('s3_in', t >= 11200, () => {
+    cue('s3_in', t >= 4350, () => {
       setActiveScene(3)
     })
-    cue('s3_ui', t >= 11360, () => {
+    cue('s3_ui', t >= 4500, () => {
       scenes[3].classList.add('is-ui-visible')
       if (s3Camera) s3Camera.classList.add('is-zoomed')
     })
 
-    // Macro Caret Typing (11.4s -> 12.9s)
-    if (t >= 11400 && t <= 12920 && promptTyped) {
-      const p = Math.min(1, (t - 11400) / 1460)
+    // Macro Caret Typing (4.55s -> 6.05s)
+    if (t >= 4550 && t <= 6080 && promptTyped) {
+      const p = Math.min(1, (t - 4550) / 1450)
       promptTyped.textContent = PROMPT_COPY.slice(0, Math.floor(p * PROMPT_COPY.length))
-    } else if (t > 12920 && t < 16000 && promptTyped) {
+    } else if (t > 6080 && t < 9300 && promptTyped) {
       promptTyped.textContent = PROMPT_COPY
     }
 
     // Pull back to 1.0 & glide cursor straight to Submit (↑) button
-    cue('s3_pullback', t >= 12950, () => {
+    cue('s3_pullback', t >= 6120, () => {
       if (s3Camera) {
         s3Camera.classList.remove('is-zoomed')
         s3Camera.classList.add('is-pulled-back')
       }
-      const r = stage.getBoundingClientRect()
-      placeCursor(r.width * 0.56, r.height * 0.62)
+      placeCursor(stageBox.width * 0.56, stageBox.height * 0.62)
       if (isFastForward) snapCursorTo(btnSubmitPrompt)
       else glideTo(btnSubmitPrompt, 300, now)
     })
 
-    cue('s3_hover', t >= 13220, () => {
+    cue('s3_hover', t >= 6380, () => {
       if (btnSubmitPrompt) btnSubmitPrompt.classList.add('is-hovered')
     })
 
-    cue('s3_click', t >= 13280, () => {
+    cue('s3_click', t >= 6460, () => {
       cursorEl.classList.add('is-clicking')
       if (btnSubmitPrompt) btnSubmitPrompt.classList.add('is-pressed')
       if (!isFastForward) fireRipple(btnSubmitPrompt)
     })
 
-    // Emit 3 concentric echoes & morph pill directly into full luxury Web App
-    cue('s3_morph_app', t >= 13440, () => {
+    // Emit 3 concentric echoes & morph pill directly into full luxury Web App (no scaleX/Y corner distortion)
+    cue('s3_morph_app', t >= 6620, () => {
       cursorEl.classList.remove('is-clicking', 'is-visible')
       if (btnSubmitPrompt) btnSubmitPrompt.classList.remove('is-pressed', 'is-hovered')
       s3Echoes.forEach((e) => e.classList.add('is-firing'))
       if (aiMorphShell) aiMorphShell.classList.add('is-app-generated')
     })
 
-    cue('s3_out', t >= 15620, () => {
+    cue('s3_out', t >= 8850, () => {
       scenes[3].classList.add('is-exiting')
     })
 
     /* =====================================================================
-       SCENE 04 (16.0s – 20.5s): MOTION & FRONT-END — VOLTREP + REPLAY LOOP
+       BEAT 3 (9.3s – 13.8s): MOTION & FRONT-END — VOLTREP + REPLAY SYSTEM
+       Matches 20261120-2223-26.0720959.mp4 (~9.5s – 13.5s)
        ===================================================================== */
-    cue('s4_in', t >= 16000, () => {
+    cue('s4_in', t >= 9250, () => {
       s3Echoes.forEach((e) => e.classList.remove('is-firing'))
       setActiveScene(4)
     })
-    cue('s4_ui', t >= 16180, () => {
+    cue('s4_ui', t >= 9420, () => {
       scenes[4].classList.add('is-ui-visible')
     })
-    cue('s4_glide_log', t >= 16480, () => {
-      const r = stage.getBoundingClientRect()
-      placeCursor(r.width * 0.32, r.height * 0.48)
+    cue('s4_glide_log', t >= 9750, () => {
+      placeCursor(stageBox.width * 0.32, stageBox.height * 0.48)
       if (isFastForward) snapCursorTo(btnLogSet)
       else glideTo(btnLogSet, 400, now)
     })
-    cue('s4_click_log', t >= 16900, () => {
+    cue('s4_click_log', t >= 10180, () => {
       cursorEl.classList.add('is-clicking')
       if (btnLogSet) btnLogSet.classList.add('is-pressed')
       if (!isFastForward) fireRipple(btnLogSet)
     })
-    cue('s4_logged', t >= 17050, () => {
+    cue('s4_logged', t >= 10320, () => {
       cursorEl.classList.remove('is-clicking')
       if (btnLogSet) {
         btnLogSet.classList.remove('is-pressed')
@@ -451,29 +428,89 @@ onMounted(() => {
       if (prBadge) prBadge.classList.add('is-visible')
     })
 
-    // Elastic Sliding Pill Nav glides to Case Studies (17.55s)
-    cue('s4_nav_slide', t >= 17550, () => {
+    // Elastic Sliding Pill Nav glides to Case Studies (10.85s)
+    cue('s4_nav_slide', t >= 10850, () => {
       if (miniNav) miniNav.classList.add('is-case-studies')
       if (prodCard) prodCard.classList.add('is-elevated')
     })
 
-    // Seamless Loop Reset via ▶ Replay System (18.6s -> 20.5s)
-    cue('s4_glide_replay', t >= 18600, () => {
+    // Glide to ▶ Replay System (11.95s -> 13.5s)
+    cue('s4_glide_replay', t >= 11950, () => {
       if (isFastForward) snapCursorTo(btnReplaySys)
-      else glideTo(btnReplaySys, 440, now)
+      else glideTo(btnReplaySys, 420, now)
     })
-    cue('s4_click_replay', t >= 19060, () => {
+    cue('s4_click_replay', t >= 12420, () => {
       cursorEl.classList.add('is-clicking')
       if (btnReplaySys) btnReplaySys.classList.add('is-pressed')
       if (!isFastForward) fireRipple(btnReplaySys)
     })
-    cue('s4_loop_echo', t >= 19220, () => {
+    cue('s4_loop_echo', t >= 12580, () => {
       cursorEl.classList.remove('is-clicking', 'is-visible')
       if (btnReplaySys) btnReplaySys.classList.remove('is-pressed')
       s4Echoes.forEach((e) => e.classList.add('is-firing'))
     })
-    cue('s4_wipe', t >= 19850, () => {
-      if (loopVeil) loopVeil.classList.add('is-wiping')
+    cue('s4_out', t >= 13350, () => {
+      scenes[4].classList.add('is-exiting')
+    })
+
+    /* =====================================================================
+       BEAT 4 (13.6s – 17.66s): BRAND LOCK-UP & UX/UI [ + System ] DESIGN
+       Matches 20261120-2223-26.0720959.mp4 (~13.6s – 17.66s)
+       ===================================================================== */
+    cue('brand_lockup_in', t >= 13600, () => {
+      s4Echoes.forEach((e) => e.classList.remove('is-firing'))
+      Object.keys(scenes).forEach((k) => {
+        scenes[Number(k)].classList.remove('is-active', 'is-exiting', 'is-ui-visible')
+      })
+      if (introOverlay) {
+        introOverlay.classList.remove('is-hidden', 'is-docking')
+        introOverlay.classList.add('is-revealed')
+      }
+    })
+    cue('brand_lockup_dock', t >= 14550, () => {
+      if (introOverlay) introOverlay.classList.add('is-docking')
+    })
+    cue('s1_in', t >= 14950, () => {
+      if (introOverlay) introOverlay.classList.add('is-hidden')
+      setActiveScene(1)
+    })
+    cue('s1_ui', t >= 15100, () => {
+      scenes[1].classList.add('is-ui-visible')
+    })
+    cue('s1_word1', t >= 15220, () => {
+      if (s1Carousel) s1Carousel.dataset.step = '1'
+    })
+    cue('s1_word2', t >= 15500, () => {
+      if (s1Carousel) s1Carousel.dataset.step = '2'
+    })
+    cue('s1_snap', t >= 15680, () => {
+      if (s1Artboard) s1Artboard.classList.add('is-snapped')
+    })
+    cue('s1_glide', t >= 16250, () => {
+      placeCursor(stageBox.width * 0.48, stageBox.height * 0.42)
+      if (isFastForward) snapCursorTo(btnValidate)
+      else glideTo(btnValidate, 380, now)
+    })
+    cue('s1_hover', t >= 16640, () => {
+      if (btnValidate) btnValidate.classList.add('is-hovered')
+    })
+    cue('s1_click', t >= 16720, () => {
+      cursorEl.classList.add('is-clicking')
+      if (btnValidate) btnValidate.classList.add('is-pressed')
+      if (!isFastForward) fireRipple(btnValidate)
+    })
+    cue('s1_valid', t >= 16840, () => {
+      cursorEl.classList.remove('is-clicking')
+      if (btnValidate) {
+        btnValidate.classList.remove('is-pressed', 'is-hovered')
+        btnValidate.classList.add('is-validated')
+        btnValidate.textContent = 'Validated ✓'
+      }
+      if (s1Artboard) s1Artboard.classList.add('is-validated-frame')
+    })
+    cue('s1_pan', t >= 17350, () => {
+      cursorEl.classList.remove('is-visible')
+      scenes[1].classList.add('is-panning-out')
     })
   }
 
@@ -501,7 +538,7 @@ onMounted(() => {
     return
   }
 
-  const bootTime = performance.now()
+  let bootTime = performance.now()
   let lastLoop = -1
   let isIntersecting = true
   let isDocumentVisible = typeof document !== 'undefined' ? !document.hidden : true
@@ -528,7 +565,7 @@ onMounted(() => {
 
   function startRaf() {
     if (isRunning) return
-    if (!isIntersecting || !isDocumentVisible) return
+    if (isUserPaused.value || !isIntersecting || !isDocumentVisible) return
     isRunning = true
     if (pauseStart > 0) {
       totalPausedTime += performance.now() - pauseStart
@@ -549,12 +586,35 @@ onMounted(() => {
     }
   }
 
+  togglePauseFn = () => {
+    isUserPaused.value = !isUserPaused.value
+    if (isUserPaused.value) {
+      stopRaf()
+    } else {
+      startRaf()
+    }
+  }
+
+  restartLoopFn = () => {
+    isUserPaused.value = false
+    bootTime = performance.now()
+    totalPausedTime = 0
+    pauseStart = 0
+    lastLoop = -1
+    fired.clear()
+    resetAll()
+    if (!isRunning) {
+      startRaf()
+    }
+  }
+
   const observer =
     typeof IntersectionObserver !== 'undefined' && stage
       ? new IntersectionObserver(
           ([entry]) => {
             isIntersecting = entry.isIntersecting
             if (isIntersecting) {
+              refreshStageCache()
               startRaf()
             } else {
               stopRaf()
@@ -569,7 +629,7 @@ onMounted(() => {
   }
 
   const handleVisibilityChange = () => {
-    isDocumentVisible = typeof document !== 'undefined' ? !document.hidden : true
+    isDocumentVisible = typeof document !== 'undefined' ? document.visibilityState !== 'hidden' : true
     if (isDocumentVisible) {
       startRaf()
     } else {
@@ -584,6 +644,8 @@ onMounted(() => {
     stopRaf()
     if (observer) observer.disconnect()
     document.removeEventListener('visibilitychange', handleVisibilityChange)
+    window.removeEventListener('resize', handleResize)
+    if (resizeTimer) clearTimeout(resizeTimer)
   }
 })
 
@@ -981,14 +1043,45 @@ onUnmounted(() => {
       <!-- Seamless Loop Reset Veil -->
       <div id="loopVeil" class="loop-veil" aria-hidden="true"></div>
 
-      <!-- Protected Lower-Left Safe Zone (Samsung One UI Ergonomics) -->
+      <!-- Protected Lower-Left Safe Zone (Samsung One UI Ergonomics) + Tactile Controls -->
       <div class="hero-safe-zone">
-        <p class="safe-identity">
-          <strong>Samuel Tavonatti</strong> <span class="safe-sep" aria-hidden="true">—</span> <span>UI/UX Designer &amp; Front-End</span>
-        </p>
-        <div class="safe-ctas">
-          <a href="#case-study" class="safe-cta safe-cta--primary">Explore Case Studies →</a>
-          <a href="#contatti" class="safe-cta safe-cta--glass">Contact Me</a>
+        <div class="safe-left-col">
+          <p class="safe-identity">
+            <strong>Samuel Tavonatti</strong> <span class="safe-sep" aria-hidden="true">—</span> <span>UI/UX Designer &amp; Front-End</span>
+          </p>
+          <div class="safe-ctas">
+            <a href="#case-study" class="safe-cta safe-cta--primary">Explore Case Studies →</a>
+            <a href="#contatti" class="safe-cta safe-cta--glass">Contact Me</a>
+          </div>
+        </div>
+
+        <div class="safe-tactile-controls">
+          <button
+            type="button"
+            class="tactile-ctrl-btn"
+            :aria-label="isUserPaused ? 'Resume showreel' : 'Pause showreel'"
+            :aria-pressed="isUserPaused"
+            @click="handleTogglePause"
+          >
+            <svg v-if="!isUserPaused" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+            <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="6 4 20 12 6 20 6 4" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="tactile-ctrl-btn"
+            aria-label="Replay showreel from beginning"
+            @click="handleRestartLoop"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -2017,7 +2110,7 @@ onUnmounted(() => {
 }
 .loop-veil.is-wiping { opacity: 1; }
 
-/* 3. PROTECTED LOWER-LEFT SAFE ZONE */
+/* 3. PROTECTED LOWER-LEFT SAFE ZONE & TACTILE CONTROLS */
 .hero-safe-zone {
   position: absolute;
   left: 0;
@@ -2030,14 +2123,68 @@ onUnmounted(() => {
   box-sizing: border-box;
   z-index: 40;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.7rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
   pointer-events: none;
 }
 
 .hero-safe-zone > * {
   pointer-events: auto;
+}
+
+.safe-left-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.safe-tactile-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tactile-ctrl-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 12px;
+  background: rgba(11, 17, 32, 0.84);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-subtle-w);
+  box-shadow: var(--specular-w);
+  color: var(--slate);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s var(--ease-spring);
+}
+
+.tactile-ctrl-btn:hover {
+  color: var(--alabaster);
+  border-color: var(--ice-border);
+  background: rgba(17, 26, 46, 0.92);
+  transform: translateY(-1px);
+}
+
+.tactile-ctrl-btn:active {
+  transform: scale(0.94);
+}
+
+.tactile-ctrl-btn:focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 2px;
 }
 
 .safe-identity { margin: 0; font-size: 0.88rem; line-height: 1.35; color: var(--slate); }

@@ -229,6 +229,7 @@ section[id] {
 .section-block {
   padding-block: clamp(104px, 13vh, 156px);
   border-bottom: 1px solid var(--border-subtle);
+  scroll-margin-top: 84px;
 }
 
 .section-head {
