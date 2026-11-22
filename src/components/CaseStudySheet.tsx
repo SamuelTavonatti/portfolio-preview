@@ -94,20 +94,20 @@ export function CaseStudySheet({
             animate={{ x: 0 }}
             exit={prefersReducedMotion ? undefined : { x: '100%' }}
             transition={{ duration: 0.36, ease: EDITORIAL_EASE }}
-            className="relative z-10 flex h-full w-full max-w-4xl flex-col border-l border-white/[0.08] bg-[#09090B] shadow-2xl"
+            className="relative z-10 flex h-full w-full max-w-4xl flex-col border-l border-white/[0.08] bg-[#0B0A09] shadow-2xl"
           >
             {/* Sticky Sheet Header */}
-            <div className="flex shrink-0 items-center justify-between gap-4 border-b border-white/[0.08] bg-[#09090B]/95 px-5 py-4 backdrop-blur-md sm:px-8">
+            <div className="flex shrink-0 items-center justify-between gap-4 border-b border-white/[0.08] bg-[#0B0A09]/95 px-5 py-4 backdrop-blur-md sm:px-8">
               <div className="flex min-w-0 items-center gap-3">
                 <button
                   type="button"
                   onClick={onClose}
                   aria-label={UI_COPY.projects.sheet.close[locale]}
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/[0.10] bg-[#111114] text-[#F4F3EF] transition-colors duration-150 hover:border-[#C8A878]/50 hover:text-[#C8A878]"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-white/[0.10] bg-[#131210] text-[#EBE4D4] transition-colors duration-150 hover:border-[#D0A243]/50 hover:text-[#D0A243]"
                 >
                   <X className="h-4 w-4" aria-hidden="true" />
                 </button>
-                <span className="truncate font-display text-sm font-medium text-[#F4F3EF]">
+                <span className="truncate font-display text-sm font-medium text-[#EBE4D4]">
                   {study ? study.title[locale] : UI_COPY.projects.sheet.notFound[locale]}
                 </span>
               </div>
@@ -119,7 +119,7 @@ export function CaseStudySheet({
                     href={study.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hidden sm:inline-flex min-h-[40px] items-center gap-1.5 rounded-md bg-[#F4F3EF] px-4 font-display text-xs font-medium text-[#09090B] transition-colors duration-150 hover:bg-[#C8A878] whitespace-nowrap"
+                    className="hidden sm:inline-flex min-h-[40px] items-center gap-1.5 rounded-md bg-[#EBE4D4] px-4 font-display text-xs font-medium text-[#0B0A09] transition-colors duration-150 hover:bg-[#D0A243] whitespace-nowrap"
                   >
                     <span>
                       {study.liveLabel?.[locale] ?? UI_COPY.projects.visitLive[locale]}
@@ -139,8 +139,8 @@ export function CaseStudySheet({
                 <div className="mx-auto max-w-3xl space-y-10">
                   {/* Header Block */}
                   <div className="space-y-4">
-                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#68686C]">
-                      <span className="text-[#C8A878]">{study.categoryLabel[locale]}</span>
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#867F70]">
+                      <span className="text-[#D0A243]">{study.categoryLabel[locale]}</span>
                       <span aria-hidden="true">·</span>
                       <span>{study.year}</span>
                       <span aria-hidden="true">·</span>
@@ -149,12 +149,12 @@ export function CaseStudySheet({
 
                     <h2
                       id="case-study-sheet-title"
-                      className="font-display text-3xl font-medium tracking-[-0.03em] text-[#F4F3EF] sm:text-4xl"
+                      className="font-display text-3xl font-medium tracking-[-0.03em] text-[#EBE4D4] sm:text-4xl"
                     >
                       {study.title[locale]}
                     </h2>
 
-                    <p className="text-base leading-relaxed text-[#9C9B96] sm:text-lg">
+                    <p className="text-base leading-relaxed text-[#BDB6AD] sm:text-lg">
                       {study.subtitle[locale]}
                     </p>
 
@@ -164,7 +164,7 @@ export function CaseStudySheet({
                           href={study.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex min-h-[42px] items-center gap-1.5 rounded-md bg-[#F4F3EF] px-5 font-display text-sm font-medium text-[#09090B] transition-colors hover:bg-[#C8A878]"
+                          className="inline-flex min-h-[42px] items-center gap-1.5 rounded-md bg-[#EBE4D4] px-5 font-display text-sm font-medium text-[#0B0A09] transition-colors hover:bg-[#D0A243]"
                         >
                           <span>
                             {study.liveLabel?.[locale] ?? UI_COPY.projects.visitLive[locale]}
@@ -183,26 +183,26 @@ export function CaseStudySheet({
                   {/* Structured Metadata Strip */}
                   <dl className="grid grid-cols-1 gap-6 border-y border-white/[0.08] py-6 sm:grid-cols-3">
                     <div>
-                      <dt className="font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#68686C]">
+                      <dt className="font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#867F70]">
                         {UI_COPY.projects.sheet.role[locale]}
                       </dt>
-                      <dd className="mt-1.5 text-sm font-medium text-[#F4F3EF]">
+                      <dd className="mt-1.5 text-sm font-medium text-[#EBE4D4]">
                         {study.role[locale]}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#68686C]">
+                      <dt className="font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#867F70]">
                         {UI_COPY.projects.sheet.context[locale]}
                       </dt>
-                      <dd className="mt-1.5 text-sm font-medium text-[#F4F3EF]">
+                      <dd className="mt-1.5 text-sm font-medium text-[#EBE4D4]">
                         {study.organization[locale]}
                       </dd>
                     </div>
                     <div>
-                      <dt className="font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#68686C]">
+                      <dt className="font-mono-num text-[11px] uppercase tracking-[0.14em] text-[#867F70]">
                         {UI_COPY.projects.sheet.year[locale]}
                       </dt>
-                      <dd className="mt-1.5 font-mono-num text-sm font-medium text-[#F4F3EF]">
+                      <dd className="mt-1.5 font-mono-num text-sm font-medium text-[#EBE4D4]">
                         {study.year}
                       </dd>
                     </div>
@@ -212,10 +212,10 @@ export function CaseStudySheet({
                   {study.gallery.length > 0 ? (
                     <section className="space-y-4">
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <h3 className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#C8A878]">
+                        <h3 className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#D0A243]">
                           {UI_COPY.projects.sheet.galleryLabel[locale]}
                         </h3>
-                        <span className="text-xs text-[#68686C]">
+                        <span className="text-xs text-[#867F70]">
                           {UI_COPY.projects.sheet.galleryHint[locale]}
                         </span>
                       </div>
@@ -242,7 +242,7 @@ export function CaseStudySheet({
                                     : photo.caption[locale],
                                 })
                               }
-                              className="group relative block w-full overflow-hidden rounded-lg border border-white/[0.08] bg-[#111114] text-left transition-colors duration-200 hover:border-[#C8A878]/50"
+                              className="group relative block w-full overflow-hidden rounded-lg border border-white/[0.08] bg-[#131210] text-left transition-colors duration-200 hover:border-[#D0A243]/50"
                             >
                               <ResilientImage
                                 src={photo.src}
@@ -255,18 +255,18 @@ export function CaseStudySheet({
                               />
                               <span
                                 aria-hidden="true"
-                                className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/15 bg-[#09090B]/85 text-[#F4F3EF] opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100"
+                                className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/15 bg-[#0B0A09]/85 text-[#EBE4D4] opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100"
                               >
                                 <Maximize2 className="h-3.5 w-3.5" />
                               </span>
                             </button>
                             <figcaption className="space-y-1">
                               {photo.label ? (
-                                <p className="font-display text-sm font-medium text-[#F4F3EF]">
+                                <p className="font-display text-sm font-medium text-[#EBE4D4]">
                                   {photo.label[locale]}
                                 </p>
                               ) : null}
-                              <p className="text-xs leading-relaxed text-[#9C9B96]">
+                              <p className="text-xs leading-relaxed text-[#BDB6AD]">
                                 {photo.caption[locale]}
                               </p>
                             </figcaption>
@@ -278,18 +278,18 @@ export function CaseStudySheet({
 
                   {/* Key Focus Areas */}
                   <div className="space-y-3 border-t border-white/[0.08] pt-8">
-                    <h3 className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#C8A878]">
+                    <h3 className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#D0A243]">
                       {UI_COPY.projects.sheet.deliverables[locale]}
                     </h3>
                     <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                       {study.deliverables[locale].map((item) => (
                         <li
                           key={item}
-                          className="flex items-start gap-2.5 text-sm text-[#9C9B96]"
+                          className="flex items-start gap-2.5 text-sm text-[#BDB6AD]"
                         >
                           <span
                             aria-hidden="true"
-                            className="mt-2 h-1 w-2 shrink-0 bg-[#C8A878]"
+                            className="mt-2 h-1 w-2 shrink-0 bg-[#D0A243]"
                           />
                           <span>{item}</span>
                         </li>
@@ -305,14 +305,14 @@ export function CaseStudySheet({
                         className="space-y-4 border-t border-white/[0.08] pt-8"
                       >
                         <div className="flex items-baseline gap-3">
-                          <span className="font-mono-num text-xs font-medium text-[#C8A878]">
+                          <span className="font-mono-num text-xs font-medium text-[#D0A243]">
                             {String(idx + 1).padStart(2, '0')}.
                           </span>
-                          <h3 className="font-display text-xl font-medium tracking-[-0.02em] text-[#F4F3EF]">
+                          <h3 className="font-display text-xl font-medium tracking-[-0.02em] text-[#EBE4D4]">
                             {section.title[locale]}
                           </h3>
                         </div>
-                        <p className="text-[15px] leading-[1.7] text-[#9C9B96] sm:text-base">
+                        <p className="text-[15px] leading-[1.7] text-[#BDB6AD] sm:text-base">
                           {section.body[locale]}
                         </p>
 
@@ -321,11 +321,11 @@ export function CaseStudySheet({
                             {section.points[locale].map((pt) => (
                               <li
                                 key={pt}
-                                className="flex items-start gap-3 text-[15px] leading-relaxed text-[#D4D3CE]"
+                                className="flex items-start gap-3 text-[15px] leading-relaxed text-[#EBE4D4]"
                               >
                                 <span
                                   aria-hidden="true"
-                                  className="mt-2.5 h-px w-3 shrink-0 bg-[#C8A878]"
+                                  className="mt-2.5 h-px w-3 shrink-0 bg-[#D0A243]"
                                 />
                                 <span>{pt}</span>
                               </li>
@@ -340,20 +340,20 @@ export function CaseStudySheet({
                   {study.brandShowcase ? (
                     <section className="space-y-6 border-t border-white/[0.08] pt-8">
                       <div className="space-y-2">
-                        <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#C8A878]">
+                        <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#D0A243]">
                           {UI_COPY.projects.sheet.brandIdentityLabel[locale]}
                         </p>
-                        <h3 className="font-display text-xl font-medium tracking-[-0.02em] text-[#F4F3EF]">
+                        <h3 className="font-display text-xl font-medium tracking-[-0.02em] text-[#EBE4D4]">
                           {study.brandShowcase.title[locale]}
                         </h3>
-                        <p className="text-sm leading-relaxed text-[#9C9B96] sm:text-[15px]">
+                        <p className="text-sm leading-relaxed text-[#BDB6AD] sm:text-[15px]">
                           {study.brandShowcase.overview[locale]}
                         </p>
                       </div>
 
                       {/* Official Mark Variants */}
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="flex min-h-[164px] flex-col items-center justify-center gap-3 rounded-lg border border-white/[0.08] bg-[#F4F3EF] p-7">
+                        <div className="flex min-h-[164px] flex-col items-center justify-center gap-3 rounded-lg border border-white/[0.08] bg-[#EBE4D4] p-7">
                           <img
                             src={study.brandShowcase.colorSrc}
                             alt={study.brandShowcase.alt[locale]}
@@ -367,7 +367,7 @@ export function CaseStudySheet({
                               : 'Full-color institutional mark'}
                           </span>
                         </div>
-                        <div className="flex min-h-[164px] flex-col items-center justify-center gap-3 rounded-lg border border-white/[0.08] bg-[#F4F3EF] p-7">
+                        <div className="flex min-h-[164px] flex-col items-center justify-center gap-3 rounded-lg border border-white/[0.08] bg-[#EBE4D4] p-7">
                           <img
                             src={study.brandShowcase.monoSrc}
                             alt={study.brandShowcase.alt[locale]}
@@ -385,7 +385,7 @@ export function CaseStudySheet({
 
                       {/* Official Territorial Palette Swatches */}
                       <div className="space-y-3">
-                        <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.14em] text-[#68686C]">
+                        <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.14em] text-[#867F70]">
                           {locale === 'it'
                             ? 'Palette cromatica territoriale'
                             : 'Territorial color palette'}
@@ -394,7 +394,7 @@ export function CaseStudySheet({
                           {study.brandShowcase.swatches.map((swatch) => (
                             <div
                               key={swatch.hex}
-                              className="flex flex-col gap-2 rounded-md border border-white/[0.08] bg-[#111114] p-3"
+                              className="flex flex-col gap-2 rounded-md border border-white/[0.08] bg-[#131210] p-3"
                             >
                               <span
                                 aria-hidden="true"
@@ -402,13 +402,13 @@ export function CaseStudySheet({
                                 style={{ backgroundColor: swatch.hex }}
                               />
                               <div className="space-y-0.5">
-                                <p className="font-display text-xs font-medium text-[#F4F3EF]">
+                                <p className="font-display text-xs font-medium text-[#EBE4D4]">
                                   {swatch.name[locale]}
                                 </p>
-                                <p className="font-mono-num text-[11px] text-[#C8A878]">
+                                <p className="font-mono-num text-[11px] text-[#D0A243]">
                                   {swatch.hex}
                                 </p>
-                                <p className="text-[11px] leading-snug text-[#68686C]">
+                                <p className="text-[11px] leading-snug text-[#867F70]">
                                   {swatch.role[locale]}
                                 </p>
                               </div>
@@ -424,10 +424,10 @@ export function CaseStudySheet({
                             key={item.label.en}
                             className="grid grid-cols-1 gap-2 py-4 sm:grid-cols-12 sm:gap-6"
                           >
-                            <dt className="font-display text-sm font-medium text-[#F4F3EF] sm:col-span-4">
+                            <dt className="font-display text-sm font-medium text-[#EBE4D4] sm:col-span-4">
                               {item.label[locale]}
                             </dt>
-                            <dd className="text-sm leading-relaxed text-[#9C9B96] sm:col-span-8">
+                            <dd className="text-sm leading-relaxed text-[#BDB6AD] sm:col-span-8">
                               {item.detail[locale]}
                             </dd>
                           </div>
@@ -437,11 +437,11 @@ export function CaseStudySheet({
                   ) : null}
 
                   {/* Calm Takeaway Callout */}
-                  <div className="rounded-lg border border-[#C8A878]/25 bg-[#111114] p-6 sm:p-8">
-                    <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#C8A878]">
+                  <div className="rounded-lg border border-[#D0A243]/25 bg-[#131210] p-6 sm:p-8">
+                    <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.16em] text-[#D0A243]">
                       {UI_COPY.projects.sheet.takeawayLabel[locale]}
                     </p>
-                    <p className="mt-3 font-display text-lg font-medium leading-relaxed text-[#F4F3EF]">
+                    <p className="mt-3 font-display text-lg font-medium leading-relaxed text-[#EBE4D4]">
                       {study.takeaway[locale]}
                     </p>
                   </div>
@@ -452,13 +452,13 @@ export function CaseStudySheet({
                       <button
                         type="button"
                         onClick={() => onSelectStudy(prevStudy)}
-                        className="flex min-h-[72px] flex-col items-start justify-center rounded-lg border border-white/[0.08] bg-[#111114] p-4 text-left transition-colors duration-150 hover:border-[#C8A878]/50"
+                        className="flex min-h-[72px] flex-col items-start justify-center rounded-lg border border-white/[0.08] bg-[#131210] p-4 text-left transition-colors duration-150 hover:border-[#D0A243]/50"
                       >
-                        <span className="inline-flex items-center gap-1.5 text-xs text-[#68686C]">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-[#867F70]">
                           <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
                           {UI_COPY.projects.sheet.previous[locale]}
                         </span>
-                        <span className="mt-1 font-display text-sm font-medium text-[#F4F3EF]">
+                        <span className="mt-1 font-display text-sm font-medium text-[#EBE4D4]">
                           {prevStudy.title[locale]}
                         </span>
                       </button>
@@ -466,13 +466,13 @@ export function CaseStudySheet({
                       <button
                         type="button"
                         onClick={() => onSelectStudy(nextStudy)}
-                        className="flex min-h-[72px] flex-col items-end justify-center rounded-lg border border-white/[0.08] bg-[#111114] p-4 text-right transition-colors duration-150 hover:border-[#C8A878]/50"
+                        className="flex min-h-[72px] flex-col items-end justify-center rounded-lg border border-white/[0.08] bg-[#131210] p-4 text-right transition-colors duration-150 hover:border-[#D0A243]/50"
                       >
-                        <span className="inline-flex items-center gap-1.5 text-xs text-[#68686C]">
+                        <span className="inline-flex items-center gap-1.5 text-xs text-[#867F70]">
                           {UI_COPY.projects.sheet.next[locale]}
                           <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                         </span>
-                        <span className="mt-1 font-display text-sm font-medium text-[#F4F3EF]">
+                        <span className="mt-1 font-display text-sm font-medium text-[#EBE4D4]">
                           {nextStudy.title[locale]}
                         </span>
                       </button>
@@ -483,15 +483,15 @@ export function CaseStudySheet({
                 <div className="mx-auto flex max-w-md flex-col items-center justify-center py-20 text-center">
                   <h2
                     id="case-study-sheet-title"
-                    className="font-display text-2xl font-medium text-[#F4F3EF]"
+                    className="font-display text-2xl font-medium text-[#EBE4D4]"
                   >
                     {UI_COPY.projects.sheet.notFound[locale]}
                   </h2>
-                  <p className="mt-2 font-mono-num text-xs text-[#68686C]">{notFoundSlug}</p>
+                  <p className="mt-2 font-mono-num text-xs text-[#867F70]">{notFoundSlug}</p>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-md bg-[#F4F3EF] px-5 font-display text-sm font-medium text-[#09090B] transition-colors hover:bg-[#C8A878]"
+                    className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-md bg-[#EBE4D4] px-5 font-display text-sm font-medium text-[#0B0A09] transition-colors hover:bg-[#D0A243]"
                   >
                     {UI_COPY.projects.sheet.backToList[locale]}
                   </button>
@@ -514,7 +514,7 @@ export function CaseStudySheet({
                     type="button"
                     onClick={() => setLightbox(null)}
                     aria-label={locale === 'it' ? 'Chiudi anteprima' : 'Close preview'}
-                    className="fixed right-5 top-5 inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/15 bg-[#111114] text-[#F4F3EF] hover:border-[#C8A878]"
+                    className="fixed right-5 top-5 inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/15 bg-[#131210] text-[#EBE4D4] hover:border-[#D0A243]"
                   >
                     <X className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -528,7 +528,7 @@ export function CaseStudySheet({
                       alt={lightbox.alt}
                       className="max-h-[76vh] w-auto max-w-full rounded-lg border border-white/10 object-contain shadow-2xl"
                     />
-                    <p className="max-w-2xl text-center text-xs leading-relaxed text-[#9C9B96] sm:text-sm">
+                    <p className="max-w-2xl text-center text-xs leading-relaxed text-[#BDB6AD] sm:text-sm">
                       {lightbox.caption}
                     </p>
                   </div>

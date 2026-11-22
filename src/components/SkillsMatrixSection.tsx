@@ -52,25 +52,25 @@ export function SkillsMatrixSection() {
     <section
       id="competenze"
       aria-labelledby="skills-heading"
-      className="relative z-10 scroll-mt-20 border-t border-white/[0.08] bg-[#09090B] py-20 sm:py-28"
+      className="relative z-10 scroll-mt-20 border-t border-white/[0.08] bg-[#0B0A09] py-20 sm:py-28"
     >
       <div className="mx-auto max-w-[1160px] px-5 sm:px-8">
         <ScrollReveal duration={0.85}>
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div className="max-w-2xl space-y-3">
-              <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.2em] text-[#C8A878]">
+              <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.2em] text-[#D0A243]">
                 02 — {locale === 'it' ? 'Competenze & Stack' : 'Skills & Stack'}
               </p>
               <h2
                 id="skills-heading"
-                className="font-display text-3xl font-medium tracking-[-0.03em] text-[#F4F3EF] sm:text-5xl"
+                className="font-display text-3xl font-medium tracking-[-0.03em] text-[#EBE4D4] sm:text-5xl"
               >
                 {locale === 'it'
                   ? 'Discipline e strumenti'
                   : 'Disciplines & Tooling'}
               </h2>
             </div>
-            <p className="font-mono-num text-[11px] uppercase tracking-[0.18em] text-[#68686C]">
+            <p className="font-mono-num text-[11px] uppercase tracking-[0.18em] text-[#867F70]">
               {locale === 'it'
                 ? 'RICERCA · CODICE · CONTENUTI'
                 : 'RESEARCH · CODE · CONTENT'}
@@ -84,10 +84,10 @@ export function SkillsMatrixSection() {
             <ScrollReveal key={pillar.code} delay={idx * 0.08} duration={0.85}>
               <div className="flex h-full flex-col border-t border-white/[0.12] pt-6">
                 <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="font-display text-lg font-medium tracking-[-0.015em] text-[#F4F3EF]">
+                  <h3 className="font-display text-lg font-medium tracking-[-0.015em] text-[#EBE4D4]">
                     {pillar.title[locale]}
                   </h3>
-                  <span className="font-mono-num text-[11px] tracking-[0.16em] text-[#C8A878]">
+                  <span className="font-mono-num text-[11px] tracking-[0.16em] text-[#D0A243]">
                     {pillar.code}
                   </span>
                 </div>
@@ -96,7 +96,7 @@ export function SkillsMatrixSection() {
                   {pillar.skills.map((skill) => (
                     <li
                       key={skill}
-                      className="py-2.5 text-sm text-[#9C9B96] transition-colors duration-200 hover:text-[#F4F3EF]"
+                      className="py-2.5 text-sm text-[#BDB6AD] transition-colors duration-200 hover:text-[#EBE4D4]"
                     >
                       {skill}
                     </li>

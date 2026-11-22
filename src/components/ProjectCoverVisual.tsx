@@ -11,15 +11,15 @@ interface ProjectCoverVisualProps {
 function VoltRepAtmosphericBackdrop({ size = 'card' }: { size?: 'card' | 'hero' }) {
   return (
     <div
-      className="relative aspect-[16/10] w-full overflow-hidden bg-[#08090D] select-none"
+      className="relative aspect-[16/10] w-full overflow-hidden bg-[#0B0A09] select-none"
       aria-hidden="true"
     >
-      {/* Sleek dark-graphite architectural lighting gradient + subtle carbon-matte shadow texture */}
+      {/* Sleek warm-graphite architectural lighting gradient + subtle carbon-matte shadow texture */}
       <div
         className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
         style={{
           background:
-            'radial-gradient(ellipse 75% 65% at 50% 32%, rgba(255, 255, 255, 0.085) 0%, rgba(24, 28, 38, 0.55) 45%, rgba(7, 8, 11, 0.98) 100%)',
+            'radial-gradient(ellipse 75% 65% at 50% 32%, rgba(208, 162, 67, 0.08) 0%, rgba(30, 26, 22, 0.6) 45%, rgba(11, 10, 9, 0.98) 100%)',
         }}
       />
       {/* Subtle architectural diagonal light shafts & carbon-matte micro-grain */}
@@ -35,7 +35,7 @@ function VoltRepAtmosphericBackdrop({ size = 'card' }: { size?: 'card' | 'hero' 
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(circle at 50% 50%, transparent 35%, rgba(5, 6, 9, 0.72) 100%)',
+            'radial-gradient(circle at 50% 50%, transparent 35%, rgba(11, 10, 9, 0.75) 100%)',
         }}
       />
 
@@ -50,28 +50,28 @@ function VoltRepAtmosphericBackdrop({ size = 'card' }: { size?: 'card' | 'hero' 
 function EsuAtmosphericBackdrop({ size = 'card' }: { size?: 'card' | 'hero' }) {
   return (
     <div
-      className="relative aspect-[16/10] w-full overflow-hidden bg-[#070910] select-none"
+      className="relative aspect-[16/10] w-full overflow-hidden bg-[#0B0A09] select-none"
       aria-hidden="true"
     >
-      {/* Moody atmospheric dark-blue/graphite studio rim-light gradient */}
+      {/* Moody atmospheric Blu Petrolio / Carta da Zucchero studio rim-light gradient */}
       <div
         className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
         style={{
           background:
-            'radial-gradient(ellipse 78% 64% at 50% 38%, rgba(59, 130, 246, 0.22) 0%, rgba(17, 24, 39, 0.68) 46%, rgba(7, 8, 11, 0.98) 100%)',
+            'radial-gradient(ellipse 78% 64% at 50% 38%, rgba(32, 80, 93, 0.35) 0%, rgba(20, 26, 32, 0.72) 46%, rgba(11, 10, 9, 0.98) 100%)',
         }}
       />
-      {/* Subtle optical wave curves in deep blue-graphite */}
+      {/* Subtle optical wave curves in Blu Petrolio & Carta da Zucchero */}
       <svg
         viewBox="0 0 640 400"
         preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-0 h-full w-full opacity-40 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-45 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
       >
         <defs>
           <linearGradient id="esuWaveRim" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0" />
-            <stop offset="50%" stopColor="#93C5FD" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+            <stop offset="0%" stopColor="#20505D" stopOpacity="0" />
+            <stop offset="50%" stopColor="#95B1BA" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#20505D" stopOpacity="0" />
           </linearGradient>
         </defs>
         <path

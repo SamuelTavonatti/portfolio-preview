@@ -187,7 +187,7 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
     <section
       id="contatti"
       aria-labelledby="contact-heading"
-      className="relative z-10 scroll-mt-20 border-t border-white/[0.08] bg-[#09090B] py-20 sm:py-28"
+      className="relative z-10 scroll-mt-20 border-t border-white/[0.08] bg-[#0B0A09] py-20 sm:py-28"
     >
       <div className="mx-auto max-w-[1160px] px-5 sm:px-8">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-12">
@@ -195,16 +195,16 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
           <ScrollReveal duration={0.85} className="lg:col-span-5">
             <div className="flex flex-col justify-between gap-10">
               <div className="space-y-4">
-                <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.2em] text-[#C8A878]">
+                <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.2em] text-[#D0A243]">
                   04 — {locale === 'it' ? 'Contatti' : 'Contact'}
                 </p>
                 <h2
                   id="contact-heading"
-                  className="font-display text-4xl font-medium tracking-[-0.03em] text-[#F4F3EF] sm:text-5xl"
+                  className="font-display text-4xl font-medium tracking-[-0.03em] text-[#EBE4D4] sm:text-5xl"
                 >
                   {UI_COPY.contact.heading[locale]}
                 </h2>
-                <p className="max-w-[38ch] text-sm leading-relaxed text-[#9C9B96] sm:text-base">
+                <p className="max-w-[38ch] text-sm leading-relaxed text-[#BDB6AD] sm:text-base">
                   {locale === 'it'
                     ? 'Disponibile per collaborazioni selettive e ruoli UX/UI & Front-End a Trento o da remoto.'
                     : 'Available for selective collaborations and UX/UI & Front-End roles in Trento or remote.'}
@@ -213,25 +213,25 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
 
               {/* Direct Email Row with Subtle Copy Action */}
               <div className="space-y-2.5 border-t border-white/[0.08] pt-6">
-                <p className="font-mono-num text-[10.5px] uppercase tracking-[0.16em] text-[#68686C]">
+                <p className="font-mono-num text-[10.5px] uppercase tracking-[0.16em] text-[#867F70]">
                   {UI_COPY.contact.directEmailLabel[locale]}
                 </p>
                 <div className="flex items-center justify-between gap-3 border-b border-white/[0.10] pb-3">
                   <a
                     href={`mailto:${CONTACT_INFO.email}`}
-                    className="min-w-0 truncate font-mono-num text-xs text-[#F4F3EF] transition-colors hover:text-[#C8A878] sm:text-sm"
+                    className="min-w-0 truncate font-mono-num text-xs text-[#EBE4D4] transition-colors hover:text-[#D0A243] sm:text-sm"
                   >
                     {CONTACT_INFO.email}
                   </a>
                   <button
                     type="button"
                     onClick={handleCopyEmail}
-                    className="inline-flex min-h-[36px] shrink-0 items-center gap-1.5 font-mono-num text-[11px] uppercase tracking-[0.12em] text-[#9C9B96] transition-colors duration-200 hover:text-[#C8A878] whitespace-nowrap"
+                    className="inline-flex min-h-[36px] shrink-0 items-center gap-1.5 font-mono-num text-[11px] uppercase tracking-[0.12em] text-[#BDB6AD] transition-colors duration-200 hover:text-[#D0A243] whitespace-nowrap"
                   >
                     {copiedEmail ? (
                       <>
-                        <Check className="h-3.5 w-3.5 text-[#C8A878]" aria-hidden="true" />
-                        <span className="text-[#C8A878]">
+                        <Check className="h-3.5 w-3.5 text-[#97A78C]" aria-hidden="true" />
+                        <span className="text-[#97A78C]">
                           {locale === 'it' ? 'Copiata' : 'Copied'}
                         </span>
                       </>
@@ -254,16 +254,16 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                   <button
                     type="button"
                     onClick={handleDownloadCv}
-                    className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-[#C8A878]/50 bg-transparent px-5 font-display text-xs font-medium text-[#F4F3EF] transition-colors duration-200 hover:border-[#C8A878] hover:bg-[#C8A878]/10 hover:text-[#C8A878] whitespace-nowrap sm:text-sm"
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-[#D0A243]/50 bg-transparent px-5 font-display text-xs font-medium text-[#EBE4D4] transition-colors duration-200 hover:border-[#D0A243] hover:bg-[#D0A243]/10 hover:text-[#D0A243] whitespace-nowrap sm:text-sm"
                   >
                     {cvDownloaded ? (
                       <>
-                        <Check className="h-4 w-4 text-[#C8A878]" aria-hidden="true" />
-                        <span>{locale === 'it' ? 'CV scaricato' : 'CV downloaded'}</span>
+                        <Check className="h-4 w-4 text-[#97A78C]" aria-hidden="true" />
+                        <span className="text-[#97A78C]">{locale === 'it' ? 'CV scaricato' : 'CV downloaded'}</span>
                       </>
                     ) : (
                       <>
-                        <FileDown className="h-4 w-4 text-[#C8A878]" aria-hidden="true" />
+                        <FileDown className="h-4 w-4 text-[#D0A243]" aria-hidden="true" />
                         <span>
                           {locale === 'it' ? 'Scarica CV (PDF)' : 'Download CV (PDF)'}
                         </span>
@@ -283,18 +283,18 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex min-h-[38px] items-center gap-1 font-display text-xs font-medium text-[#9C9B96] transition-colors duration-200 hover:text-[#F4F3EF] sm:text-sm"
+                      className="group inline-flex min-h-[38px] items-center gap-1 font-display text-xs font-medium text-[#BDB6AD] transition-colors duration-200 hover:text-[#EBE4D4] sm:text-sm"
                     >
                       <span>{social.label}</span>
                       <ArrowUpRight
-                        className="h-3.5 w-3.5 text-[#68686C] transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#C8A878]"
+                        className="h-3.5 w-3.5 text-[#867F70] transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#D0A243]"
                         aria-hidden="true"
                       />
                     </a>
                   ))}
                 </div>
 
-                <p className="font-mono-num text-[11px] leading-relaxed text-[#68686C]">
+                <p className="font-mono-num text-[11px] leading-relaxed text-[#867F70]">
                   {locale === 'it'
                     ? 'Zero cookie di profilazione · Privacy GDPR-first.'
                     : 'Zero tracking cookies · GDPR-first privacy.'}
@@ -305,30 +305,30 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
 
           {/* Right Architectural Form Surface (Zero Sci-Fi Telemetry Headers) */}
           <ScrollReveal delay={0.1} duration={0.85} className="lg:col-span-7">
-            <div className="rounded-lg border border-white/[0.08] bg-[#111114] p-7 sm:p-9">
+            <div className="rounded-lg border border-white/[0.08] bg-[#131210] p-7 sm:p-9">
               {preparedPayload ? (
                 <div className="space-y-6 py-2" role="status" aria-live="polite">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[#C8A878]/40 bg-[#C8A878]/10 text-[#C8A878]">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[#D0A243]/40 bg-[#D0A243]/10 text-[#D0A243]">
                       <Check className="h-4 w-4" aria-hidden="true" />
                     </div>
-                    <h3 className="font-display text-xl font-medium text-[#F4F3EF]">
+                    <h3 className="font-display text-xl font-medium text-[#EBE4D4]">
                       {f.successTitle[locale]}
                     </h3>
                   </div>
 
-                  <p className="text-sm leading-relaxed text-[#9C9B96]">
+                  <p className="text-sm leading-relaxed text-[#BDB6AD]">
                     {f.successBody[locale]}
                   </p>
 
-                  <pre className="overflow-x-auto whitespace-pre-wrap rounded-md border border-white/[0.08] bg-[#09090B] p-4 font-mono-num text-xs leading-relaxed text-[#9C9B96]">
+                  <pre className="overflow-x-auto whitespace-pre-wrap rounded-md border border-white/[0.08] bg-[#0B0A09] p-4 font-mono-num text-xs leading-relaxed text-[#BDB6AD]">
                     {preparedPayload.plainText}
                   </pre>
 
                   <div className="flex flex-wrap items-center gap-3 pt-2">
                     <a
                       href={preparedPayload.mailtoHref}
-                      className="inline-flex min-h-[44px] items-center gap-2 rounded-md bg-[#F4F3EF] px-5 font-display text-sm font-medium text-[#09090B] transition-colors hover:bg-[#C8A878] whitespace-nowrap"
+                      className="inline-flex min-h-[44px] items-center gap-2 rounded-md bg-[#D0A243] px-5 font-display text-sm font-semibold text-[#0B0A09] transition-colors hover:bg-[#DEB252] whitespace-nowrap shadow-[0_4px_16px_rgba(208,162,67,0.2)]"
                     >
                       <Mail className="h-4 w-4" aria-hidden="true" />
                       <span>{f.openMailClient[locale]}</span>
@@ -337,16 +337,16 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                     <button
                       type="button"
                       onClick={handleCopyPayload}
-                      className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-white/[0.12] bg-[#09090B] px-4 font-display text-sm font-medium text-[#F4F3EF] transition-colors hover:border-[#C8A878]/60 hover:text-[#C8A878] whitespace-nowrap"
+                      className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-white/[0.12] bg-[#0B0A09] px-4 font-display text-sm font-medium text-[#EBE4D4] transition-colors hover:border-[#D0A243]/60 hover:text-[#D0A243] whitespace-nowrap"
                     >
                       {copiedPayload ? (
                         <>
-                          <Check className="h-4 w-4 text-[#C8A878]" aria-hidden="true" />
-                          <span>{f.copiedFormatted[locale]}</span>
+                          <Check className="h-4 w-4 text-[#97A78C]" aria-hidden="true" />
+                          <span className="text-[#97A78C]">{f.copiedFormatted[locale]}</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="h-4 w-4 text-[#9C9B96]" aria-hidden="true" />
+                          <Copy className="h-4 w-4 text-[#BDB6AD]" aria-hidden="true" />
                           <span>{f.copyFormatted[locale]}</span>
                         </>
                       )}
@@ -355,7 +355,7 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="inline-flex min-h-[44px] items-center px-3 font-display text-sm font-medium text-[#9C9B96] transition-colors hover:text-[#F4F3EF]"
+                      className="inline-flex min-h-[44px] items-center px-3 font-display text-sm font-medium text-[#BDB6AD] transition-colors hover:text-[#EBE4D4]"
                     >
                       {f.resetForm[locale]}
                     </button>
@@ -369,11 +369,11 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                       <div className="flex items-center justify-between gap-2">
                         <label
                           htmlFor="contact-name"
-                          className="text-xs font-medium text-[#9C9B96]"
+                          className="text-xs font-medium text-[#BDB6AD]"
                         >
                           {f.nameLabel[locale]}
                         </label>
-                        <span className="font-mono-num text-[11px] text-[#68686C]">
+                        <span className="font-mono-num text-[11px] text-[#867F70]">
                           {form.name.length}/{MAX_NAME}
                         </span>
                       </div>
@@ -397,10 +397,10 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                         placeholder={f.namePlaceholder[locale]}
                         aria-invalid={Boolean(errors.name)}
                         aria-describedby={errors.name ? 'contact-name-error' : undefined}
-                        className={`mt-2 min-h-[46px] w-full rounded-md border bg-[#09090B] px-3.5 text-sm text-[#F4F3EF] placeholder:text-[#68686C] transition-colors ${
+                        className={`mt-2 min-h-[46px] w-full rounded-md border bg-[#0B0A09] px-3.5 text-sm text-[#EBE4D4] placeholder:text-[#867F70] transition-colors ${
                           errors.name
                             ? 'border-[#E07A7A]'
-                            : 'border-white/[0.10] focus:border-[#C8A878]'
+                            : 'border-white/[0.10] focus:border-[#D0A243]'
                         }`}
                       />
                       {errors.name ? (
@@ -419,11 +419,11 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                       <div className="flex items-center justify-between gap-2">
                         <label
                           htmlFor="contact-email"
-                          className="text-xs font-medium text-[#9C9B96]"
+                          className="text-xs font-medium text-[#BDB6AD]"
                         >
                           {f.emailLabel[locale]}
                         </label>
-                        <span className="font-mono-num text-[11px] text-[#68686C]">
+                        <span className="font-mono-num text-[11px] text-[#867F70]">
                           {form.email.length}/{MAX_EMAIL}
                         </span>
                       </div>
@@ -447,10 +447,10 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                         placeholder={f.emailPlaceholder[locale]}
                         aria-invalid={Boolean(errors.email)}
                         aria-describedby={errors.email ? 'contact-email-error' : undefined}
-                        className={`mt-2 min-h-[46px] w-full rounded-md border bg-[#09090B] px-3.5 text-sm text-[#F4F3EF] placeholder:text-[#68686C] transition-colors ${
+                        className={`mt-2 min-h-[46px] w-full rounded-md border bg-[#0B0A09] px-3.5 text-sm text-[#EBE4D4] placeholder:text-[#867F70] transition-colors ${
                           errors.email
                             ? 'border-[#E07A7A]'
-                            : 'border-white/[0.10] focus:border-[#C8A878]'
+                            : 'border-white/[0.10] focus:border-[#D0A243]'
                         }`}
                       />
                       {errors.email ? (
@@ -470,11 +470,11 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                     <div className="flex items-center justify-between gap-2">
                       <label
                         htmlFor="contact-subject"
-                        className="text-xs font-medium text-[#9C9B96]"
+                        className="text-xs font-medium text-[#BDB6AD]"
                       >
                         {f.subjectLabel[locale]}
                       </label>
-                      <span className="font-mono-num text-[11px] text-[#68686C]">
+                      <span className="font-mono-num text-[11px] text-[#867F70]">
                         {form.subject.length}/{MAX_SUBJECT}
                       </span>
                     </div>
@@ -497,10 +497,10 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                       placeholder={f.subjectPlaceholder[locale]}
                       aria-invalid={Boolean(errors.subject)}
                       aria-describedby={errors.subject ? 'contact-subject-error' : undefined}
-                      className={`mt-2 min-h-[46px] w-full rounded-md border bg-[#09090B] px-3.5 text-sm text-[#F4F3EF] placeholder:text-[#68686C] transition-colors ${
+                      className={`mt-2 min-h-[46px] w-full rounded-md border bg-[#0B0A09] px-3.5 text-sm text-[#EBE4D4] placeholder:text-[#867F70] transition-colors ${
                         errors.subject
                           ? 'border-[#E07A7A]'
-                          : 'border-white/[0.10] focus:border-[#C8A878]'
+                          : 'border-white/[0.10] focus:border-[#D0A243]'
                       }`}
                     />
                     {errors.subject ? (
@@ -519,11 +519,11 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                     <div className="flex items-center justify-between gap-2">
                       <label
                         htmlFor="contact-message"
-                        className="text-xs font-medium text-[#9C9B96]"
+                        className="text-xs font-medium text-[#BDB6AD]"
                       >
                         {f.messageLabel[locale]}
                       </label>
-                      <span className="font-mono-num text-[11px] text-[#68686C]">
+                      <span className="font-mono-num text-[11px] text-[#867F70]">
                         {form.message.length}/{MAX_MESSAGE}
                       </span>
                     </div>
@@ -543,10 +543,10 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                       placeholder={f.messagePlaceholder[locale]}
                       aria-invalid={Boolean(errors.message)}
                       aria-describedby={errors.message ? 'contact-message-error' : undefined}
-                      className={`mt-2 w-full rounded-md border bg-[#09090B] px-3.5 py-3 text-sm leading-relaxed text-[#F4F3EF] placeholder:text-[#68686C] transition-colors ${
+                      className={`mt-2 w-full rounded-md border bg-[#0B0A09] px-3.5 py-3 text-sm leading-relaxed text-[#EBE4D4] placeholder:text-[#867F70] transition-colors ${
                         errors.message
                           ? 'border-[#E07A7A]'
-                          : 'border-white/[0.10] focus:border-[#C8A878]'
+                          : 'border-white/[0.10] focus:border-[#D0A243]'
                       }`}
                     />
                     {errors.message ? (
@@ -584,17 +584,17 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                         aria-describedby={
                           errors.privacyAccepted ? 'contact-privacy-error' : undefined
                         }
-                        className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-white/25 bg-[#09090B] accent-[#C8A878]"
+                        className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-white/25 bg-[#0B0A09] accent-[#D0A243]"
                       />
                       <label
                         htmlFor="contact-privacy"
-                        className="text-xs leading-relaxed text-[#9C9B96]"
+                        className="text-xs leading-relaxed text-[#BDB6AD]"
                       >
                         {f.privacyPrefix[locale]}
                         <button
                           type="button"
                           onClick={() => onOpenLegal('privacy')}
-                          className="font-medium text-[#C8A878] underline underline-offset-4 hover:text-[#F4F3EF]"
+                          className="font-medium text-[#D0A243] underline underline-offset-4 hover:text-[#EBE4D4]"
                         >
                           {f.privacyLink[locale]}
                         </button>
@@ -616,7 +616,7 @@ export function ContactSection({ onOpenLegal }: ContactSectionProps) {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="group inline-flex min-h-[46px] w-full items-center justify-center gap-2.5 rounded-md bg-[#F4F3EF] px-6 font-display text-sm font-medium text-[#09090B] transition-colors duration-200 hover:bg-[#C8A878] disabled:opacity-60 sm:w-auto"
+                      className="group inline-flex min-h-[46px] w-full items-center justify-center gap-2.5 rounded-md bg-[#D0A243] px-6 font-display text-sm font-semibold text-[#0B0A09] transition-colors duration-200 hover:bg-[#DEB252] disabled:opacity-60 sm:w-auto shadow-[0_4px_16px_rgba(208,162,67,0.2)]"
                     >
                       <span>
                         {isSubmitting

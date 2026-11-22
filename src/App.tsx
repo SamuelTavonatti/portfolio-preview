@@ -69,7 +69,7 @@ function PortfolioContent() {
   }, []);
 
   return (
-    <div id="top" className="min-h-screen overflow-x-clip bg-[#07080B] text-[#F5F5F7]">
+    <div id="top" className="min-h-screen overflow-x-clip bg-[#0B0A09] text-[#EBE4D4]">
       <a href="#main-content" className="skip-link">
         {UI_COPY.skipToContent[locale]}
       </a>

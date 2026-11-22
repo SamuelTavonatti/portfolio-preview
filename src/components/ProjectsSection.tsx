@@ -78,22 +78,22 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
     <section
       id="progetti"
       aria-labelledby="projects-heading"
-      className="relative z-10 scroll-mt-20 border-t border-white/[0.08] bg-[#07080B] py-20 sm:py-26"
+      className="relative z-10 scroll-mt-20 border-t border-white/[0.08] bg-[#0B0A09] py-20 sm:py-26"
     >
       <div className="mx-auto max-w-[1160px] px-4 sm:px-8">
         <ScrollReveal duration={0.85}>
           <div className="space-y-7">
             <div className="max-w-2xl space-y-3">
-              <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.2em] text-[#F59E0B]">
+              <p className="font-mono-num text-[11px] font-medium uppercase tracking-[0.2em] text-[#D0A243]">
                 01 — {locale === 'it' ? 'Archivio Lavori' : 'Work Archive'}
               </p>
               <h2
                 id="projects-heading"
-                className="font-display text-3xl font-semibold tracking-[-0.035em] text-[#F5F5F7] sm:text-5xl"
+                className="font-display text-3xl font-semibold tracking-[-0.035em] text-[#EBE4D4] sm:text-5xl"
               >
                 {locale === 'it' ? 'Case Study & Progetti' : 'Case Studies & Projects'}
               </h2>
-              <p className="text-sm leading-relaxed text-[#94A3B8] sm:text-base">
+              <p className="text-sm leading-relaxed text-[#BDB6AD] sm:text-base">
                 {locale === 'it'
                   ? 'Tre progetti reali tra prodotto web indipendente, ricerca HCI universitaria e architettura editoriale su CMS.'
                   : 'Three real projects spanning independent web product engineering, university HCI research, and enterprise CMS architecture.'}
@@ -116,8 +116,8 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
                     aria-pressed={selected}
                     className={`relative min-h-[42px] pb-3 font-display text-xs font-medium transition-colors duration-200 whitespace-nowrap sm:text-sm ${
                       selected
-                        ? 'text-[#F5F5F7]'
-                        : 'text-[#64748B] hover:text-[#CBD5E1]'
+                        ? 'text-[#EBE4D4]'
+                        : 'text-[#867F70] hover:text-[#BDB6AD]'
                     }`}
                   >
                     <span>{opt.label[locale]}</span>
@@ -130,7 +130,7 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
                             : { duration: 0.42, ease: [0.22, 1, 0.36, 1] }
                         }
                         aria-hidden="true"
-                        className="absolute inset-x-0 -bottom-px h-[2px] bg-[#F59E0B]"
+                        className="absolute inset-x-0 -bottom-px h-[2px] bg-[#D0A243]"
                       />
                     ) : null}
                   </button>
@@ -155,7 +155,7 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
                 duration={0.85}
                 className="h-full"
               >
-                <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.09] bg-[#111318] transition-[border-color,transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-[#F59E0B]/40 hover:shadow-[0_22px_54px_rgba(0,0,0,0.5)]">
+                <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.09] bg-[#131210] transition-[border-color,transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-[#D0A243]/45 hover:shadow-[0_22px_54px_rgba(0,0,0,0.5)]">
                   {/* Authentic Product UI Preview (VoltRep & ESU) / Dolomites Photo (Trentino) */}
                   <button
                     type="button"
@@ -168,15 +168,15 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
 
                   <div className="flex flex-1 flex-col justify-between p-6">
                     <div>
-                      <p className="font-mono-num text-[10.5px] font-medium uppercase tracking-[0.14em] text-[#F59E0B]">
+                      <p className="font-mono-num text-[10.5px] font-medium uppercase tracking-[0.14em] text-[#D0A243]">
                         {metaLine}
                       </p>
 
-                      <h3 className="mt-2.5 font-display text-xl font-semibold leading-snug tracking-[-0.02em] text-[#F5F5F7]">
+                      <h3 className="mt-2.5 font-display text-xl font-semibold leading-snug tracking-[-0.02em] text-[#EBE4D4]">
                         {study.title[locale]}
                       </h3>
 
-                      <p className="mt-2.5 text-sm leading-relaxed text-[#94A3B8]">
+                      <p className="mt-2.5 text-sm leading-relaxed text-[#BDB6AD]">
                         {study.summary[locale]}
                       </p>
 
@@ -188,8 +188,8 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
                               key={kpi}
                               className={`rounded-full border px-2.5 py-1 font-mono-num text-[10.5px] font-medium ${
                                 kIdx === 0
-                                  ? 'border-[#3B82F6]/35 bg-[#3B82F6]/10 text-[#93C5FD]'
-                                  : 'border-white/[0.09] bg-[#07080B] text-[#CBD5E1]'
+                                  ? 'border-[#20505D]/60 bg-[#20505D]/20 text-[#95B1BA]'
+                                  : 'border-white/[0.09] bg-[#0B0A09] text-[#BDB6AD]'
                               }`}
                             >
                               {kpi}
@@ -204,7 +204,7 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
                       <button
                         type="button"
                         onClick={() => onSelectCaseStudy(study)}
-                        className="inline-flex min-h-[40px] items-center gap-1.5 font-display text-xs font-semibold text-[#F5F5F7] transition-colors duration-200 hover:text-[#F59E0B] whitespace-nowrap sm:text-sm"
+                        className="inline-flex min-h-[40px] items-center gap-1.5 font-display text-xs font-semibold text-[#EBE4D4] transition-colors duration-200 hover:text-[#D0A243] whitespace-nowrap sm:text-sm"
                       >
                         <span>
                           {locale === 'it' ? 'Leggi Case Study' : 'Read Case Study'}
@@ -220,7 +220,7 @@ export function ProjectsSection({ onSelectCaseStudy }: ProjectsSectionProps) {
                           href={study.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex min-h-[34px] items-center gap-1 rounded-full border border-[#F59E0B]/40 bg-[#F59E0B]/10 px-3 font-display text-xs font-semibold text-[#F59E0B] transition-colors duration-200 hover:bg-[#F59E0B] hover:text-[#07080B] whitespace-nowrap"
+                          className="inline-flex min-h-[34px] items-center gap-1 rounded-full border border-[#D0A243]/40 bg-[#D0A243]/10 px-3 font-display text-xs font-semibold text-[#D0A243] transition-colors duration-200 hover:bg-[#D0A243] hover:text-[#0B0A09] whitespace-nowrap"
                         >
                           <span>{locale === 'it' ? 'Apri Live' : 'Open Live'}</span>
                           <ArrowUpRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />

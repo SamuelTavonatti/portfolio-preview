@@ -50,18 +50,18 @@ export function LegalModal({ activeTab, onChangeTab, onClose }: LegalModalProps)
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={prefersReducedMotion ? undefined : { opacity: 0, y: 8, scale: 0.98 }}
             transition={{ duration: 0.24, ease: EDITORIAL_EASE }}
-            className="relative z-10 flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-white/[0.10] bg-[#111114] shadow-2xl"
+            className="relative z-10 flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-white/[0.10] bg-[#131210] shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] px-5 py-4 sm:px-7">
               <div className="min-w-0">
                 <h2
                   id="legal-modal-title"
-                  className="truncate font-display text-base font-medium text-[#F4F3EF] sm:text-lg"
+                  className="truncate font-display text-base font-medium text-[#EBE4D4] sm:text-lg"
                 >
                   {UI_COPY.legal.modalTitle[locale]}
                 </h2>
-                <p className="mt-0.5 text-xs text-[#68686C]">
+                <p className="mt-0.5 text-xs text-[#867F70]">
                   {UI_COPY.legal.updated[locale]}
                 </p>
               </div>
@@ -72,7 +72,7 @@ export function LegalModal({ activeTab, onChangeTab, onClose }: LegalModalProps)
                   type="button"
                   onClick={onClose}
                   aria-label={UI_COPY.legal.close[locale]}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/[0.10] bg-[#09090B] text-[#F4F3EF] transition-colors hover:border-[#C8A878]/50 hover:text-[#C8A878]"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/[0.10] bg-[#0B0A09] text-[#EBE4D4] transition-colors hover:border-[#D0A243]/50 hover:text-[#D0A243]"
                 >
                   <X className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -83,7 +83,7 @@ export function LegalModal({ activeTab, onChangeTab, onClose }: LegalModalProps)
             <div
               role="tablist"
               aria-label={UI_COPY.legal.modalTitle[locale]}
-              className="flex items-center gap-6 overflow-x-auto border-b border-white/[0.08] bg-[#09090B] px-5 sm:px-7"
+              className="flex items-center gap-6 overflow-x-auto border-b border-white/[0.08] bg-[#0B0A09] px-5 sm:px-7"
             >
               {LEGAL_TABS.map((tab) => {
                 const selected = tab === activeTab;
@@ -98,8 +98,8 @@ export function LegalModal({ activeTab, onChangeTab, onClose }: LegalModalProps)
                     onClick={() => onChangeTab(tab)}
                     className={`relative min-h-[44px] py-3 font-display text-xs font-medium transition-colors duration-200 whitespace-nowrap shrink-0 ${
                       selected
-                        ? 'text-[#F4F3EF]'
-                        : 'text-[#68686C] hover:text-[#9C9B96]'
+                        ? 'text-[#EBE4D4]'
+                        : 'text-[#867F70] hover:text-[#BDB6AD]'
                     }`}
                   >
                     <span>{UI_COPY.legal.tabs[tab][locale]}</span>
@@ -112,7 +112,7 @@ export function LegalModal({ activeTab, onChangeTab, onClose }: LegalModalProps)
                             : { duration: 0.35, ease: EDITORIAL_EASE }
                         }
                         aria-hidden="true"
-                        className="absolute inset-x-0 bottom-0 h-px bg-[#C8A878]"
+                        className="absolute inset-x-0 bottom-0 h-px bg-[#D0A243]"
                       />
                     ) : null}
                   </button>
@@ -129,10 +129,10 @@ export function LegalModal({ activeTab, onChangeTab, onClose }: LegalModalProps)
             >
               {sections.map((section) => (
                 <div key={section.heading} className="space-y-2">
-                  <h3 className="font-display text-base font-medium text-[#F4F3EF]">
+                  <h3 className="font-display text-base font-medium text-[#EBE4D4]">
                     {section.heading}
                   </h3>
-                  <p className="text-sm leading-[1.7] text-[#9C9B96]">{section.body}</p>
+                  <p className="text-sm leading-[1.7] text-[#BDB6AD]">{section.body}</p>
                 </div>
               ))}
             </div>

@@ -1,21 +1,54 @@
 @import "tailwindcss";
 
 :root {
-  --bg-canvas: #09090B;
-  --bg-surface: #111114;
-  --bg-elevated: #16161A;
-  --border-hairline: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  /* Samuel Tavonatti Natural Palette: Autunno Soft / Caldo */
+  --palette-senape: #D0A243;
+  --palette-senape-hover: #DEB252;
+  --palette-senape-soft: rgba(208, 162, 67, 0.12);
+  --palette-senape-border: rgba(208, 162, 67, 0.35);
 
-  --text-primary: #F4F3EF;
-  --text-secondary: #9C9B96;
-  --text-muted: #68686C;
+  --palette-siena: #A8532C;
+  --palette-terracotta: #B1603A;
+  --palette-terracotta-soft: rgba(177, 96, 58, 0.14);
 
-  /* Single restrained luxury accent: Muted Brushed Champagne */
-  --accent-champagne: #C8A878;
-  --accent-champagne-hover: #D8BC91;
-  --accent-champagne-soft: rgba(200, 168, 120, 0.10);
-  --accent-champagne-border: rgba(200, 168, 120, 0.32);
+  --palette-petrolio: #20505D;
+  --palette-petrolio-deep: #16363F;
+  --palette-carta-zucchero: #95B1BA;
+  --palette-carta-zucchero-soft: rgba(149, 177, 186, 0.14);
+
+  --palette-verde-salvia: #97A78C;
+  --palette-verde-oliva: #71734B;
+
+  --palette-cacao: #664536;
+  --palette-sabbia: #C9B091;
+  --palette-bordeaux: #792733;
+
+  /* Neutri Base: Warm Editorial Materials */
+  --palette-avorio: #EBE4D4;
+  --palette-avorio-soft: #F4EFE6;
+  --palette-grigio-caldo: #BDB6AD;
+  --palette-fango: #867F70;
+
+  /* Surfaces: Warm Midnight Umber & Obsidian */
+  --bg-canvas: #0B0A09;
+  --bg-surface: #131210;
+  --bg-elevated: #1A1815;
+  --border-hairline: rgba(235, 228, 212, 0.08);
+  --border-strong: rgba(235, 228, 212, 0.16);
+
+  --text-primary: #EBE4D4;
+  --text-secondary: #BDB6AD;
+  --text-muted: #867F70;
+
+  /* Accents */
+  --accent-senape: var(--palette-senape);
+  --accent-senape-hover: var(--palette-senape-hover);
+  --accent-petrolio: var(--palette-petrolio);
+  --accent-carta-zucchero: var(--palette-carta-zucchero);
+  --accent-champagne: var(--palette-senape);
+  --accent-champagne-hover: var(--palette-senape-hover);
+  --accent-champagne-soft: var(--palette-senape-soft);
+  --accent-champagne-border: var(--palette-senape-border);
 
   --status-error: #D97777;
 
@@ -27,7 +60,7 @@
 }
 
 ::selection {
-  background-color: rgba(200, 168, 120, 0.25);
+  background-color: rgba(208, 162, 67, 0.28);
   color: var(--text-primary);
 }
 
@@ -70,7 +103,7 @@ h1, h2, h3, h4, .font-display {
 }
 
 :focus-visible {
-  outline: 1.5px solid var(--accent-champagne);
+  outline: 1.5px solid var(--palette-senape);
   outline-offset: 3px;
   border-radius: 3px;
 }
@@ -81,8 +114,8 @@ h1, h2, h3, h4, .font-display {
   left: 16px;
   top: -120px;
   z-index: 100;
-  background-color: #F4F3EF;
-  color: #09090B;
+  background-color: var(--palette-avorio);
+  color: #0B0A09;
   padding: 12px 18px;
   border-radius: 4px;
   font-family: var(--font-display);
@@ -106,12 +139,12 @@ h1, h2, h3, h4, .font-display {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 155, 150, 0.24);
+  background: rgba(189, 182, 173, 0.22);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(200, 168, 120, 0.5);
+  background: rgba(208, 162, 67, 0.55);
 }
 
 @media (prefers-reduced-motion: reduce) {

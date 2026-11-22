@@ -24,7 +24,7 @@ export function LanguageToggle({ compact = false }: LanguageToggleProps) {
         return (
           <span key={opt.value} className="inline-flex items-center">
             {idx > 0 ? (
-              <span aria-hidden="true" className="mx-1 text-[11px] text-[#4A4A4F]">
+              <span aria-hidden="true" className="mx-1 text-[11px] text-[#867F70]/60">
                 /
               </span>
             ) : null}
@@ -36,8 +36,8 @@ export function LanguageToggle({ compact = false }: LanguageToggleProps) {
                 compact ? 'min-h-[36px] px-1.5 text-[11px]' : 'min-h-[40px] px-2 text-xs'
               } tracking-[0.12em] ${
                 isActive
-                  ? 'font-semibold text-[#F59E0B]'
-                  : 'text-[#64748B] hover:text-[#F5F5F7]'
+                  ? 'font-semibold text-[#D0A243]'
+                  : 'text-[#867F70] hover:text-[#EBE4D4]'
               }`}
             >
               {opt.label}

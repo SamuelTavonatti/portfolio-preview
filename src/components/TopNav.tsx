@@ -153,8 +153,8 @@ export function TopNav() {
       <header
         className={`sticky top-0 z-40 h-16 border-b transition-colors duration-300 backdrop-blur-md ${
           scrolled
-            ? 'border-white/[0.10] bg-[#07080B]/92 shadow-[0_8px_30px_rgba(0,0,0,0.35)]'
-            : 'border-white/[0.06] bg-[#07080B]/80'
+            ? 'border-white/[0.10] bg-[#0B0A09]/92 shadow-[0_8px_30px_rgba(0,0,0,0.35)]'
+            : 'border-white/[0.06] bg-[#0B0A09]/80'
         }`}
       >
         <div className="mx-auto flex h-full max-w-[1160px] items-center justify-between gap-4 px-4 sm:px-8">
@@ -162,21 +162,21 @@ export function TopNav() {
           <a
             href="#panoramica"
             onClick={() => handleSelectNav('panoramica')}
-            className="inline-flex min-w-0 items-center gap-2.5 font-display text-[15px] font-semibold tracking-[-0.02em] text-[#F5F5F7] transition-colors duration-200 hover:text-[#F59E0B] whitespace-nowrap shrink-0"
+            className="inline-flex min-w-0 items-center gap-2.5 font-display text-[15px] font-semibold tracking-[-0.02em] text-[#EBE4D4] transition-colors duration-200 hover:text-[#D0A243] whitespace-nowrap shrink-0"
           >
             <span
               aria-hidden="true"
-              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#F59E0B]/40 bg-[#111318] font-mono-num text-[11px] font-semibold text-[#F59E0B]"
+              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#D0A243]/40 bg-[#131210] font-mono-num text-[11px] font-semibold text-[#D0A243]"
             >
               ST
             </span>
             <span className="truncate">Samuel Tavonatti</span>
           </a>
 
-          {/* Desktop Navigation with Smooth Gliding Semi-Warm Amber Indicator */}
+          {/* Desktop Navigation with Smooth Gliding Senape Indicator */}
           <nav
             aria-label={locale === 'it' ? 'Navigazione principale' : 'Primary navigation'}
-            className="hidden md:flex items-center gap-1 rounded-full border border-white/[0.08] bg-[#111318]/85 p-1"
+            className="hidden md:flex items-center gap-1 rounded-full border border-white/[0.08] bg-[#131210]/85 p-1"
           >
             {navItems.map((item) => {
               const isActive = activeSection === item.id;
@@ -188,8 +188,8 @@ export function TopNav() {
                   aria-current={isActive ? 'page' : undefined}
                   className={`relative z-10 inline-flex min-h-[34px] items-center rounded-full px-4 font-display text-[13px] font-medium transition-colors duration-200 whitespace-nowrap shrink-0 ${
                     isActive
-                      ? 'text-[#F5F5F7]'
-                      : 'text-[#94A3B8] hover:text-[#F5F5F7]'
+                      ? 'text-[#EBE4D4]'
+                      : 'text-[#BDB6AD] hover:text-[#EBE4D4]'
                   }`}
                 >
                   {isActive ? (
@@ -201,7 +201,7 @@ export function TopNav() {
                           : { duration: 0.42, ease: EDITORIAL_EASE }
                       }
                       aria-hidden="true"
-                      className="absolute inset-0 -z-10 rounded-full border border-[#F59E0B]/55 bg-[#F59E0B]/14 shadow-[0_0_16px_rgba(245,158,11,0.16)]"
+                      className="absolute inset-0 -z-10 rounded-full border border-[#D0A243]/55 bg-[#D0A243]/14 shadow-[0_0_16px_rgba(208,162,67,0.16)]"
                     />
                   ) : null}
                   <span>{item.label}</span>
@@ -214,7 +214,7 @@ export function TopNav() {
                           : { duration: 0.42, ease: EDITORIAL_EASE }
                       }
                       aria-hidden="true"
-                      className="absolute inset-x-4 bottom-0.5 h-[2px] rounded-full bg-[#F59E0B]"
+                      className="absolute inset-x-4 bottom-0.5 h-[2px] rounded-full bg-[#D0A243]"
                     />
                   ) : null}
                 </a>
@@ -232,7 +232,7 @@ export function TopNav() {
               aria-label={UI_COPY.nav.openMenu[locale]}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav-drawer"
-              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full border border-white/[0.12] bg-[#111318] px-3.5 font-display text-xs font-medium text-[#F5F5F7] transition-colors duration-200 hover:border-[#F59E0B]/55 hover:text-[#F59E0B] md:hidden"
+              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full border border-white/[0.12] bg-[#131210] px-3.5 font-display text-xs font-medium text-[#EBE4D4] transition-colors duration-200 hover:border-[#D0A243]/55 hover:text-[#D0A243] md:hidden"
             >
               <Menu className="h-4 w-4" aria-hidden="true" />
               <span>{locale === 'it' ? 'Menu' : 'Menu'}</span>
@@ -267,18 +267,18 @@ export function TopNav() {
               animate={{ x: 0 }}
               exit={prefersReducedMotion ? undefined : { x: '100%' }}
               transition={{ duration: 0.34, ease: EDITORIAL_EASE }}
-              className="fixed inset-y-0 right-0 flex w-full max-w-[300px] flex-col justify-between border-l border-white/[0.10] bg-[#111318] p-6 shadow-2xl"
+              className="fixed inset-y-0 right-0 flex w-full max-w-[300px] flex-col justify-between border-l border-white/[0.10] bg-[#131210] p-6 shadow-2xl"
             >
               <div>
                 <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
                   <div className="flex items-center gap-2.5">
                     <span
                       aria-hidden="true"
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#F59E0B]/40 bg-[#07080B] font-mono-num text-[11px] font-semibold text-[#F59E0B]"
+                      className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[#D0A243]/40 bg-[#0B0A09] font-mono-num text-[11px] font-semibold text-[#D0A243]"
                     >
                       ST
                     </span>
-                    <span className="font-display text-sm font-semibold text-[#F5F5F7]">
+                    <span className="font-display text-sm font-semibold text-[#EBE4D4]">
                       Samuel Tavonatti
                     </span>
                   </div>
@@ -286,7 +286,7 @@ export function TopNav() {
                     type="button"
                     onClick={closeMobile}
                     aria-label={UI_COPY.nav.closeMenu[locale]}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.12] bg-[#07080B] text-[#F5F5F7] transition-colors hover:border-[#F59E0B]/55 hover:text-[#F59E0B]"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.12] bg-[#0B0A09] text-[#EBE4D4] transition-colors hover:border-[#D0A243]/55 hover:text-[#D0A243]"
                   >
                     <X className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -306,15 +306,15 @@ export function TopNav() {
                         aria-current={isActive ? 'page' : undefined}
                         className={`flex min-h-[46px] items-center justify-between rounded-xl px-4 font-display text-sm font-medium transition-colors ${
                           isActive
-                            ? 'border border-[#F59E0B]/45 bg-[#F59E0B]/12 text-[#F5F5F7]'
-                            : 'text-[#94A3B8] hover:bg-white/[0.04] hover:text-[#F5F5F7]'
+                            ? 'border border-[#D0A243]/45 bg-[#D0A243]/12 text-[#EBE4D4]'
+                            : 'text-[#BDB6AD] hover:bg-white/[0.04] hover:text-[#EBE4D4]'
                         }`}
                       >
                         <span>{item.label}</span>
                         {isActive ? (
                           <span
                             aria-hidden="true"
-                            className="h-1.5 w-1.5 rounded-full bg-[#F59E0B]"
+                            className="h-1.5 w-1.5 rounded-full bg-[#D0A243]"
                           />
                         ) : null}
                       </a>
@@ -324,7 +324,7 @@ export function TopNav() {
               </div>
 
               <div className="flex items-center justify-between border-t border-white/[0.08] pt-5">
-                <span className="font-mono-num text-[11px] uppercase tracking-wider text-[#64748B]">
+                <span className="font-mono-num text-[11px] uppercase tracking-wider text-[#867F70]">
                   {locale === 'it' ? 'Lingua' : 'Language'}
                 </span>
                 <LanguageToggle compact />

@@ -44,7 +44,7 @@ function buildExecutiveCvPdf(locale: Locale): Blob {
       size: 11,
       bold: true,
       gapBefore: 4,
-      color: [0.52, 0.41, 0.25],
+      color: [0.82, 0.64, 0.26],
     },
     {
       text: 'samuel.tavonatti05@gmail.com  |  linkedin.com/in/samuel-tavonatti  |  github.com/samueltavonatti',
