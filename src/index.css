@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+:root {
+  --bg-canvas: #09090B;
+  --bg-surface: #111114;
+  --bg-elevated: #16161A;
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text-primary: #F4F3EF;
+  --text-secondary: #9C9B96;
+  --text-muted: #68686C;
+
+  /* Single restrained luxury accent: Muted Brushed Champagne */
+  --accent-champagne: #C8A878;
+  --accent-champagne-hover: #D8BC91;
+  --accent-champagne-soft: rgba(200, 168, 120, 0.10);
+  --accent-champagne-border: rgba(200, 168, 120, 0.32);
+
+  --status-error: #D97777;
+
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::selection {
+  background-color: rgba(200, 168, 120, 0.25);
+  color: var(--text-primary);
+}
+
+html {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-optical-sizing: auto;
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  letter-spacing: -0.011em;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 1.5px solid var(--accent-champagne);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Skip to content link for keyboard users */
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -120px;
+  z-index: 100;
+  background-color: #F4F3EF;
+  color: #09090B;
+  padding: 12px 18px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: top 180ms var(--ease-editorial);
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
+/* Subtle quiet scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 155, 150, 0.24);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 168, 120, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

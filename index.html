@@ -1,46 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2304060C' stroke='%23E2B878' stroke-width='4'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-family='Inter, sans-serif' font-weight='700' font-size='42' fill='%23E2B878'>ST</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Samuel Tavonatti — UI/UX Designer &amp; Interaction Design</title>
-    <meta name="description" content="Portfolio di Samuel Tavonatti: Interaction Design, ergonomia cognitiva, prototipazione UI/UX e architetture CMS enterprise." />
-    <meta name="theme-color" content="#04060C" />
-    <meta name="google-site-verification" content="ToX9Nmsn9mQUw-DWINSguE53Bo7Q_pgIFXd9-vvb9tk" />
-
-    <link rel="canonical" href="https://samueltavonatti.github.io/portfolio-preview/" />
-    <meta name="referrer" content="strict-origin-when-cross-origin" />
-
-    <!-- Open Graph -->
+    <title>Samuel Tavonatti — UX/UI Designer</title>
+    <meta
+      name="description"
+      content="Portfolio personale di Samuel Tavonatti, UX/UI Designer con competenze front-end e motion design. Progetti: VoltRep, ESU HCI, Trentino Marketing."
+    />
+    <meta property="og:title" content="Samuel Tavonatti — UX/UI Designer" />
+    <meta
+      property="og:description"
+      content="Interfacce calme, leggibili e a basso carico cognitivo. Progetti selezionati: VoltRep, ESU HCI e Trentino Marketing."
+    />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Samuel Tavonatti — UI/UX Designer &amp; Interaction Design" />
-    <meta property="og:description" content="Progettazione di interfacce digitali ad alta usabilità, ergonomia cognitiva e case study reali." />
-    <meta property="og:image" content="https://samueltavonatti.github.io/portfolio-preview/assets/avatar.webp" />
-
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Samuel Tavonatti — UI/UX Designer &amp; Interaction Design" />
-    <meta name="twitter:description" content="Progettazione di interfacce digitali ad alta usabilità, ergonomia cognitiva e case study reali." />
-    <meta name="twitter:image" content="https://samueltavonatti.github.io/portfolio-preview/assets/avatar.webp" />
-
-    <!-- SPA 404.html restore for GitHub Pages -->
-    <script>
-      (function(l) {
-        if (l.search[1] === '/') {
-          var decoded = l.search.slice(1).split('&').map(function(s) {
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          var basePath = l.pathname.endsWith('/') ? l.pathname.slice(0, -1) : l.pathname;
-          window.history.replaceState(null, null,
-              basePath + (decoded.startsWith('/') ? '' : '/') + decoded + l.hash
-          );
-        }
-      }(window.location))
-    </script>
+    <meta name="theme-color" content="#09090B" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+  <body class="bg-[#09090B] text-[#F4F3EF] antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
