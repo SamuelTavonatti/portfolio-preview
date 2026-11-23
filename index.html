@@ -133,25 +133,92 @@
   }
   .lang button.charging { color: var(--accent); }
 
-  /* Sipario (apertura iniziale protetta) */
-  .curtain {
-    position: fixed; top: 0; bottom: 0; width: 50vw; z-index: 40;
-    background: var(--surface);
+  /* Kinetic Opening Curtain (00 -> 100 + architectural hairlines + clip-path wipe) */
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: var(--bg);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    clip-path: inset(0% 0% 0% 0%);
+    transition: clip-path 0.72s cubic-bezier(0.76, 0, 0.24, 1), visibility 0.72s;
+    will-change: clip-path;
+  }
+  .preloader.done {
+    clip-path: inset(0% 0% 100% 0%);
+    visibility: hidden;
     pointer-events: none;
-    transition: transform 1.9s cubic-bezier(0.7, 0, 0.2, 1);
   }
-  .curtain.l { left: 0; }
-  .curtain.r { right: 0; }
-  .curtain.l::after, .curtain.r::after {
-    content: ""; position: absolute; top: 0; bottom: 0; width: 1px;
-    background: linear-gradient(180deg, transparent, var(--accent) 50%, transparent);
-    opacity: 0.6;
+  .preloader-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
   }
-  .curtain.l::after { right: 0; }
-  .curtain.r::after { left: 0; }
-  html:not(.js) .curtain, html.reduce .curtain { display: none; }
-  body.opened .curtain.l { transform: translateX(-100%); }
-  body.opened .curtain.r { transform: translateX(100%); }
+  .preloader-grid .hl-v,
+  .preloader-grid .hl-h {
+    position: absolute;
+    background: rgba(248, 250, 252, 0.06);
+  }
+  .preloader-grid .hl-v { top: 0; bottom: 0; width: 1px; }
+  .preloader-grid .hl-v.v1 { left: 25%; }
+  .preloader-grid .hl-v.v2 { left: 75%; }
+  .preloader-grid .hl-h { left: 0; right: 0; height: 1px; top: 50%; }
+  .preloader-axis {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--accent);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    opacity: 0.7;
+    will-change: transform;
+  }
+  .preloader-center {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(18px, 4vw, 56px);
+    padding: 0 24px;
+  }
+  .preloader-word {
+    font-size: clamp(13px, 1.4vw, 16px);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--soft);
+    will-change: transform, opacity;
+  }
+  .preloader-aperture {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    min-width: clamp(110px, 18vw, 220px);
+    padding: 12px 24px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .preloader-num {
+    font-size: clamp(3rem, 7.5vw, 5.5rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--text);
+  }
+  .preloader-pct {
+    font-size: clamp(14px, 1.5vw, 18px);
+    font-weight: 500;
+    color: var(--accent);
+    margin-left: 4px;
+  }
+  html:not(.js) .preloader, html.reduce .preloader { display: none; }
 
   /* Navigazione */
   .nav {
@@ -207,28 +274,73 @@
   }
   .mobile-menu a:hover { background: var(--surface-elevated); color: var(--text); }
 
-  /* Stage hero (fisica parallasse & scroll pinned protetti) */
+  /* Stage hero (100dvh monumentale + velocity rails + clip-path scroll stage) */
   .stage { position: relative; z-index: 1; }
   .sticky { position: relative; display: grid; place-items: center; overflow: hidden; }
   .layer { position: relative; text-align: center; padding: 120px 24px; }
-  .hero { overflow: hidden; }
+  .hero { overflow: hidden; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; }
 
   /* Luce morbida nella hero (tono ciano calibrato) */
   .hero-light {
     position: absolute; inset: 0; pointer-events: none; z-index: 0;
-    background: radial-gradient(520px circle at var(--lx, 50%) var(--ly, 40%), rgba(var(--accent-rgb), 0.11), rgba(var(--accent-rgb), 0) 70%);
+    background: radial-gradient(560px circle at var(--lx, 50%) var(--ly, 42%), rgba(var(--accent-rgb), 0.13), rgba(var(--accent-rgb), 0) 70%);
     transition: opacity 0.6s;
   }
-  .hero > div { position: relative; z-index: 1; }
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1280px;
+    width: 100%;
+    will-change: transform;
+  }
 
-  /* H1 con lettere reattive (fisica protetta) */
+  /* Dual-Direction Kinetic Velocity Bands (edge-to-edge) */
+  .kinetic-rail {
+    position: absolute;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 9px 0;
+    opacity: 0.72;
+    will-change: opacity;
+  }
+  .kinetic-rail.top { top: 68px; }
+  .kinetic-rail.bottom { bottom: 100px; }
+  .kinetic-track {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    width: max-content;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    will-change: transform;
+  }
+  .kinetic-track .k-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .kinetic-track .k-accent { color: var(--accent); }
+
+  /* Monumental Edge-to-Edge Hero Typography */
   .hero-name {
-    font-size: clamp(48px, 8.5vw, 96px);
+    font-size: clamp(3.6rem, 9.5vw, 8.5rem);
     font-weight: 600;
-    letter-spacing: -0.04em;
-    line-height: 1.02;
-    display: flex; gap: 0.22em; justify-content: center; flex-wrap: wrap;
-    will-change: translate;
+    letter-spacing: -0.045em;
+    line-height: 0.96;
+    display: flex; gap: 0.2em; justify-content: center; flex-wrap: wrap;
+    will-change: transform;
   }
   .hero-name .w { display: inline-flex; }
   .hero-name .ch {
@@ -236,14 +348,14 @@
     transition: transform 0.35s var(--ease), text-shadow 0.35s;
     will-change: transform;
   }
-  html.js body:not(.opened) .hero-name { opacity: 0; transform: scale(0.96); }
-  html.js .hero-name { transition: opacity 1.6s ease 0.4s, transform 1.6s var(--ease) 0.4s, translate 0.6s ease-out; }
-  body.opened .hero-name { opacity: 1; transform: scale(1); }
+  html.js body:not(.opened) .hero-name { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.95); }
+  html.js .hero-name { transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+  body.opened .hero-name { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 
-  .hero .role { margin-top: 24px; font-size: clamp(18px, 2.2vw, 22px); color: var(--muted); font-weight: 500; transition: translate 0.6s ease-out; }
-  .hero .lead { margin: 20px auto 0; max-width: 540px; font-size: 18px; color: var(--soft); transition: translate 0.6s ease-out; }
+  .hero .role { margin-top: 24px; font-size: clamp(16px, 2vw, 21px); color: var(--muted); font-weight: 500; letter-spacing: -0.01em; }
+  .hero .lead { margin: 16px auto 0; max-width: 540px; font-size: 17px; color: var(--soft); }
   .hero .actions {
-    margin-top: 48px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    margin-top: 36px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
     position: relative; z-index: 30; pointer-events: auto;
   }
   .hero .actions a { pointer-events: auto; cursor: pointer; position: relative; z-index: 30; }
@@ -260,9 +372,9 @@
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
 
   .scroll-hint {
-    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 25;
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    background: none; border: 0; cursor: pointer; font: inherit; font-size: 13px; color: var(--muted);
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 25;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: none; border: 0; cursor: pointer; font: inherit; font-size: 12px; color: var(--muted);
     transition: color 0.2s var(--ease), opacity 0.3s; min-height: 44px; min-width: 44px; padding: 4px;
     pointer-events: auto;
   }
@@ -277,35 +389,81 @@
     50% { transform: translateY(6px); opacity: 1; }
   }
 
-  /* Capitoli (stage pinned — motion graphic Apple ultra-minimal) */
+  /* Viewport Clip-Path Expansion Frame per i Capitoli */
+  .stage-frame {
+    position: relative;
+    width: 100%;
+    z-index: 3;
+  }
+  .stage.pinned .stage-frame {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--surface);
+    clip-path: inset(10% 8% round 24px);
+    opacity: 0;
+    pointer-events: none;
+    will-change: clip-path, opacity;
+  }
+  .stage.pinned .stage-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: var(--frame-border, 0);
+  }
+
+  /* Capitoli: Counter-Directional Kinetic Typography & Masked Line Wipes */
+  .chapter-inner {
+    max-width: 960px;
+    width: 100%;
+    will-change: transform;
+  }
   .chapter h2 {
-    font-size: clamp(36px, 5.5vw, 72px);
+    font-size: clamp(34px, 6.2vw, 82px);
     font-weight: 600;
-    letter-spacing: -0.035em;
-    line-height: 1.06;
-    will-change: transform, letter-spacing;
+    letter-spacing: -0.04em;
+    line-height: 1.03;
+    display: grid;
+    gap: 4px;
+  }
+  .k-line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .k-inner {
+    display: inline-block;
+    will-change: transform;
+  }
+  .chapter .body-mask {
+    overflow: hidden;
+    margin: 24px auto 0;
+    max-width: 600px;
   }
   .chapter .body {
-    margin: 24px auto 0;
-    max-width: 580px;
     font-size: 18px;
     color: var(--muted);
     will-change: transform, color;
   }
   .chapter .trait {
-    margin: 32px auto 0;
+    margin: 28px auto 0;
     max-width: 580px;
-    font-size: 15px;
+    font-size: 14px;
+    letter-spacing: 0.02em;
     color: var(--muted);
-    will-change: transform;
+    will-change: transform, opacity;
   }
   .chapter .trait span { color: var(--accent); }
 
-  .stage.pinned { height: 560vh; }
-  .stage.pinned .sticky { position: sticky; top: 0; height: 100vh; }
+  .stage.pinned { height: 580vh; }
+  .stage.pinned .sticky { position: sticky; top: 0; height: 100vh; height: 100dvh; }
   .stage.pinned .layer { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; padding: 0 24px; pointer-events: none; z-index: 3; }
   .stage.pinned .layer.hero { pointer-events: auto; z-index: 5; }
-  .stage.pinned .chapter { opacity: 0; pointer-events: none; will-change: opacity, filter; }
+  .stage.pinned .chapter { opacity: 0; pointer-events: none; will-change: opacity; }
 
   /* Luce ambientale e filo geometrico unico nello .sticky */
   .stage-ambient,
@@ -318,7 +476,7 @@
     pointer-events: none;
     z-index: 1;
     opacity: 0;
-    background: radial-gradient(620px circle at var(--gx, 50%) var(--gy, 42%), rgba(var(--accent-rgb), 0.085), rgba(var(--accent-rgb), 0) 68%);
+    background: radial-gradient(640px circle at var(--gx, 50%) var(--gy, 42%), rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0) 68%);
     will-change: opacity;
   }
   .stage.pinned .stage-line {
@@ -331,7 +489,7 @@
     margin-left: -24px;
     background: var(--accent);
     pointer-events: none;
-    z-index: 2;
+    z-index: 4;
     opacity: 0;
     transform-origin: center center;
     will-change: transform, opacity;
@@ -341,10 +499,10 @@
     align-items: center;
     gap: 10px;
     position: absolute;
-    bottom: 36px;
+    bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 4;
+    z-index: 6;
     pointer-events: none;
     opacity: 0;
     font-size: 13px;
@@ -930,7 +1088,11 @@
     .nav-toggle { display: inline-flex; }
     .nav-right { gap: 12px; }
     section { padding: 88px 0; }
-    .layer { padding: 96px 24px; }
+    .layer { padding: 96px 20px; }
+    .hero-name { font-size: clamp(2.6rem, 11vw, 3.6rem); }
+    .kinetic-rail.top { top: 62px; }
+    .kinetic-rail.bottom { bottom: 90px; }
+    .preloader-word { display: none; }
     .work-grid, .skill-list, .case-grid, .field-row { grid-template-columns: 1fr; gap: 16px; }
     .skills-index { margin-top: 40px; }
     .skill-row { padding: 28px 0; gap: 16px; }
@@ -945,16 +1107,18 @@
     .wrap { padding: 0 16px; }
     .direct-email { font-size: 16px; }
     .nav .brand { font-size: 14px; }
-    .hero-name { font-size: 40px; }
+    .hero-name { font-size: 38px; }
+    .chapter h2 { font-size: 28px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .scroll-hint, .stage-ambient, .stage-line, .stage-counter { display: none !important; }
-    .chapter h2, .chapter .body, .chapter .trait { transform: none !important; letter-spacing: normal; }
-    .chapter h2 { letter-spacing: -0.035em; }
+    .preloader, .scroll-hint, .stage-ambient, .stage-line, .stage-counter, .kinetic-rail { display: none !important; }
+    .stage-frame { clip-path: none !important; opacity: 1 !important; }
+    .chapter h2, .k-inner, .chapter .body, .chapter .trait, .hero-inner, .chapter-inner { transform: none !important; letter-spacing: normal; }
+    .chapter h2 { letter-spacing: -0.04em; }
     .chapter .body { color: var(--soft); }
-    .scroll-arrow, .curtain, .lang-charge-bar, .counter-track { animation: none !important; transition: none !important; }
+    .scroll-arrow, .lang-charge-bar, .counter-track { animation: none !important; transition: none !important; }
     body.lang-switching main, body.lang-switching header nav { filter: none; transform: none; }
   }
 </style>
@@ -963,8 +1127,22 @@
 
 <a href="#top" class="skip-link"><span lang="it">Vai al contenuto principale</span><span lang="en">Skip to main content</span></a>
 
-<div class="curtain l" aria-hidden="true"></div>
-<div class="curtain r" aria-hidden="true"></div>
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="preloader-grid">
+    <span class="hl-v v1"></span>
+    <span class="hl-v v2"></span>
+    <span class="hl-h"></span>
+    <span class="preloader-axis" id="preloaderAxis"></span>
+  </div>
+  <div class="preloader-center">
+    <span class="preloader-word" id="preWordL">Samuel</span>
+    <div class="preloader-aperture">
+      <span class="preloader-num" id="preloaderNum">00</span>
+      <span class="preloader-pct">%</span>
+    </div>
+    <span class="preloader-word" id="preWordR">Tavonatti</span>
+  </div>
+</div>
 <div class="cursor-ring" id="ring" aria-hidden="true"></div>
 <div class="progress" aria-hidden="true"></div>
 <div id="langCharge" class="lang-charge" aria-hidden="true"><div class="lang-charge-bar"></div></div>
@@ -1009,12 +1187,28 @@
 
   <div class="stage">
     <div class="sticky">
-      <div class="stage-ambient" id="stageAmbient" aria-hidden="true"></div>
-      <div class="stage-line" id="stageLine" aria-hidden="true"></div>
 
       <div class="layer hero" id="hero">
         <div class="hero-light" aria-hidden="true"></div>
-        <div>
+
+        <div class="kinetic-rail top" aria-hidden="true">
+          <div class="kinetic-track" id="railTop">
+            <span>46.07° N · 11.12° E</span><span class="k-dot"></span>
+            <span>TRENTO, ITALY</span><span class="k-dot"></span>
+            <span class="k-accent">01 — UX/UI DESIGN</span><span class="k-dot"></span>
+            <span>USER RESEARCH</span><span class="k-dot"></span>
+            <span>FRONT-END &amp; MOTION</span><span class="k-dot"></span>
+            <span>60 / 120 FPS</span><span class="k-dot"></span>
+            <span>46.07° N · 11.12° E</span><span class="k-dot"></span>
+            <span>TRENTO, ITALY</span><span class="k-dot"></span>
+            <span class="k-accent">01 — UX/UI DESIGN</span><span class="k-dot"></span>
+            <span>USER RESEARCH</span><span class="k-dot"></span>
+            <span>FRONT-END &amp; MOTION</span><span class="k-dot"></span>
+            <span>60 / 120 FPS</span><span class="k-dot"></span>
+          </div>
+        </div>
+
+        <div class="hero-inner" id="heroInner">
           <h1 class="hero-name" id="heroName" aria-label="Samuel Tavonatti"><span class="w">Samuel</span> <span class="w">Tavonatti</span></h1>
           <p class="role">
             <span lang="it">UX/UI Designer e Front-End, Trento</span>
@@ -1029,49 +1223,91 @@
             <a href="#contatti" class="btn btn-ghost"><span lang="it">Scrivimi</span><span lang="en">Write to me</span></a>
           </div>
         </div>
-      </div>
 
-      <div class="layer chapter">
-        <div>
-          <h2><span lang="it">Interfacce che si capiscono da sole</span><span lang="en">Interfaces that explain themselves</span></h2>
-          <p class="body">
-            <span lang="it">Architetture informative, wireframe e prototipi in Figma. Ogni schermata parte da un compito concreto che l'utente deve compiere.</span>
-            <span lang="en">Information architecture, wireframes and prototypes in Figma. Every screen starts from a concrete task the user needs to complete.</span>
-          </p>
-          <p class="trait"><span>UX/UI Design</span> · Information architecture · Design system</p>
+        <div class="kinetic-rail bottom" aria-hidden="true">
+          <div class="kinetic-track" id="railBottom">
+            <span class="k-accent">VOLTREP</span><span class="k-dot"></span>
+            <span>ESU HCI RESEARCH</span><span class="k-dot"></span>
+            <span>TRENTINO MARKETING</span><span class="k-dot"></span>
+            <span class="k-accent">PORTFOLIO 2026</span><span class="k-dot"></span>
+            <span>DESIGN SYSTEMS</span><span class="k-dot"></span>
+            <span>COGNITIVE ERGONOMICS</span><span class="k-dot"></span>
+            <span class="k-accent">VOLTREP</span><span class="k-dot"></span>
+            <span>ESU HCI RESEARCH</span><span class="k-dot"></span>
+            <span>TRENTINO MARKETING</span><span class="k-dot"></span>
+            <span class="k-accent">PORTFOLIO 2026</span><span class="k-dot"></span>
+            <span>DESIGN SYSTEMS</span><span class="k-dot"></span>
+            <span>COGNITIVE ERGONOMICS</span><span class="k-dot"></span>
+          </div>
         </div>
       </div>
 
-      <div class="layer chapter">
-        <div>
-          <h2><span lang="it">Prima di disegnare, ascolto</span><span lang="en">Before designing, I listen</span></h2>
-          <p class="body">
-            <span lang="it">Interviste sul campo, mappature dei processi e valutazioni euristiche, con il Double Diamond come riferimento per capire il problema prima della soluzione.</span>
-            <span lang="en">Field interviews, process mapping and heuristic evaluations, using the Double Diamond to understand the problem before the solution.</span>
-          </p>
-          <p class="trait"><span>User research</span> · <span lang="it">Interviste · Mappatura · Euristiche</span><span lang="en">Interviews · Mapping · Heuristics</span></p>
-        </div>
-      </div>
+      <div class="stage-frame" id="stageFrame">
+        <div class="stage-ambient" id="stageAmbient" aria-hidden="true"></div>
+        <div class="stage-line" id="stageLine" aria-hidden="true"></div>
 
-      <div class="layer chapter">
-        <div>
-          <h2><span lang="it">Misuro dove l'utente rallenta</span><span lang="en">I measure where users slow down</span></h2>
-          <p class="body">
-            <span lang="it">Ergonomia cognitiva e test di usabilità per individuare attrito, confusione e abbandono, e trasformarli in decisioni di design verificabili.</span>
-            <span lang="en">Cognitive ergonomics and usability testing to find friction, confusion and drop-off, and turn them into verifiable design decisions.</span>
-          </p>
-          <p class="trait"><span lang="it">Analisi · Ergonomia cognitiva · Test di usabilità</span><span lang="en">Analysis · Cognitive ergonomics · Usability testing</span></p>
+        <div class="layer chapter">
+          <div class="chapter-inner">
+            <h2>
+              <span class="k-line"><span class="k-inner" data-dir="1"><span lang="it">Interfacce che</span><span lang="en">Interfaces that</span></span></span>
+              <span class="k-line"><span class="k-inner" data-dir="-1"><span lang="it">si capiscono da sole</span><span lang="en">explain themselves</span></span></span>
+            </h2>
+            <div class="body-mask">
+              <p class="body">
+                <span lang="it">Architetture informative, wireframe e prototipi in Figma. Ogni schermata parte da un compito concreto che l'utente deve compiere.</span>
+                <span lang="en">Information architecture, wireframes and prototypes in Figma. Every screen starts from a concrete task the user needs to complete.</span>
+              </p>
+            </div>
+            <p class="trait"><span>UX/UI Design</span> · Information architecture · Design system</p>
+          </div>
         </div>
-      </div>
 
-      <div class="layer chapter">
-        <div>
-          <h2><span lang="it">Dal prototipo al codice</span><span lang="en">From prototype to code</span></h2>
-          <p class="body">
-            <span lang="it">Vue, React e TypeScript, animazioni in CSS e SVG, e una cura costante per performance e accessibilità.</span>
-            <span lang="en">Vue, React and TypeScript, CSS and SVG animation, and constant care for performance and accessibility.</span>
-          </p>
-          <p class="trait"><span>Front-End</span> · Vue · React · TypeScript · Motion</p>
+        <div class="layer chapter">
+          <div class="chapter-inner">
+            <h2>
+              <span class="k-line"><span class="k-inner" data-dir="1"><span lang="it">Prima di disegnare,</span><span lang="en">Before designing,</span></span></span>
+              <span class="k-line"><span class="k-inner" data-dir="-1"><span lang="it">ascolto</span><span lang="en">I listen</span></span></span>
+            </h2>
+            <div class="body-mask">
+              <p class="body">
+                <span lang="it">Interviste sul campo, mappature dei processi e valutazioni euristiche, con il Double Diamond come riferimento per capire il problema prima della soluzione.</span>
+                <span lang="en">Field interviews, process mapping and heuristic evaluations, using the Double Diamond to understand the problem before the solution.</span>
+              </p>
+            </div>
+            <p class="trait"><span>User research</span> · <span lang="it">Interviste · Mappatura · Euristiche</span><span lang="en">Interviews · Mapping · Heuristics</span></p>
+          </div>
+        </div>
+
+        <div class="layer chapter">
+          <div class="chapter-inner">
+            <h2>
+              <span class="k-line"><span class="k-inner" data-dir="1"><span lang="it">Misuro dove</span><span lang="en">I measure where</span></span></span>
+              <span class="k-line"><span class="k-inner" data-dir="-1"><span lang="it">l'utente rallenta</span><span lang="en">users slow down</span></span></span>
+            </h2>
+            <div class="body-mask">
+              <p class="body">
+                <span lang="it">Ergonomia cognitiva e test di usabilità per individuare attrito, confusione e abbandono, e trasformarli in decisioni di design verificabili.</span>
+                <span lang="en">Cognitive ergonomics and usability testing to find friction, confusion and drop-off, and turn them into verifiable design decisions.</span>
+              </p>
+            </div>
+            <p class="trait"><span lang="it">Analisi · Ergonomia cognitiva · Test di usabilità</span><span lang="en">Analysis · Cognitive ergonomics · Usability testing</span></p>
+          </div>
+        </div>
+
+        <div class="layer chapter">
+          <div class="chapter-inner">
+            <h2>
+              <span class="k-line"><span class="k-inner" data-dir="1"><span lang="it">Dal prototipo</span><span lang="en">From prototype</span></span></span>
+              <span class="k-line"><span class="k-inner" data-dir="-1"><span lang="it">al codice</span><span lang="en">to code</span></span></span>
+            </h2>
+            <div class="body-mask">
+              <p class="body">
+                <span lang="it">Vue, React e TypeScript, animazioni in CSS e SVG, e una cura costante per performance e accessibilità.</span>
+                <span lang="en">Vue, React and TypeScript, CSS and SVG animation, and constant care for performance and accessibility.</span>
+              </p>
+            </div>
+            <p class="trait"><span>Front-End</span> · Vue · React · TypeScript · Motion</p>
+          </div>
         </div>
       </div>
 
@@ -1726,7 +1962,41 @@
 
   var pinned = !reduce;
   if (pinned) stage.classList.add('pinned');
-  if (!reduce) setTimeout(function () { body.classList.add('opened'); }, 300);
+
+  // 1. Kinetic Opening Curtain (00 -> 100 tabular-nums + architectural hairlines + clip-path wipe)
+  var preloader = document.getElementById('preloader');
+  var preNum = document.getElementById('preloaderNum');
+  var preAxis = document.getElementById('preloaderAxis');
+  var preWordL = document.getElementById('preWordL');
+  var preWordR = document.getElementById('preWordR');
+
+  if (reduce || !preloader) {
+    body.classList.add('opened');
+    if (preloader) preloader.classList.add('done');
+  } else {
+    var preStart = performance.now();
+    var PRE_DUR = 920;
+    function runPreloader(now) {
+      var raw = Math.min(1, (now - preStart) / PRE_DUR);
+      var eased = raw === 1 ? 1 : 1 - Math.pow(2, -10 * raw);
+      var val = Math.round(eased * 100);
+      if (preNum) preNum.textContent = val < 10 ? '0' + val : String(val);
+      if (preAxis) preAxis.style.transform = 'scaleX(' + eased.toFixed(4) + ')';
+      var spread = eased * 26;
+      if (preWordL) preWordL.style.transform = 'translate3d(' + (-spread).toFixed(1) + 'px,0,0)';
+      if (preWordR) preWordR.style.transform = 'translate3d(' + spread.toFixed(1) + 'px,0,0)';
+
+      if (raw < 1) {
+        requestAnimationFrame(runPreloader);
+      } else {
+        setTimeout(function () {
+          preloader.classList.add('done');
+          body.classList.add('opened');
+        }, 120);
+      }
+    }
+    requestAnimationFrame(runPreloader);
+  }
 
   function clamp(v) { return Math.min(1, Math.max(0, v)); }
   function seg(u, a, b) { return clamp((u - a) / (b - a)); }
@@ -1734,39 +2004,83 @@
   function easeIn(t) { return t * t * t; }
   function lerp(a, b, t) { return a + (b - a) * t; }
 
-  // Capitoli: motion graphic Apple ultra-minimal sincronizzata con lo scroll
-  var CH = [[1.6, 2.6], [2.6, 3.6], [3.6, 4.6], [4.6, 5.4]];
+  // 2. Scroll-Driven Stage: Clip-Path Viewport Expansion + Counter-Directional Kinetic Typography
+  var CH = [[1.6, 2.6], [2.6, 3.6], [3.6, 4.6], [4.6, 5.6]];
   var chapterParts = chapters.map(function (el) {
     return {
       el: el,
-      h2: el.querySelector('h2'),
+      inner: el.querySelector('.chapter-inner'),
+      lines: Array.prototype.slice.call(el.querySelectorAll('.k-inner')),
       body: el.querySelector('.body'),
       trait: el.querySelector('.trait')
     };
   });
+  var stageFrame = document.getElementById('stageFrame');
   var stageAmbient = document.getElementById('stageAmbient');
   var stageLine = document.getElementById('stageLine');
   var stageCounter = document.getElementById('stageCounter');
   var counterTrack = document.getElementById('counterTrack');
+  var heroInner = document.getElementById('heroInner');
+  var railTop = document.getElementById('railTop');
+  var railBottom = document.getElementById('railBottom');
   var lastCounterIdx = -1;
 
   var STAGE_KF = [
-    { gx: 50, gy: 36, tx: 0, ty: -146, rot: 0, sx: 1.0 },
-    { gx: 36, gy: 46, tx: 0, ty: -156, rot: 90, sx: 0.72 },
-    { gx: 64, gy: 44, tx: 0, ty: -146, rot: 180, sx: 1.25 },
-    { gx: 50, gy: 56, tx: 0, ty: -146, rot: 360, sx: 1.0 }
+    { gx: 50, gy: 36, tx: 0, ty: -158, rot: 0, sx: 1.0 },
+    { gx: 36, gy: 46, tx: 0, ty: -168, rot: 90, sx: 0.72 },
+    { gx: 64, gy: 44, tx: 0, ty: -158, rot: 180, sx: 1.25 },
+    { gx: 50, gy: 56, tx: 0, ty: -158, rot: 360, sx: 1.0 }
   ];
 
+  // Continuous Scroll Velocity & Kinetic Velocity Bands (60/120 FPS)
+  var lastScrollY = window.scrollY;
+  var scrollVel = 0;
+  var railPosTop = 0;
+  var railPosBot = 0;
+
+  function kineticLoop() {
+    if (!landing.hidden && !reduce) {
+      var curY = window.scrollY;
+      var delta = curY - lastScrollY;
+      lastScrollY = curY;
+      scrollVel = lerp(scrollVel, Math.max(-60, Math.min(60, delta)), 0.14);
+
+      var speedBoost = Math.abs(scrollVel) * 0.22;
+      var skew = Math.max(-6, Math.min(6, scrollVel * 0.14));
+
+      if (railTop) {
+        var halfT = railTop.scrollWidth / 2 || 600;
+        railPosTop = (railPosTop - (0.45 + speedBoost)) % halfT;
+        if (railPosTop > 0) railPosTop -= halfT;
+        railTop.style.transform = 'translate3d(' + railPosTop.toFixed(1) + 'px,0,0) skewX(' + (-skew).toFixed(2) + 'deg)';
+      }
+      if (railBottom) {
+        var halfB = railBottom.scrollWidth / 2 || 600;
+        railPosBot = (railPosBot + (0.45 + speedBoost)) % halfB;
+        if (railPosBot > 0) railPosBot -= halfB;
+        railBottom.style.transform = 'translate3d(' + railPosBot.toFixed(1) + 'px,0,0) skewX(' + skew.toFixed(2) + 'deg)';
+      }
+      if (progress) {
+        var extraGlow = Math.min(1, Math.abs(scrollVel) / 24);
+        progress.style.boxShadow = extraGlow > 0.05 ? '0 0 ' + (8 + extraGlow * 14).toFixed(1) + 'px rgba(' + accentRgb + ',' + (0.45 + extraGlow * 0.4).toFixed(2) + ')' : 'none';
+      }
+    }
+    requestAnimationFrame(kineticLoop);
+  }
+  if (!reduce) requestAnimationFrame(kineticLoop);
+
   function chapterState(t, exits) {
-    var inP = easeOut(Math.min(1, t / 0.24));
-    var outP = exits ? easeIn(Math.max(0, (t - 0.76) / 0.24)) : 0;
+    var inP = easeOut(Math.min(1, t / 0.26));
+    var outP = exits ? easeIn(Math.max(0, (t - 0.74) / 0.26)) : 0;
     var alpha = inP * (1 - outP);
+    var scrub = t * 2 - 1; // -1 -> 0 -> +1 across chapter
     return {
       o: alpha,
-      y: (1 - inP) * 44 - outP * 44,
-      sc: 0.97 + 0.03 * inP - 0.015 * outP,
-      ls: -0.035 + (1 - alpha) * 0.02,
-      b: (1 - alpha) * 4
+      inP: inP,
+      outP: outP,
+      wipeY: (1 - inP) * 112 - outP * 112,
+      scrubX: scrub * 36,
+      sc: 0.96 + 0.04 * inP + 0.03 * outP
     };
   }
 
@@ -1775,14 +2089,26 @@
     var vh = window.innerHeight;
     var u = Math.max(0, -stage.getBoundingClientRect().top) / vh;
 
-    var ht = seg(u, 1.1, 1.7);
+    var ht = seg(u, 0.95, 1.58);
     hero.style.opacity = String(1 - ht);
-    hero.style.transform = 'scale(' + (1 - 0.08 * ht) + ') translateY(' + (-ht * 6) + 'vh)';
-    hero.style.filter = 'blur(' + (ht * 6) + 'px)';
+    hero.style.transform = 'scale(' + (1 - 0.07 * ht) + ') translate3d(0,' + (-ht * 5) + 'vh,0)';
 
     if (pinned) {
+      // Viewport Clip-Path Expansion: inset(10% 8% round 24px) -> inset(0% 0% round 0px)
+      var frameIn = seg(u, 1.05, 1.5);
+      var frameExp = easeOut(seg(u, 1.25, 2.05));
+      if (stageFrame) {
+        var vIns = (10 * (1 - frameExp)).toFixed(2);
+        var hIns = (8 * (1 - frameExp)).toFixed(2);
+        var rad = (24 * (1 - frameExp)).toFixed(1);
+        stageFrame.style.opacity = String(frameIn);
+        stageFrame.style.clipPath = 'inset(' + vIns + '% ' + hIns + '% round ' + rad + 'px)';
+        stageFrame.style.setProperty('--frame-border', (frameIn * (1 - frameExp)).toFixed(3));
+      }
+
       var activeIdx = 0;
       var bestAlpha = -1;
+      var isNarrow = window.innerWidth <= 640;
 
       chapterParts.forEach(function (part, i) {
         var t = seg(u, CH[i][0], CH[i][1]);
@@ -1791,28 +2117,33 @@
           bestAlpha = s.o;
           activeIdx = i;
         }
-        part.el.style.opacity = String(s.o);
-        part.el.style.filter = s.b > 0.05 ? 'blur(' + s.b.toFixed(2) + 'px)' : 'none';
+        part.el.style.opacity = s.o > 0.002 ? '1' : '0';
 
-        if (part.h2) {
-          part.h2.style.transform = 'translate3d(0,' + s.y.toFixed(2) + 'px,0) scale(' + s.sc.toFixed(4) + ')';
-          part.h2.style.letterSpacing = s.ls.toFixed(4) + 'em';
+        if (part.inner) {
+          part.inner.style.transform = 'scale(' + s.sc.toFixed(4) + ')';
         }
+        part.lines.forEach(function (lineEl) {
+          var dir = parseFloat(lineEl.getAttribute('data-dir') || '1');
+          var hx = (isNarrow ? s.scrubX * 0.45 : s.scrubX) * dir;
+          lineEl.style.transform = 'translate3d(' + hx.toFixed(1) + 'px,' + s.wipeY.toFixed(1) + '%,0)';
+        });
         if (part.body) {
-          var focus = Math.pow(s.o, 1.35);
+          var focus = Math.pow(s.o, 1.25);
           var cr = Math.round(148 + (248 - 148) * focus);
           var cg = Math.round(163 + (250 - 163) * focus);
           var cb = Math.round(184 + (252 - 184) * focus);
           part.body.style.color = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
-          part.body.style.transform = 'translate3d(0,' + (s.y * 1.16).toFixed(2) + 'px,0)';
+          var bodyY = (1 - s.inP) * 105 - s.outP * 105;
+          part.body.style.transform = 'translate3d(0,' + bodyY.toFixed(1) + '%,0)';
         }
         if (part.trait) {
-          part.trait.style.transform = 'translate3d(0,' + (s.y * 1.3).toFixed(2) + 'px,0)';
+          part.trait.style.opacity = String(s.o);
+          part.trait.style.transform = 'translate3d(0,' + ((1 - s.inP) * 20 - s.outP * 20).toFixed(1) + 'px,0)';
         }
       });
 
-      var stageVis = seg(u, 1.45, 1.78);
-      var cp = clamp((u - 2.1) / 2.9) * (STAGE_KF.length - 1);
+      var stageVis = seg(u, 1.45, 1.82);
+      var cp = clamp((u - 2.1) / 3.0) * (STAGE_KF.length - 1);
       var k0 = Math.min(STAGE_KF.length - 2, Math.floor(cp));
       var kfT = easeOut(cp - k0);
       var a = STAGE_KF[k0];
@@ -1824,11 +2155,12 @@
         stageAmbient.style.setProperty('--gy', lerp(a.gy, b.gy, kfT).toFixed(1) + '%');
       }
       if (stageLine) {
-        var mobileLift = window.innerWidth <= 640 ? -24 : 0;
+        var mobileLift = isNarrow ? -24 : 0;
         var lx = lerp(a.tx, b.tx, kfT);
         var ly = lerp(a.ty, b.ty, kfT) + mobileLift;
         var lr = lerp(a.rot, b.rot, kfT);
-        var lsx = lerp(a.sx, b.sx, kfT);
+        var velStretch = 1 + Math.min(0.65, Math.abs(scrollVel) * 0.018);
+        var lsx = lerp(a.sx, b.sx, kfT) * velStretch;
         stageLine.style.opacity = String(stageVis * 0.85);
         stageLine.style.transform = 'translate3d(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px,0) rotate(' + lr.toFixed(1) + 'deg) scaleX(' + lsx.toFixed(3) + ')';
       }
@@ -1880,6 +2212,9 @@
 
       var nx = e.clientX / window.innerWidth - 0.5;
       var ny = e.clientY / window.innerHeight - 0.5;
+      if (heroInner) {
+        heroInner.style.transform = 'perspective(1100px) rotateX(' + (-ny * 4.5).toFixed(2) + 'deg) rotateY(' + (nx * 5.5).toFixed(2) + 'deg) translate3d(' + (nx * 10).toFixed(1) + 'px,' + (ny * 6).toFixed(1) + 'px,0)';
+      }
       if (heroName) heroName.style.translate = (nx * 18) + 'px ' + (ny * 10) + 'px';
       if (roleEl) roleEl.style.translate = (nx * -8) + 'px ' + (ny * -4) + 'px';
       if (leadEl) leadEl.style.translate = (nx * -4) + 'px ' + (ny * -2) + 'px';
@@ -1903,6 +2238,7 @@
 
     window.addEventListener('mouseout', function (e) {
       if (!e.relatedTarget) {
+        if (heroInner) heroInner.style.transform = '';
         if (heroName) heroName.style.translate = '';
         letters.forEach(function (c) { c.style.transform = ''; c.style.textShadow = ''; });
       }
