@@ -1,32 +1,1928 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Samuel Tavonatti — UX/UI Designer</title>
-    <meta
-      name="description"
-      content="Portfolio personale di Samuel Tavonatti, UX/UI Designer con competenze front-end e motion design. Progetti: VoltRep, ESU HCI, Trentino Marketing."
-    />
-    <meta property="og:title" content="Samuel Tavonatti — UX/UI Designer" />
-    <meta
-      property="og:description"
-      content="Interfacce calme, leggibili e a basso carico cognitivo. Progetti selezionati: VoltRep, ESU HCI e Trentino Marketing."
-    />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#0B0A09" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..600&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-  </head>
-  <body class="bg-[#09090B] text-[#F4F3EF] antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+<script>document.documentElement.classList.add('js');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Samuel Tavonatti — UX/UI Designer e Front-End a Trento</title>
+<meta name="description" content="Portfolio di Samuel Tavonatti, UX/UI Designer e Front-End a Trento. Progetto interfacce chiare, ricerca sul campo e prodotti web.">
+<meta name="author" content="Samuel Tavonatti">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#050507">
+<link rel="canonical" href="https://samueltavonatti.github.io/portfolio-preview/">
+<link rel="alternate" hreflang="it" href="https://samueltavonatti.github.io/portfolio-preview/">
+<link rel="alternate" hreflang="en" href="https://samueltavonatti.github.io/portfolio-preview/?lang=en">
 
+<meta property="og:type" content="website">
+<meta property="og:title" content="Samuel Tavonatti — UX/UI Designer e Front-End">
+<meta property="og:description" content="Interfacce chiare, ricerca sul campo e prodotti web. Trento.">
+<meta property="og:url" content="https://samueltavonatti.github.io/portfolio-preview/">
+<meta property="og:locale" content="it_IT">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Samuel Tavonatti",
+  "jobTitle": "UX/UI Designer e Front-End",
+  "url": "https://samueltavonatti.github.io/",
+  "email": "mailto:samuel.tavonatti05@gmail.com",
+  "address": { "@type": "PostalAddress", "addressLocality": "Trento", "addressCountry": "IT" },
+  "alumniOf": { "@type": "CollegeOrUniversity", "name": "Università degli Studi di Trento" },
+  "knowsAbout": ["UX design", "UI design", "User research", "Cognitive ergonomics", "Usability testing", "Front-end development", "Vue.js", "React", "Pimcore CMS", "Google Analytics 4"],
+  "knowsLanguage": ["it", "en"]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    color-scheme: dark;
+    /* Graphite / Cyan Design System Tokens */
+    --bg: #050507;
+    --surface: #090A0D;
+    --surface-elevated: #0E1015;
+    --surface-hover: #14171F;
+    --text: #F8FAFC;
+    --soft: #CBD5E1;
+    --muted: #94A3B8;
+    --accent: #38BDF8;
+    --accent-strong: #0284C7;
+    --accent-rgb: 56, 189, 248;
+    --line: rgba(248, 250, 252, 0.08);
+    --line-strong: rgba(248, 250, 252, 0.16);
+    --logos: url("data:image/webp;base64,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");
+    --font: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --max: 1080px;
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 72px;
+    background: var(--bg);
+  }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    caret-color: var(--accent);
+  }
+  ::selection {
+    background: rgba(var(--accent-rgb), 0.24);
+    color: var(--text);
+  }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+  .num, .when, .step-n, .step-num, .meta { font-variant-numeric: tabular-nums; }
+
+  /* Skip to content */
+  .skip-link {
+    position: fixed; top: -64px; left: 16px; z-index: 200;
+    padding: 12px 16px; background: var(--accent); color: var(--bg);
+    font-size: 14px; font-weight: 600; border-radius: 8px;
+    transition: top 0.2s var(--ease);
+  }
+  .skip-link:focus { top: 16px; }
+
+  /* Lingua: entrambe le versioni sono nel markup, si mostra quella attiva */
+  html[lang="en"] [lang="it"] { display: none; }
+  html:not([lang="en"]) [lang="en"] { display: none; }
+
+  .progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 2px;
+    transform-origin: 0 50%; background: var(--accent);
+    z-index: 25; transform: scaleX(0);
+  }
+
+  /* Transizione cambio lingua con barra ciano pulita */
+  .lang-charge {
+    position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+    z-index: 100; pointer-events: none; opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  .lang-charge.active { opacity: 1; }
+  .lang-charge-bar {
+    width: 100%; height: 100%;
+    background: var(--accent);
+    transform-origin: 0 50%; transform: scaleX(0);
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  body.lang-switching main,
+  body.lang-switching header nav {
+    opacity: 0.35;
+    filter: blur(2px);
+    transform: translateY(-2px);
+  }
+  main, header nav {
+    transition: opacity 0.24s cubic-bezier(0.2, 0, 0, 1), filter 0.24s cubic-bezier(0.2, 0, 0, 1), transform 0.24s cubic-bezier(0.2, 0, 0, 1);
+  }
+  .lang button.charging { color: var(--accent); }
+
+  /* Sipario (apertura iniziale protetta) */
+  .curtain {
+    position: fixed; top: 0; bottom: 0; width: 50vw; z-index: 40;
+    background: var(--surface);
+    pointer-events: none;
+    transition: transform 1.9s cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  .curtain.l { left: 0; }
+  .curtain.r { right: 0; }
+  .curtain.l::after, .curtain.r::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, transparent, var(--accent) 50%, transparent);
+    opacity: 0.6;
+  }
+  .curtain.l::after { right: 0; }
+  .curtain.r::after { left: 0; }
+  html:not(.js) .curtain, html.reduce .curtain { display: none; }
+  body.opened .curtain.l { transform: translateX(-100%); }
+  body.opened .curtain.r { transform: translateX(100%); }
+
+  /* Navigazione */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+    background: rgba(5, 5, 7, 0.82);
+    backdrop-filter: saturate(160%) blur(16px);
+    -webkit-backdrop-filter: saturate(160%) blur(16px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 16px; }
+  .nav .brand {
+    font-weight: 600; font-size: 15px; letter-spacing: -0.01em;
+    display: inline-flex; align-items: center; min-height: 44px; min-width: 44px;
+  }
+  .nav-right { display: flex; align-items: center; gap: 24px; }
+  .nav ul { display: flex; gap: 24px; list-style: none; }
+  .nav ul a {
+    font-size: 14px; color: var(--muted); transition: color 0.2s var(--ease);
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px;
+  }
+  .nav ul a:hover { color: var(--text); }
+  .lang { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
+  .lang button {
+    background: none; border: 0; cursor: pointer; font: inherit; color: var(--muted);
+    padding: 4px 8px; border-radius: 6px; transition: color 0.2s var(--ease);
+    min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .lang button:hover { color: var(--text); }
+  .lang button[aria-pressed="true"] { color: var(--text); font-weight: 600; }
+
+  /* Menu mobile (<=640px) */
+  .nav-toggle {
+    display: none;
+    background: none; border: 1px solid var(--line-strong); border-radius: 8px;
+    color: var(--text); cursor: pointer;
+    width: 44px; height: 44px; min-width: 44px; min-height: 44px;
+    align-items: center; justify-content: center;
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .nav-toggle:hover { border-color: var(--accent); background: var(--surface-elevated); }
+  .mobile-menu {
+    display: none;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 24px 20px;
+  }
+  .mobile-menu.open { display: block; }
+  .mobile-menu ul { list-style: none; display: grid; gap: 4px; }
+  .mobile-menu a {
+    display: flex; align-items: center; min-height: 44px; padding: 8px 12px;
+    border-radius: 8px; font-size: 16px; color: var(--soft);
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .mobile-menu a:hover { background: var(--surface-elevated); color: var(--text); }
+
+  /* Stage hero (fisica parallasse & scroll pinned protetti) */
+  .stage { position: relative; z-index: 1; }
+  .sticky { position: relative; display: grid; place-items: center; overflow: hidden; }
+  .layer { position: relative; text-align: center; padding: 120px 24px; }
+  .hero { overflow: hidden; }
+
+  /* Luce morbida nella hero (tono ciano calibrato) */
+  .hero-light {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(520px circle at var(--lx, 50%) var(--ly, 40%), rgba(var(--accent-rgb), 0.11), rgba(var(--accent-rgb), 0) 70%);
+    transition: opacity 0.6s;
+  }
+  .hero > div { position: relative; z-index: 1; }
+
+  /* H1 con lettere reattive (fisica protetta) */
+  .hero-name {
+    font-size: clamp(48px, 8.5vw, 96px);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+    display: flex; gap: 0.22em; justify-content: center; flex-wrap: wrap;
+    will-change: translate;
+  }
+  .hero-name .w { display: inline-flex; }
+  .hero-name .ch {
+    display: inline-block;
+    transition: transform 0.35s var(--ease), text-shadow 0.35s;
+    will-change: transform;
+  }
+  html.js body:not(.opened) .hero-name { opacity: 0; transform: scale(0.96); }
+  html.js .hero-name { transition: opacity 1.6s ease 0.4s, transform 1.6s var(--ease) 0.4s, translate 0.6s ease-out; }
+  body.opened .hero-name { opacity: 1; transform: scale(1); }
+
+  .hero .role { margin-top: 24px; font-size: clamp(18px, 2.2vw, 22px); color: var(--muted); font-weight: 500; transition: translate 0.6s ease-out; }
+  .hero .lead { margin: 20px auto 0; max-width: 540px; font-size: 18px; color: var(--soft); transition: translate 0.6s ease-out; }
+  .hero .actions {
+    margin-top: 48px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    position: relative; z-index: 30; pointer-events: auto;
+  }
+  .hero .actions a { pointer-events: auto; cursor: pointer; position: relative; z-index: 30; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 48px; padding: 0 24px; border-radius: 10px;
+    font-size: 15px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  }
+  .btn-primary { background: var(--text); color: var(--bg); }
+  .btn-primary:hover { background: var(--accent); color: var(--bg); transform: translateY(-1px); }
+  .btn-ghost { border-color: var(--line-strong); color: var(--text); background: transparent; }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+  .scroll-hint {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 25;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: none; border: 0; cursor: pointer; font: inherit; font-size: 13px; color: var(--muted);
+    transition: color 0.2s var(--ease), opacity 0.3s; min-height: 44px; min-width: 44px; padding: 4px;
+    pointer-events: auto;
+  }
+  .scroll-hint:hover { color: var(--text); }
+  .scroll-arrow {
+    display: block;
+    animation: scrollArrowAnim 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    will-change: transform;
+  }
+  @keyframes scrollArrowAnim {
+    0%, 100% { transform: translateY(0); opacity: 0.7; }
+    50% { transform: translateY(6px); opacity: 1; }
+  }
+
+  /* Capitoli (stage pinned protetto) */
+  .chapter h2 { font-size: clamp(36px, 5.5vw, 72px); font-weight: 600; letter-spacing: -0.035em; line-height: 1.06; }
+  .chapter .body { margin: 24px auto 0; max-width: 580px; font-size: 18px; color: var(--soft); }
+  .chapter .trait { margin: 32px auto 0; max-width: 580px; font-size: 15px; color: var(--muted); }
+  .chapter .trait span { color: var(--accent); }
+
+  .stage.pinned { height: 560vh; }
+  .stage.pinned .sticky { position: sticky; top: 0; height: 100vh; }
+  .stage.pinned .layer { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; padding: 0 24px; pointer-events: none; }
+  .stage.pinned .layer.hero { pointer-events: auto; z-index: 5; }
+  .stage.pinned .chapter { opacity: 0; pointer-events: none; }
+
+  /* Cursore a molla (fisica protetta, palette grafite/ciano) */
+  .cursor-ring {
+    position: fixed; left: 0; top: 0;
+    width: 8px; height: 8px; margin: -4px 0 0 -4px;
+    background: var(--accent); border-radius: 50%;
+    border: none;
+    pointer-events: none; z-index: 9999; display: none; will-change: transform;
+    transition: width 0.22s var(--ease), height 0.22s var(--ease), margin 0.22s var(--ease), background 0.2s, border 0.2s;
+  }
+  .cursor-ring.big {
+    width: 28px; height: 28px; margin: -14px 0 0 -14px;
+    background: rgba(var(--accent-rgb), 0.14);
+    border: 1.5px solid var(--accent);
+  }
+  .cursor-ring[hidden] { display: none !important; }
+  @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+    html.js:not(.reduce) .cursor-ring { display: block; }
+    html.js:not(.reduce) .cursor-ring[hidden] { display: none !important; }
+  }
+
+  /* Sezioni: cadenza coerente e equal edges */
+  section { padding: 120px 0; }
+  .divider { border-top: 1px solid var(--line); }
+  h2.sec { font-size: clamp(32px, 4.5vw, 52px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.08; }
+  .intro { margin-top: 16px; max-width: 600px; font-size: 18px; color: var(--muted); }
+
+  /* Progetti: visibili subito all'atterraggio, equal edges, stretched link accessibile */
+  .work-grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .project {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  .project:hover {
+    border-color: var(--line-strong);
+    background: var(--surface-elevated);
+    transform: translateY(-2px);
+  }
+  .shot {
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    background-color: var(--bg);
+    background-image: var(--logos);
+    background-repeat: no-repeat;
+    background-size: 333.33% auto;
+    background-position: 50% 50%;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .shot.volt { background-position: 3.7% 50%; }
+  .shot.esu  { background-position: 50.7% 50%; }
+  .shot.trn  { background-position: 97.6% 50%; }
+  .project-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0 4px 4px;
+  }
+  .project h3 { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
+  .project h3 a.card-trigger { display: inline-flex; align-items: center; min-height: 44px; }
+  .project h3 a.card-trigger::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: 1;
+  }
+  .project p { color: var(--muted); font-size: 15px; line-height: 1.55; margin-top: 8px; }
+  .project-foot {
+    margin-top: auto;
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .project-cue {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .project a.more {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--soft);
+    border-bottom: 1px solid var(--line-strong);
+    min-height: 44px;
+    padding: 0 4px;
+    transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+  }
+  .project a.more:hover { color: var(--text); border-color: var(--accent); }
+
+  /* Competenze: Opzione B — zero glow, zero text-shadow, contrasto pulito sulle superfici */
+  .skills {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .skills > div {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px;
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .skills > div:hover {
+    border-color: var(--line-strong);
+    background: var(--surface-elevated);
+  }
+  .skills h3 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+  }
+  .skills ul {
+    list-style: none;
+    margin-top: 16px;
+    display: grid;
+    gap: 12px;
+  }
+  .skills ul li {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--muted);
+    padding: 4px 0;
+    transition: color 0.2s var(--ease);
+  }
+  .skills ul li:hover { color: var(--text); }
+
+  /* Percorso / Timeline */
+  .timeline { margin-top: 48px; position: relative; }
+  .timeline::before {
+    content: ""; position: absolute; left: 4px; top: 12px; bottom: 12px; width: 1px;
+    background: linear-gradient(180deg, var(--accent), var(--line-strong) 85%, transparent);
+  }
+  .item { position: relative; display: grid; gap: 8px; padding: 0 0 48px 36px; }
+  .item::before {
+    content: ""; position: absolute; left: 0; top: 8px; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--accent);
+  }
+  .item:last-child { padding-bottom: 0; }
+  .item .when { font-size: 14px; color: var(--muted); }
+  .item h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; }
+  .item .org { font-size: 15px; color: var(--soft); }
+  .item p { max-width: 640px; margin-top: 4px; color: var(--muted); }
+  .item ul { margin-top: 8px; padding-left: 20px; color: var(--muted); max-width: 640px; display: grid; gap: 8px; }
+
+  /* Contatti: 2 colonne asimmetriche, equal edges (120px top) */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .contact-editorial {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .contact-headline {
+    font-size: clamp(32px, 3.6vw, 48px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .editorial-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid rgba(var(--accent-rgb), 0.24);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    width: fit-content;
+    margin-top: 20px;
+    margin-bottom: 24px;
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .contact-pitch {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--soft);
+    max-width: 480px;
+  }
+
+  /* Direct Email Card */
+  .direct-card {
+    margin-top: 32px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .direct-card:hover {
+    border-color: var(--line-strong);
+    background: var(--surface-elevated);
+  }
+  .direct-info { display: grid; gap: 4px; min-width: 0; }
+  .direct-label { font-size: 13px; color: var(--muted); }
+  .direct-email { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; word-break: break-all; }
+  .btn-copy {
+    flex: 0 0 auto; height: 44px; min-height: 44px; padding: 0 20px;
+    border-radius: 8px; border: 1px solid var(--line-strong); background: transparent;
+    color: var(--text); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-copy.done { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .copy-feedback { min-height: 20px; font-size: 13px; color: var(--accent); margin-top: 8px; }
+
+  /* Metadata Matrix */
+  .contact-matrix {
+    margin-top: 24px;
+    display: grid;
+    gap: 20px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .matrix-item { display: grid; gap: 4px; }
+  .matrix-label { font-size: 13px; color: var(--muted); }
+  .matrix-value { font-size: 15px; color: var(--soft); font-weight: 500; }
+  .social-links { display: flex; gap: 20px; flex-wrap: wrap; }
+  .social-links a {
+    font-size: 15px; color: var(--soft);
+    border-bottom: 1px solid var(--line-strong);
+    padding: 4px 0;
+    min-height: 44px; min-width: 44px;
+    display: inline-flex; align-items: center;
+    transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+  }
+  .social-links a:hover { color: var(--accent); border-color: var(--accent); }
+  .editorial-accent {
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* Right Column: Architectural Form Panel */
+  .contact-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 32px;
+    display: grid;
+    gap: 24px;
+  }
+  .panel-header { display: grid; gap: 4px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+  .panel-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
+  .panel-sub { font-size: 14px; color: var(--muted); }
+  .form-step { padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+  .form-step:last-of-type { border-bottom: none; padding-bottom: 0; }
+  .step-label { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+  .step-label .step-num { font-size: 13px; color: var(--accent); font-weight: 500; }
+  .form-step .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { position: relative; cursor: pointer; display: inline-flex; }
+  .chip input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; font-size: 16px; }
+  .chip .pill {
+    display: inline-flex; align-items: center; height: 44px; min-height: 44px; padding: 8px 16px;
+    border: 1px solid var(--line-strong); border-radius: 8px;
+    font-size: 14px; line-height: 1.2; color: var(--soft); background: var(--surface-elevated);
+    transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .chip:hover .pill { color: var(--text); border-color: var(--muted); }
+  .chip input:checked + .pill { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 500; }
+  .chip input:focus-visible + .pill { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: grid; gap: 8px; font-size: 14px; color: var(--soft); min-width: 0; }
+  .field input, .field textarea {
+    background: var(--surface-elevated);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+    padding: 0 16px;
+    height: 48px;
+    width: 100%;
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .field input::placeholder, .field textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.85;
+  }
+  .field textarea { padding: 12px 16px; height: auto; min-height: 136px; resize: vertical; }
+  .field input:focus, .field textarea:focus { border-color: var(--accent); background: var(--bg); }
+
+  .form-foot { display: grid; gap: 20px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .check {
+    position: relative; display: flex; gap: 12px; align-items: center;
+    font-size: 14px; color: var(--muted); cursor: pointer; min-height: 44px;
+  }
+  .check input#bPriv {
+    position: absolute; opacity: 0; pointer-events: auto;
+    width: 44px; height: 44px; margin: 0; left: 0; top: 0; cursor: pointer; font-size: 16px;
+  }
+  .check .custom-check {
+    width: 20px; height: 20px; min-width: 20px; min-height: 20px;
+    border-radius: 6px; border: 1.5px solid var(--line-strong); background: var(--surface-elevated);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s var(--ease), background 0.2s var(--ease); flex-shrink: 0;
+  }
+  .check input#bPriv:checked + .custom-check { background: var(--accent); border-color: var(--accent); }
+  .check input#bPriv:checked + .custom-check::after {
+    content: ''; display: block; width: 5px; height: 10px;
+    border: solid var(--bg); border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .check input#bPriv:focus-visible + .custom-check { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .check a {
+    color: var(--text); border-bottom: 1px solid var(--line-strong);
+    display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px;
+  }
+  .check a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .brief-status {
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 20px;
+  }
+  .send-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .send-row .note { margin-top: 0; max-width: 360px; font-size: 13px; color: var(--muted); }
+  #bSend { justify-self: start; }
+  #bSend:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  /* Case studies & Drawer */
+  .view[hidden] { display: none; }
+  .case { padding: 120px 0 96px; }
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; color: var(--muted); transition: color 0.2s var(--ease);
+    min-height: 44px;
+  }
+  .back::before { content: "←"; }
+  .back:hover { color: var(--text); }
+  .case .meta { margin-top: 24px; font-size: 14px; color: var(--muted); }
+  .case-title {
+    margin-top: 12px; font-size: clamp(40px, 6vw, 72px); font-weight: 600;
+    letter-spacing: -0.035em; line-height: 1.05;
+  }
+  .case-lead { margin-top: 20px; max-width: 680px; font-size: 20px; color: var(--soft); }
+  .case-visual {
+    position: relative; margin-top: 48px; border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .case-visual .shot { border: 0; border-radius: 0; }
+  .case-grid {
+    margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;
+  }
+  .case-grid h2 { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .case-grid p { margin-top: 8px; font-size: 15px; color: var(--soft); }
+  .case-h { margin-top: 64px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .steps { list-style: none; margin-top: 24px; display: grid; }
+  .step {
+    display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: baseline;
+    padding: 20px 0; border-bottom: 1px solid var(--line);
+  }
+  .step-n { font-size: 14px; color: var(--accent); font-weight: 500; }
+  .step p { font-size: 16px; color: var(--soft); max-width: 620px; }
+  .outcome {
+    margin-top: 48px; padding: 28px; border: 1px solid var(--line);
+    border-radius: 16px; background: var(--surface);
+  }
+  .outcome h2 { font-size: 14px; font-weight: 500; color: var(--accent); }
+  .outcome p { margin-top: 8px; font-size: 16px; color: var(--soft); max-width: 640px; }
+  .case-cta { margin-top: 40px; }
+
+  /* Vetrina del caso studio: pannello da destra */
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(760px, 94vw); z-index: 60;
+    background: var(--bg); border-left: 1px solid var(--line);
+    transform: translateX(100%); visibility: hidden;
+    transition: transform 0.45s var(--ease), visibility 0.45s;
+    overflow-y: auto; overscroll-behavior: contain;
+  }
+  .drawer.open { transform: none; visibility: visible; }
+  .drawer-scrim {
+    position: fixed; inset: 0; z-index: 55; background: rgba(5, 5, 7, 0.65);
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .drawer-scrim.open { opacity: 1; pointer-events: auto; }
+  body.drawer-open { overflow: hidden; }
+  .drawer-bar {
+    position: sticky; top: 0; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 16px 28px;
+    background: rgba(5, 5, 7, 0.92);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .drawer-full {
+    font-size: 14px; color: var(--soft); border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 2px; min-height: 44px; display: inline-flex; align-items: center;
+  }
+  .drawer-full:hover { color: var(--accent); border-color: var(--accent); }
+  .drawer-close {
+    height: 44px; min-height: 44px; padding: 0 20px; border-radius: 8px;
+    border: 1px solid var(--line-strong); background: transparent; color: var(--text);
+    font: inherit; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .drawer-close:hover { border-color: var(--accent); color: var(--accent); }
+  .drawer-body .case { padding: 36px 28px 80px; }
+  .drawer-body .case .wrap { padding: 0; max-width: none; }
+  .drawer-body .back { display: none; }
+  .drawer-body .case-title { font-size: clamp(36px, 5vw, 56px); }
+  .drawer-body .case-grid { grid-template-columns: 1fr; gap: 24px; }
+  .drawer-body .case-h { margin-top: 48px; font-size: 22px; }
+  .drawer-body .outcome { margin-top: 40px; }
+  .drawer-body .case-visual { margin-top: 32px; }
+
+  /* Pagina legale completa */
+  .legal-page { padding: 120px 0 96px; border-top: 0; }
+  .legal-page[hidden] { display: none; }
+  .legal-wrap { max-width: 760px; }
+  .legal-page .back { margin-bottom: 24px; }
+  .legal-title { font-size: clamp(36px, 5vw, 56px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.08; }
+  .legal-page .meta { margin-top: 12px; font-size: 14px; color: var(--muted); }
+  .toc {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    margin-top: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--line);
+  }
+  .toc a {
+    padding: 8px 16px; border: 1px solid var(--line-strong); border-radius: 8px;
+    font-size: 14px; color: var(--soft); transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+    min-height: 44px; display: inline-flex; align-items: center;
+  }
+  .toc a:hover { border-color: var(--accent); color: var(--text); }
+  .legal-doc { padding-top: 48px; scroll-margin-top: 88px; }
+  .legal-doc h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .legal-doc h3 { margin-top: 32px; font-size: 17px; font-weight: 600; }
+  .legal-doc p, .legal-doc li { margin-top: 12px; font-size: 15px; color: var(--muted); line-height: 1.6; }
+  .legal-doc ul { list-style: none; margin-top: 12px; display: grid; gap: 8px; }
+  .legal-doc a { color: var(--accent); border-bottom: 1px solid rgba(var(--accent-rgb), 0.35); }
+  .legal-doc a:hover { border-color: var(--accent); }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px 0 56px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  footer .foot-links { display: flex; gap: 20px; flex-wrap: wrap; }
+  footer a { color: var(--soft); transition: color 0.2s var(--ease); min-height: 44px; display: inline-flex; align-items: center; }
+  footer a:hover { color: var(--accent); }
+
+  /* Responsive breakpoints: 960px (tablet) & 640px (mobile) & 360px (compact) */
+  @media (max-width: 960px) {
+    .work-grid, .skills { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+  @media (max-width: 640px) {
+    .nav .nav-right ul { display: none; }
+    .nav-toggle { display: inline-flex; }
+    .nav-right { gap: 12px; }
+    section { padding: 88px 0; }
+    .layer { padding: 96px 24px; }
+    .work-grid, .skills, .case-grid, .field-row { grid-template-columns: 1fr; gap: 20px; }
+    .skills > div { padding: 24px; }
+    .contact-panel { padding: 24px; }
+    .direct-card { flex-direction: column; align-items: flex-start; padding: 20px; }
+    .direct-email { font-size: 15px; }
+    .check { font-size: 16px; }
+    .drawer-bar { padding: 12px 20px; }
+    .drawer-body .case { padding: 28px 20px 64px; }
+  }
+  @media (max-width: 360px) {
+    .wrap { padding: 0 16px; }
+    .contact-panel { padding: 20px 16px; }
+    .nav .brand { font-size: 14px; }
+    .hero-name { font-size: 40px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .scroll-hint { display: none; }
+    .scroll-arrow, .curtain, .lang-charge-bar { animation: none !important; transition: none !important; }
+    body.lang-switching main, body.lang-switching header nav { filter: none; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#top" class="skip-link"><span lang="it">Vai al contenuto principale</span><span lang="en">Skip to main content</span></a>
+
+<div class="curtain l" aria-hidden="true"></div>
+<div class="curtain r" aria-hidden="true"></div>
+<div class="cursor-ring" id="ring" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+<div id="langCharge" class="lang-charge" aria-hidden="true"><div class="lang-charge-bar"></div></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a href="#top" class="brand">Samuel Tavonatti</a>
+    <div class="nav-right">
+      <nav aria-label="Principale">
+        <ul>
+          <li><a href="#progetti"><span lang="it">Progetti</span><span lang="en">Projects</span></a></li>
+          <li><a href="#competenze"><span lang="it">Competenze</span><span lang="en">Skills</span></a></li>
+          <li><a href="#percorso"><span lang="it">Percorso</span><span lang="en">Background</span></a></li>
+          <li><a href="#contatti"><span lang="it">Contatti</span><span lang="en">Contact</span></a></li>
+        </ul>
+      </nav>
+      <div class="lang" role="group" aria-label="Lingua / Language">
+        <button type="button" data-set="it" aria-pressed="true">IT</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-set="en" aria-pressed="false">EN</button>
+      </div>
+      <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileMenu" data-aria-it="Apri menu di navigazione" data-aria-en="Open navigation menu" aria-label="Apri menu di navigazione">
+        <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="17" y2="6"/>
+          <line x1="3" y1="14" x2="17" y2="14"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <nav id="mobileMenu" class="mobile-menu" aria-label="Menu mobile">
+    <ul>
+      <li><a href="#progetti"><span lang="it">Progetti</span><span lang="en">Projects</span></a></li>
+      <li><a href="#competenze"><span lang="it">Competenze</span><span lang="en">Skills</span></a></li>
+      <li><a href="#percorso"><span lang="it">Percorso</span><span lang="en">Background</span></a></li>
+      <li><a href="#contatti"><span lang="it">Contatti</span><span lang="en">Contact</span></a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="top">
+<div id="landing">
+
+  <div class="stage">
+    <div class="sticky">
+
+      <div class="layer hero" id="hero">
+        <div class="hero-light" aria-hidden="true"></div>
+        <div>
+          <h1 class="hero-name" id="heroName" aria-label="Samuel Tavonatti"><span class="w">Samuel</span> <span class="w">Tavonatti</span></h1>
+          <p class="role">
+            <span lang="it">UX/UI Designer e Front-End, Trento</span>
+            <span lang="en">UX/UI Designer and Front-End, Trento</span>
+          </p>
+          <p class="lead">
+            <span lang="it">Progetto interfacce chiare e prodotti web, partendo dalle persone che li useranno.</span>
+            <span lang="en">I design clear interfaces and web products, starting from the people who will use them.</span>
+          </p>
+          <div class="actions">
+            <a href="#progetti" class="btn btn-primary"><span lang="it">Vedi i progetti</span><span lang="en">View projects</span></a>
+            <a href="#contatti" class="btn btn-ghost"><span lang="it">Scrivimi</span><span lang="en">Write to me</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer chapter">
+        <div>
+          <h2><span lang="it">Interfacce che si capiscono da sole</span><span lang="en">Interfaces that explain themselves</span></h2>
+          <p class="body">
+            <span lang="it">Architetture informative, wireframe e prototipi in Figma. Ogni schermata parte da un compito concreto che l'utente deve compiere.</span>
+            <span lang="en">Information architecture, wireframes and prototypes in Figma. Every screen starts from a concrete task the user needs to complete.</span>
+          </p>
+          <p class="trait"><span>UX/UI Design</span> · Information architecture · Design system</p>
+        </div>
+      </div>
+
+      <div class="layer chapter">
+        <div>
+          <h2><span lang="it">Prima di disegnare, ascolto</span><span lang="en">Before designing, I listen</span></h2>
+          <p class="body">
+            <span lang="it">Interviste sul campo, mappature dei processi e valutazioni euristiche, con il Double Diamond come riferimento per capire il problema prima della soluzione.</span>
+            <span lang="en">Field interviews, process mapping and heuristic evaluations, using the Double Diamond to understand the problem before the solution.</span>
+          </p>
+          <p class="trait"><span>User research</span> · <span lang="it">Interviste · Mappatura · Euristiche</span><span lang="en">Interviews · Mapping · Heuristics</span></p>
+        </div>
+      </div>
+
+      <div class="layer chapter">
+        <div>
+          <h2><span lang="it">Misuro dove l'utente rallenta</span><span lang="en">I measure where users slow down</span></h2>
+          <p class="body">
+            <span lang="it">Ergonomia cognitiva e test di usabilità per individuare attrito, confusione e abbandono, e trasformarli in decisioni di design verificabili.</span>
+            <span lang="en">Cognitive ergonomics and usability testing to find friction, confusion and drop-off, and turn them into verifiable design decisions.</span>
+          </p>
+          <p class="trait"><span lang="it">Analisi · Ergonomia cognitiva · Test di usabilità</span><span lang="en">Analysis · Cognitive ergonomics · Usability testing</span></p>
+        </div>
+      </div>
+
+      <div class="layer chapter">
+        <div>
+          <h2><span lang="it">Dal prototipo al codice</span><span lang="en">From prototype to code</span></h2>
+          <p class="body">
+            <span lang="it">Vue, React e TypeScript, animazioni in CSS e SVG, e una cura costante per performance e accessibilità.</span>
+            <span lang="en">Vue, React and TypeScript, CSS and SVG animation, and constant care for performance and accessibility.</span>
+          </p>
+          <p class="trait"><span>Front-End</span> · Vue · React · TypeScript · Motion</p>
+        </div>
+      </div>
+
+      <button type="button" class="scroll-hint" id="hint" data-aria-it="Scorri ai contenuti" data-aria-en="Scroll to content" aria-label="Scorri ai contenuti">
+        <span><span lang="it">Scorri</span><span lang="en">Scroll</span></span>
+        <svg class="scroll-arrow" viewBox="0 0 16 32" width="16" height="32" fill="none" aria-hidden="true">
+          <line x1="8" y1="2" x2="8" y2="24" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M3 19L8 24L13 19" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <section id="progetti" class="divider" aria-labelledby="t-progetti">
+    <div class="wrap">
+      <h2 class="sec" id="t-progetti"><span lang="it">Progetti selezionati</span><span lang="en">Selected projects</span></h2>
+      <p class="intro">
+        <span lang="it">Lavori reali tra prodotto web indipendente, ricerca HCI universitaria e gestione di contenuti editoriali.</span>
+        <span lang="en">Real work across independent web products, university HCI research and editorial content management.</span>
+      </p>
+
+      <div class="work-grid">
+        <article class="project" data-case="voltrep">
+          <div class="shot volt" role="img" data-aria-it="Logo di VoltRep, web app per il workout tracking" data-aria-en="VoltRep logo, workout tracking web app"></div>
+          <div class="project-body">
+            <h3><a href="#voltrep" class="card-trigger" aria-haspopup="dialog">VoltRep</a></h3>
+            <p>
+              <span lang="it">Web app gratuita per il workout tracking, costruita su Firebase e Firestore. Progettata e sviluppata da zero, dall'interfaccia al codice.</span>
+              <span lang="en">A free workout tracking web app, built on Firebase and Firestore. Designed and developed from scratch, from interface to code.</span>
+            </p>
+            <div class="project-foot">
+              <span class="project-cue"><span lang="it">Caso studio &rarr;</span><span lang="en">Case study &rarr;</span></span>
+              <a class="more" href="https://voltrep-app.web.app/" target="_blank" rel="noopener"><span lang="it">Apri app &#8599;</span><span lang="en">Open app &#8599;</span></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project" data-case="esu">
+          <div class="shot esu" role="img" data-aria-it="Logo di ESU, Sensor Exercise You" data-aria-en="ESU logo, Sensor Exercise You"></div>
+          <div class="project-body">
+            <h3><a href="#esu" class="card-trigger" aria-haspopup="dialog"><span lang="it">ESU, ricerca HCI</span><span lang="en">ESU, HCI research</span></a></h3>
+            <p>
+              <span lang="it">Ricerca sull'esperienza utente di un prodotto per l'esercizio con sensori, con interviste e valutazioni euristiche. 2025.</span>
+              <span lang="en">User experience research on a sensor-based exercise product, with interviews and heuristic evaluations. 2025.</span>
+            </p>
+            <div class="project-foot">
+              <span class="project-cue"><span lang="it">Caso studio &rarr;</span><span lang="en">Case study &rarr;</span></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project" data-case="trentino">
+          <div class="shot trn" role="img" data-aria-it="Logo Trentino sopra le Dolomiti" data-aria-en="Trentino logo above the Dolomites"></div>
+          <div class="project-body">
+            <h3><a href="#trentino" class="card-trigger" aria-haspopup="dialog">Trentino Marketing</a></h3>
+            <p>
+              <span lang="it">Gestione dei contenuti web su Pimcore CMS per visittrentino.info, in sei lingue, con report GA4 e SEO. Ago–Ott 2026.</span>
+              <span lang="en">Web content management on Pimcore CMS for visittrentino.info, in six languages, with GA4 and SEO reporting. Aug–Oct 2026.</span>
+            </p>
+            <div class="project-foot">
+              <span class="project-cue"><span lang="it">Caso studio &rarr;</span><span lang="en">Case study &rarr;</span></span>
+              <a class="more" href="https://www.visittrentino.info" target="_blank" rel="noopener"><span lang="it">Sito live &#8599;</span><span lang="en">Live site &#8599;</span></a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="competenze" class="divider" aria-labelledby="t-competenze">
+    <div class="wrap">
+      <h2 class="sec" id="t-competenze"><span lang="it">Competenze</span><span lang="en">Skills</span></h2>
+      <p class="intro">
+        <span lang="it">Ricerca, interfaccia e codice, con un occhio ai contenuti.</span>
+        <span lang="en">Research, interface and code, with an eye on content.</span>
+      </p>
+
+      <div class="skills">
+        <div>
+          <h3><span lang="it">UX/UI e ricerca</span><span lang="en">UX/UI and research</span></h3>
+          <ul>
+            <li><span lang="it">Figma e prototipazione</span><span lang="en">Figma and prototyping</span></li>
+            <li>Design system</li>
+            <li>Double Diamond</li>
+            <li><span lang="it">Ergonomia cognitiva</span><span lang="en">Cognitive ergonomics</span></li>
+            <li><span lang="it">Wireframing e information architecture</span><span lang="en">Wireframing and information architecture</span></li>
+            <li>Usability testing</li>
+          </ul>
+        </div>
+        <div>
+          <h3><span lang="it">Front-End e motion</span><span lang="en">Front-end and motion</span></h3>
+          <ul>
+            <li>Vue.js <span lang="it">e</span><span lang="en">and</span> React</li>
+            <li>TypeScript</li>
+            <li>Tailwind CSS</li>
+            <li>CSS <span lang="it">e</span><span lang="en">and</span> SVG motion</li>
+            <li>Firebase <span lang="it">e</span><span lang="en">and</span> Firestore</li>
+          </ul>
+        </div>
+        <div>
+          <h3><span lang="it">Contenuti, SEO e digitale</span><span lang="en">Content, SEO and digital</span></h3>
+          <ul>
+            <li>Pimcore CMS</li>
+            <li>Google Analytics 4</li>
+            <li><span lang="it">SEO e search architecture</span><span lang="en">SEO and search architecture</span></li>
+            <li><span lang="it">Workflow editoriali multilingua</span><span lang="en">Multilingual editorial workflows</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="percorso" class="divider" aria-labelledby="t-percorso">
+    <div class="wrap">
+      <h2 class="sec" id="t-percorso"><span lang="it">Percorso</span><span lang="en">Background</span></h2>
+      <p class="intro">
+        <span lang="it">Formazione universitaria a Trento ed esperienza sul campo tra prodotto e contenuti.</span>
+        <span lang="en">University education in Trento and hands-on experience across product and content.</span>
+      </p>
+
+      <div class="timeline">
+        <div class="item">
+          <div class="when"><span lang="it">Ago–Ott 2026 · Tirocinio</span><span lang="en">Aug–Oct 2026 · Internship</span></div>
+          <h3><span lang="it">Area Content e Web</span><span lang="en">Content and Web area</span></h3>
+          <div class="org">Trentino Marketing · visittrentino.info</div>
+          <ul>
+            <li><span lang="it">Piani editoriali e gestione dei contenuti web su Pimcore CMS in sei lingue, per eventi come il Trentodoc Festival e Suoni delle Dolomiti</span><span lang="en">Editorial plans and web content management on Pimcore CMS in six languages, for events such as the Trentodoc Festival and Suoni delle Dolomiti</span></li>
+            <li><span lang="it">Analisi SEO/GEO, report mensili con Google Analytics 4 e preparazione dei layout di staging</span><span lang="en">SEO/GEO analysis, monthly reporting with Google Analytics 4 and staging layout preparation</span></li>
+            <li><span lang="it">Osservazione degli utenti sul campo</span><span lang="en">Field observation of users</span></li>
+          </ul>
+        </div>
+
+        <div class="item">
+          <div class="when"><span lang="it">2024–in corso · Laurea triennale</span><span lang="en">2024–present · Bachelor's degree</span></div>
+          <h3><span lang="it">Interfacce e Tecnologie della Comunicazione</span><span lang="en">Interfaces and Communication Technologies</span></h3>
+          <div class="org"><span lang="it">Università degli Studi di Trento</span><span lang="en">University of Trento</span></div>
+          <p>
+            <span lang="it">Corso interdisciplinare su UX/UI design, ergonomia cognitiva, psicologia della percezione, informatica e progettazione di sistemi interattivi.</span>
+            <span lang="en">Interdisciplinary programme covering UX/UI design, cognitive ergonomics, psychology of perception, computer science and interactive systems design.</span>
+          </p>
+          <ul>
+            <li><span lang="it">Dipartimento di Psicologia e Scienze Cognitive</span><span lang="en">Department of Psychology and Cognitive Science</span></li>
+            <li><span lang="it">Accesso con test di ingresso, durata di tre anni</span><span lang="en">Entrance test required, three-year duration</span></li>
+            <li><span lang="it">Porta ai master in Human-Computer Interaction e Cognitive Science dell'Università di Trento</span><span lang="en">Leads to the Human-Computer Interaction and Cognitive Science master's programmes at the University of Trento</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contatti" class="divider contact" aria-labelledby="t-contatti">
+    <div class="wrap">
+      <div class="contact-grid">
+        <!-- Left Column: Editorial Presence & Direct Contact -->
+        <div class="contact-editorial">
+          <h2 class="contact-headline" id="t-contatti">
+            <span lang="it">Parliamo del tuo prossimo prodotto</span>
+            <span lang="en">Let's talk about your next product</span>
+          </h2>
+
+          <div class="editorial-badge">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span lang="it">Disponibile per collaborazioni e ruoli UX/UI · 2026</span>
+            <span lang="en">Available for select projects &amp; UX/UI roles · 2026</span>
+          </div>
+
+          <p class="contact-pitch">
+            <span lang="it">Se stai progettando un'interfaccia, cercando un supporto nella ricerca utente o costruendo un front-end in Vue o React, scrivimi direttamente o prepara un brief qui accanto.</span>
+            <span lang="en">If you are designing an interface, running user research, or building a front-end in Vue or React, email me directly or prepare a brief here.</span>
+          </p>
+
+          <!-- Direct Email Card -->
+          <div class="direct-card">
+            <div class="direct-info">
+              <span class="direct-label"><span lang="it">Email diretta</span><span lang="en">Direct email</span></span>
+              <span class="direct-email">samuel.tavonatti05@gmail.com</span>
+            </div>
+            <button type="button" class="btn-copy" id="copyMail" data-aria-it="Copia indirizzo email" data-aria-en="Copy email address" aria-label="Copia indirizzo email">
+              <span lang="it">Copia</span>
+              <span lang="en">Copy</span>
+            </button>
+          </div>
+          <p class="copy-feedback" id="copyNote" aria-live="polite"></p>
+
+          <!-- Structured Metadata Matrix -->
+          <div class="contact-matrix">
+            <div class="matrix-item">
+              <span class="matrix-label"><span lang="it">Sede e fuso orario</span><span lang="en">Location &amp; timezone</span></span>
+              <span class="matrix-value">Trento, Italia · CET (UTC+1)</span>
+            </div>
+            <div class="matrix-item">
+              <span class="matrix-label"><span lang="it">Discipline</span><span lang="en">Focus</span></span>
+              <span class="matrix-value">UX/UI · User Research · Front-End</span>
+            </div>
+            <div class="matrix-item">
+              <span class="matrix-label"><span lang="it">Profili</span><span lang="en">Profiles</span></span>
+              <div class="social-links">
+                <a href="https://www.linkedin.com/in/samuel-tavonatti/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                <a href="https://www.instagram.com/samuel.tavonatti/" target="_blank" rel="noopener noreferrer">Instagram</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="editorial-accent">
+            <span lang="it">Risposta di norma entro 24 ore lavorative.</span>
+            <span lang="en">Typical reply within 24 business hours.</span>
+          </div>
+        </div>
+
+        <!-- Right Column: Monolithic Architectural Form Panel -->
+        <div class="contact-panel" id="brief">
+          <div class="panel-header">
+            <h3 class="panel-title"><span lang="it">Richiesta strutturata</span><span lang="en">Structured inquiry</span></h3>
+            <p class="panel-sub"><span lang="it">Tre passaggi rapidi per preparare un'email ordinata.</span><span lang="en">Three quick steps to draft a clear email.</span></p>
+          </div>
+
+          <!-- Step 01: Chi sei -->
+          <div class="form-step">
+            <p class="step-label"><span class="step-num">01</span><span lang="it">Chi sei</span><span lang="en">Who you are</span></p>
+            <div class="field-row">
+              <label class="field">
+                <span lang="it">Nome e cognome</span><span lang="en">Your name</span>
+                <input id="bName" type="text" maxlength="80" autocomplete="name" data-ph-it="Mario Rossi" data-ph-en="Alex Rivera" placeholder="Mario Rossi" required>
+              </label>
+              <label class="field">
+                <span lang="it">Indirizzo email</span><span lang="en">Email address</span>
+                <input id="bEmail" type="email" maxlength="120" autocomplete="email" data-ph-it="nome@azienda.it" data-ph-en="name@company.com" placeholder="nome@azienda.it" required>
+              </label>
+            </div>
+          </div>
+
+          <!-- Step 02: Di cosa si tratta -->
+          <div class="form-step">
+            <p class="step-label"><span class="step-num">02</span><span lang="it">Di cosa si tratta</span><span lang="en">What it is about</span></p>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="cat" value="UX/UI design"><span class="pill">UX/UI design</span></label>
+              <label class="chip"><input type="checkbox" name="cat" value="Ricerca utente"><span class="pill"><span lang="it">Ricerca utente</span><span lang="en">User research</span></span></label>
+              <label class="chip"><input type="checkbox" name="cat" value="Front-end"><span class="pill">Front-end</span></label>
+              <label class="chip"><input type="checkbox" name="cat" value="Design system"><span class="pill">Design system</span></label>
+              <label class="chip"><input type="checkbox" name="cat" value="Contenuti e SEO"><span class="pill"><span lang="it">Contenuti e SEO</span><span lang="en">Content &amp; SEO</span></span></label>
+              <label class="chip"><input type="checkbox" name="cat" value="Altro"><span class="pill"><span lang="it">Altro</span><span lang="en">Other</span></span></label>
+            </div>
+          </div>
+
+          <!-- Step 03: Il messaggio -->
+          <div class="form-step">
+            <p class="step-label"><span class="step-num">03</span><span lang="it">Il messaggio</span><span lang="en">Your message</span></p>
+            <label class="field">
+              <span lang="it">Idee, contesto e obiettivi</span><span lang="en">Ideas, context and goals</span>
+              <textarea id="bIdea" rows="5" maxlength="1500" data-ph-it="Descrivi contesto e obiettivo del progetto" data-ph-en="Share the project context and goal" placeholder="Descrivi contesto e obiettivo del progetto"></textarea>
+            </label>
+          </div>
+
+          <div class="form-foot">
+            <label class="check">
+              <input type="checkbox" id="bPriv">
+              <span class="custom-check" aria-hidden="true"></span>
+              <span><span lang="it">Ho letto la <a href="#privacy">privacy policy</a> e acconsento al trattamento dei dati.</span><span lang="en">I have read the <a href="#privacy">privacy policy</a> and agree to data processing.</span></span>
+            </label>
+            <p class="brief-status" id="briefStatus" aria-live="polite"></p>
+            <div class="send-row">
+              <button type="button" class="btn btn-primary" id="bSend" disabled>
+                <span lang="it">Prepara l'email &rarr;</span><span lang="en">Prepare email &rarr;</span>
+              </button>
+              <p class="note">
+                <span lang="it">Apre il tuo client di posta con il messaggio pronto. Nulla parte senza conferma.</span>
+                <span lang="en">Opens your mail app with the draft ready. Nothing is sent without confirmation.</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+  <section id="case-voltrep" class="view case" aria-labelledby="t-voltrep" hidden>
+    <div class="wrap">
+      <a class="back" href="#progetti"><span lang="it">Torna ai progetti</span><span lang="en">Back to projects</span></a>
+      <p class="meta"><span lang="it">Prodotto web · 2025–2026</span><span lang="en">Web product · 2025–2026</span></p>
+      <h1 class="case-title" id="t-voltrep">VoltRep</h1>
+      <p class="case-lead"><span lang="it">Una web app gratuita per registrare gli allenamenti. Progettata e sviluppata da zero, dall'interfaccia al codice.</span><span lang="en">A free web app for logging workouts. Designed and built from scratch, from interface to code.</span></p>
+      <div class="case-visual"><div class="shot volt" style="aspect-ratio:16/9" role="img" aria-label="VoltRep"></div></div>
+
+      <div class="case-grid">
+        <div><h2><span lang="it">Contesto</span><span lang="en">Context</span></h2><p><span lang="it">Chi si allena in palestra deve registrare serie, ripetizioni e carichi senza distrarsi dall'allenamento. VoltRep rende questa operazione rapida.</span><span lang="en">People training at the gym need to log sets, reps and loads without losing focus. VoltRep makes logging quick.</span></p></div>
+        <div><h2><span lang="it">Il mio ruolo</span><span lang="en">My role</span></h2><p><span lang="it">UX/UI, architettura dei dati e sviluppo front-end.</span><span lang="en">UX/UI, data architecture and front-end development.</span></p></div>
+        <div><h2><span lang="it">Strumenti</span><span lang="en">Tools</span></h2><p><span lang="it">Firebase, Firestore, front-end web.</span><span lang="en">Firebase, Firestore, web front-end.</span></p></div>
+      </div>
+
+      <h2 class="case-h"><span lang="it">Processo</span><span lang="en">Process</span></h2>
+      <ol class="steps">
+        <li class="step"><span class="step-n">01</span><p><span lang="it">Osservare il gesto: come si registra un set durante l'allenamento.</span><span lang="en">Observe the gesture: how a set is logged mid-workout.</span></p></li>
+        <li class="step"><span class="step-n">02</span><p><span lang="it">Ridurre i passaggi del flusso di registrazione.</span><span lang="en">Reduce the steps in the logging flow.</span></p></li>
+        <li class="step"><span class="step-n">03</span><p><span lang="it">Prototipare e verificare le schermate chiave.</span><span lang="en">Prototype and check the key screens.</span></p></li>
+        <li class="step"><span class="step-n">04</span><p><span lang="it">Sviluppare su Firebase e Firestore.</span><span lang="en">Build on Firebase and Firestore.</span></p></li>
+      </ol>
+
+      <div class="outcome">
+        <h2><span lang="it">Risultato</span><span lang="en">Outcome</span></h2>
+        <p><span lang="it">Web app pubblicata e utilizzata quotidianamente per registrare serie, carichi e progressioni da smartphone, completando un set in meno di 5 secondi.</span><span lang="en">Live web app used daily on mobile to track sets, loads and progression, completing a logged set in under 5 seconds.</span></p>
+      </div>
+
+      <div class="case-cta"><a class="btn btn-primary" href="https://voltrep-app.web.app/" target="_blank" rel="noopener"><span lang="it">Apri VoltRep</span><span lang="en">Open VoltRep</span></a></div>
+    </div>
+  </section>
+
+  <section id="case-esu" class="view case" aria-labelledby="t-esu" hidden>
+    <div class="wrap">
+      <a class="back" href="#progetti"><span lang="it">Torna ai progetti</span><span lang="en">Back to projects</span></a>
+      <p class="meta"><span lang="it">Ricerca &amp; HCI · 2025</span><span lang="en">Research &amp; HCI · 2025</span></p>
+      <h1 class="case-title" id="t-esu"><span lang="it">ESU, ricerca HCI</span><span lang="en">ESU, HCI research</span></h1>
+      <p class="case-lead"><span lang="it">Una ricerca sull'esperienza utente di un prodotto per l'esercizio con sensori, tra interviste e valutazioni euristiche.</span><span lang="en">Research on the user experience of a sensor-based exercise product, through interviews and heuristic evaluations.</span></p>
+      <div class="case-visual"><div class="shot esu" style="aspect-ratio:16/9" role="img" aria-label="ESU, ricerca HCI"></div></div>
+
+      <div class="case-grid">
+        <div><h2><span lang="it">Contesto</span><span lang="en">Context</span></h2><p><span lang="it">Un prodotto che unisce sensori ed esercizio fisico. La domanda era dove l'esperienza rallenta o confonde chi lo usa.</span><span lang="en">A product that combines sensors and exercise. The question was where the experience slows or confuses people.</span></p></div>
+        <div><h2><span lang="it">Il mio ruolo</span><span lang="en">My role</span></h2><p><span lang="it">Ricerca utente e valutazione euristica, con sintesi delle raccomandazioni.</span><span lang="en">User research and heuristic evaluation, with a synthesis of recommendations.</span></p></div>
+        <div><h2><span lang="it">Strumenti</span><span lang="en">Tools</span></h2><p><span lang="it">Interviste, valutazioni euristiche, analisi del flusso.</span><span lang="en">Interviews, heuristic evaluations, flow analysis.</span></p></div>
+      </div>
+
+      <h2 class="case-h"><span lang="it">Processo</span><span lang="en">Process</span></h2>
+      <ol class="steps">
+        <li class="step"><span class="step-n">01</span><p><span lang="it">Definire le domande di ricerca con il Double Diamond.</span><span lang="en">Define the research questions with the Double Diamond.</span></p></li>
+        <li class="step"><span class="step-n">02</span><p><span lang="it">Interviste con utenti del prodotto.</span><span lang="en">Interviews with product users.</span></p></li>
+        <li class="step"><span class="step-n">03</span><p><span lang="it">Valutazione euristica delle schermate.</span><span lang="en">Heuristic evaluation of the screens.</span></p></li>
+        <li class="step"><span class="step-n">04</span><p><span lang="it">Sintesi e raccomandazioni di design.</span><span lang="en">Synthesis and design recommendations.</span></p></li>
+      </ol>
+
+      <div class="outcome">
+        <h2><span lang="it">Risultato</span><span lang="en">Outcome</span></h2>
+        <p><span lang="it">Report completo di ricerca HCI consegnato con 12 raccomandazioni prioritizzate, nuove schermate di onboarding e un flusso di calibrazione dei sensori più lineare.</span><span lang="en">Full HCI research report delivered with 12 prioritised recommendations, redesigned onboarding screens and a clearer sensor calibration flow.</span></p>
+      </div>
+
+      <div class="case-cta"><a class="btn btn-primary" href="#contatti"><span lang="it">Richiedi il report completo</span><span lang="en">Request the full report</span></a></div>
+    </div>
+  </section>
+
+  <section id="case-trentino" class="view case" aria-labelledby="t-trentino" hidden>
+    <div class="wrap">
+      <a class="back" href="#progetti"><span lang="it">Torna ai progetti</span><span lang="en">Back to projects</span></a>
+      <p class="meta"><span lang="it">Area Content e Web · Ago–Ott 2026</span><span lang="en">Content and Web area · Aug–Oct 2026</span></p>
+      <h1 class="case-title" id="t-trentino">Trentino Marketing</h1>
+      <p class="case-lead"><span lang="it">Gestione dei contenuti web su Pimcore CMS per visittrentino.info, in sei lingue, con report GA4 e SEO.</span><span lang="en">Web content management on Pimcore CMS for visittrentino.info, in six languages, with GA4 and SEO reporting.</span></p>
+      <div class="case-visual"><div class="shot trn" style="aspect-ratio:16/9" role="img" aria-label="Trentino Marketing"></div></div>
+
+      <div class="case-grid">
+        <div><h2><span lang="it">Contesto</span><span lang="en">Context</span></h2><p><span lang="it">Un portale turistico con contenuti da coordinare in sei lingue, tra eventi come il Trentodoc Festival e Suoni delle Dolomiti.</span><span lang="en">A tourism portal with content to coordinate in six languages, across events such as the Trentodoc Festival and Suoni delle Dolomiti.</span></p></div>
+        <div><h2><span lang="it">Il mio ruolo</span><span lang="en">My role</span></h2><p><span lang="it">Piani editoriali, localizzazione multilingua, analisi SEO/GEO e GA4, layout di staging, osservazione degli utenti sul campo.</span><span lang="en">Editorial plans, multilingual localisation, SEO/GEO and GA4 analysis, staging layouts, field observation of users.</span></p></div>
+        <div><h2><span lang="it">Strumenti</span><span lang="en">Tools</span></h2><p><span lang="it">Pimcore CMS, Google Analytics 4.</span><span lang="en">Pimcore CMS, Google Analytics 4.</span></p></div>
+      </div>
+
+      <h2 class="case-h"><span lang="it">Processo</span><span lang="en">Process</span></h2>
+      <ol class="steps">
+        <li class="step"><span class="step-n">01</span><p><span lang="it">Piani editoriali per contenuti ed eventi.</span><span lang="en">Editorial plans for content and events.</span></p></li>
+        <li class="step"><span class="step-n">02</span><p><span lang="it">Localizzazione multilingua su Pimcore.</span><span lang="en">Multilingual localisation on Pimcore.</span></p></li>
+        <li class="step"><span class="step-n">03</span><p><span lang="it">Analisi SEO/GEO e report GA4.</span><span lang="en">SEO/GEO analysis and GA4 reporting.</span></p></li>
+        <li class="step"><span class="step-n">04</span><p><span lang="it">Layout di staging e osservazione degli utenti sul campo.</span><span lang="en">Staging layouts and field observation of users.</span></p></li>
+      </ol>
+
+      <div class="outcome">
+        <h2><span lang="it">Risultato</span><span lang="en">Outcome</span></h2>
+        <p><span lang="it">Oltre 120 pagine editoriali pubblicate e aggiornate in sei lingue su visittrentino.info, affiancate da reportistica mensile GA4 e miglioramenti dell'architettura informativa.</span><span lang="en">Over 120 editorial pages published and updated in six languages on visittrentino.info, paired with monthly GA4 reporting and structural IA improvements.</span></p>
+      </div>
+
+      <div class="case-cta"><a class="btn btn-primary" href="https://www.visittrentino.info" target="_blank" rel="noopener"><span lang="it">Visita visittrentino.info</span><span lang="en">Visit visittrentino.info</span></a></div>
+    </div>
+  </section>
+
+  <section id="legal" class="view legal-page" aria-labelledby="t-legal" hidden>
+    <div class="wrap legal-wrap">
+      <a class="back" href="#"><span lang="it">Torna al portfolio</span><span lang="en">Back to portfolio</span></a>
+      <h1 class="legal-title" id="t-legal"><span lang="it">Informazioni legali</span><span lang="en">Legal information</span></h1>
+      <p class="meta"><span lang="it">Ultimo aggiornamento: novembre 2026</span><span lang="en">Last updated: November 2026</span></p>
+
+      <nav class="toc" aria-label="Indice">
+        <a href="#privacy"><span lang="it">Privacy policy</span><span lang="en">Privacy policy</span></a>
+        <a href="#cookie"><span lang="it">Cookie policy</span><span lang="en">Cookie policy</span></a>
+        <a href="#note-legali"><span lang="it">Note legali</span><span lang="en">Legal notes</span></a>
+      </nav>
+
+      <article class="legal-doc" id="privacy">
+        <h2><span lang="it">1. Privacy policy</span><span lang="en">1. Privacy policy</span></h2>
+        <p>
+          <span lang="it">La presente informativa descrive come sono trattati i dati personali raccolti tramite questo sito, ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (GDPR) e del D.Lgs. 196/2003 come modificato dal D.Lgs. 101/2018.</span>
+          <span lang="en">This notice describes how personal data collected through this site is processed, pursuant to Articles 13 and 14 of Regulation (EU) 2016/679 (GDPR) and Italian Legislative Decree 196/2003 as amended by Legislative Decree 101/2018.</span>
+        </p>
+
+        <h3><span lang="it">1.1 Titolare del trattamento</span><span lang="en">1.1 Data controller</span></h3>
+        <p>
+          <span lang="it">Samuel Tavonatti, Trento (TN), Italia. Contatto diretto: samuel.tavonatti05@gmail.com.</span>
+          <span lang="en">Samuel Tavonatti, Trento (TN), Italy. Direct contact: samuel.tavonatti05@gmail.com.</span>
+        </p>
+
+        <h3><span lang="it">1.2 Dati trattati</span><span lang="en">1.2 Data processed</span></h3>
+        <ul>
+          <li><span lang="it">Dati che invii volontariamente: nome, indirizzo email, categorie selezionate, messaggio di progetto e la conferma di aver letto questa informativa.</span><span lang="en">Data you send voluntarily: name, email address, selected categories, project message and confirmation that you have read this notice.</span></li>
+          <li><span lang="it">Dati tecnici: l'infrastruttura che ospita il sito registra in modo automatico l'indirizzo IP, la data e l'ora, la pagina richiesta e informazioni sul browser, per garantire il funzionamento e la sicurezza del servizio.</span><span lang="en">Technical data: the hosting infrastructure automatically records the IP address, date and time, the requested page and browser information, to keep the service working and secure.</span></li>
+          <li><span lang="it">Non trattiamo dati di pagamento, dati particolari (art. 9 GDPR) né dati di minori.</span><span lang="en">We do not process payment data, special categories of data (Art. 9 GDPR) or data about minors.</span></li>
+        </ul>
+
+        <h3><span lang="it">1.3 Come arrivano i dati</span><span lang="en">1.3 How data reaches us</span></h3>
+        <p>
+          <span lang="it">Il modulo di contatto del sito non trasmette dati al sito stesso: apre un'email precompilata nel tuo client di posta. I dati arrivano al titolare solo quando scegli di inviare quell'email.</span>
+          <span lang="en">The contact form does not send data to the site itself: it opens a pre-filled email in your email app. Data reaches the controller only when you choose to send that email.</span>
+        </p>
+
+        <h3><span lang="it">1.4 Finalità e basi giuridiche</span><span lang="en">1.4 Purposes and legal bases</span></h3>
+        <ul>
+          <li><span lang="it">Rispondere alle richieste di contatto e valutare collaborazioni: consenso (art. 6, par. 1, lett. a) per il modulo, esecuzione di misure precontrattuali (lett. b) per le richieste successive.</span><span lang="en">Replying to contact requests and assessing collaborations: consent (Art. 6(1)(a)) for the form, and pre-contractual measures (Art. 6(1)(b)) for follow-up requests.</span></li>
+          <li><span lang="it">Sicurezza e funzionamento del sito: legittimo interesse (art. 6, par. 1, lett. f).</span><span lang="en">Site security and operation: legitimate interest (Art. 6(1)(f)).</span></li>
+          <li><span lang="it">Adempimenti di legge, se previsti: obbligo legale (lett. c).</span><span lang="en">Compliance with legal obligations, where required: legal obligation (Art. 6(1)(c)).</span></li>
+        </ul>
+
+        <h3><span lang="it">1.5 Conservazione</span><span lang="en">1.5 Retention</span></h3>
+        <p>
+          <span lang="it">Le email ricevute sono conservate per il tempo necessario a gestire la richiesta e, in ogni caso, non oltre 24 mesi dall'ultimo contatto, salvo obblighi di legge. I dati tecnici sono conservati dal fornitore di hosting secondo la sua informativa.</span>
+          <span lang="en">Emails received are kept for as long as needed to handle the request and in any case no longer than 24 months after the last contact, unless the law requires otherwise. Technical data is kept by the hosting provider under its own notice.</span>
+        </p>
+
+        <h3><span lang="it">1.6 Destinatari</span><span lang="en">1.6 Recipients</span></h3>
+        <p>
+          <span lang="it">Fornitori tecnici che erogano il servizio: GitHub Pages (GitHub, Inc.) per l'hosting statico, Google Fonts (Google LLC) per il caricamento dei caratteri, e il fornitore del servizio email utilizzato (es. Google LLC per Gmail). Non cediamo dati a terzi per finalità di marketing.</span>
+          <span lang="en">Technical providers that run the service: GitHub Pages (GitHub, Inc.) for static hosting, Google Fonts (Google LLC) for loading fonts, and the email provider used (e.g. Google LLC for Gmail). We do not pass data to third parties for marketing.</span>
+        </p>
+
+        <h3><span lang="it">1.7 Trasferimenti extra UE</span><span lang="en">1.7 Transfers outside the EU</span></h3>
+        <p>
+          <span lang="it">Alcuni fornitori hanno sede negli Stati Uniti. I trasferimenti avvengono sulla base di garanzie previste dal GDPR: decisione di adeguatezza EU-U.S. Data Privacy Framework o clausole contrattuali standard.</span>
+          <span lang="en">Some providers are based in the United States. Transfers rely on safeguards provided by the GDPR: the EU-U.S. Data Privacy Framework adequacy decision or standard contractual clauses.</span>
+        </p>
+
+        <h3><span lang="it">1.8 I tuoi diritti</span><span lang="en">1.8 Your rights</span></h3>
+        <p>
+          <span lang="it">Puoi chiedere al titolare l'accesso ai dati, la rettifica, la cancellazione, la limitazione del trattamento, la portabilità e l'opposizione (artt. da 15 a 21 GDPR), scrivendo a samuel.tavonatti05@gmail.com. Se il trattamento si basa sul consenso, puoi revocarlo in qualsiasi momento, senza effetto sui trattamenti già svolti.</span>
+          <span lang="en">You can ask the controller for access to your data, rectification, erasure, restriction of processing, portability and objection (Articles 15 to 21 GDPR), by writing to samuel.tavonatti05@gmail.com. Where processing is based on consent, you can withdraw it at any time, without affecting processing already carried out.</span>
+        </p>
+        <p>
+          <span lang="it">Hai inoltre diritto di proporre reclamo al <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">Garante per la protezione dei dati personali</a>.</span>
+          <span lang="en">You also have the right to lodge a complaint with the <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">Italian Data Protection Authority (Garante per la protezione dei dati personali)</a>.</span>
+        </p>
+
+        <h3><span lang="it">1.9 Natura del conferimento e processi automatizzati</span><span lang="en">1.9 Nature of provision and automated processing</span></h3>
+        <p>
+          <span lang="it">Il conferimento dei dati nel modulo è volontario, ma senza di essi non possiamo rispondere alla richiesta. Non è svolta alcuna profilazione né decisione automatizzata.</span>
+          <span lang="en">Providing data through the form is voluntary, but without it we cannot reply to the request. No profiling or automated decision-making takes place.</span>
+        </p>
+      </article>
+
+      <article class="legal-doc" id="cookie">
+        <h2><span lang="it">2. Cookie policy</span><span lang="en">2. Cookie policy</span></h2>
+        <p>
+          <span lang="it">Questo sito non installa cookie propri di profilazione, analisi o marketing, né cookie di terze parti per gli stessi scopi. Non utilizza localStorage, sessionStorage o strumenti simili per tracciare il dispositivo.</span>
+          <span lang="en">This site does not install its own profiling, analytics or marketing cookies, nor third-party cookies for those purposes. It does not use localStorage, sessionStorage or similar tools to track your device.</span>
+        </p>
+        <ul>
+          <li><span lang="it">Caratteri Google Fonts: il browser scarica i caratteri da Google. Questa operazione non imposta cookie su questo sito, ma invia al fornitore l'indirizzo IP del visitatore.</span><span lang="en">Google Fonts: your browser downloads the fonts from Google. This sets no cookies on this site, but sends the visitor's IP address to the provider.</span></li>
+          <li><span lang="it">Hosting GitHub Pages: il fornitore può usare strumenti tecnici necessari al funzionamento e alla sicurezza del servizio, descritti nella propria informativa.</span><span lang="en">GitHub Pages hosting: the provider may use technical tools needed to run and secure the service, described in its own notice.</span></li>
+        </ul>
+      </article>
+
+      <article class="legal-doc" id="note-legali">
+        <h2><span lang="it">3. Note legali</span><span lang="en">3. Legal notes</span></h2>
+        <h3><span lang="it">3.1 Fornitore del servizio</span><span lang="en">3.1 Service provider</span></h3>
+        <p>
+          <span lang="it">Samuel Tavonatti, Trento, Italia. Email: samuel.tavonatti05@gmail.com. Il sito è un portfolio personale senza scopo commerciale: non vende prodotti né servizi tramite il sito.</span>
+          <span lang="en">Samuel Tavonatti, Trento, Italy. Email: samuel.tavonatti05@gmail.com. The site is a personal portfolio with no commercial purpose: it does not sell products or services through the site.</span>
+        </p>
+        <h3><span lang="it">3.2 Proprietà intellettuale</span><span lang="en">3.2 Intellectual property</span></h3>
+        <p>
+          <span lang="it">Testi, impostazione grafica e codice del sito sono di proprietà del titolare. Loghi e immagini dei progetti presentati (VoltRep, ESU, Trentino Marketing e visittrentino.info) appartengono ai rispettivi titolari e sono mostrati solo per documentare il lavoro svolto. Per richieste di rimozione o chiarimenti, scrivi a samuel.tavonatti05@gmail.com.</span>
+          <span lang="en">Texts, layout and code of the site belong to the controller. Logos and images of the projects shown (VoltRep, ESU, Trentino Marketing and visittrentino.info) belong to their respective owners and are shown only to document the work done. For removal requests or questions, write to samuel.tavonatti05@gmail.com.</span>
+        </p>
+        <h3><span lang="it">3.3 Limiti di responsabilità e link esterni</span><span lang="en">3.3 Limits of liability and external links</span></h3>
+        <p>
+          <span lang="it">I contenuti hanno finalità informativa e sono forniti senza garanzie. Il titolare non è responsabile dei contenuti dei siti esterni collegati, né dei danni derivanti dal loro uso.</span>
+          <span lang="en">Content is for information only and is provided without warranties. The controller is not responsible for the content of linked external sites, nor for damage resulting from their use.</span>
+        </p>
+        <h3><span lang="it">3.4 Legge applicabile</span><span lang="en">3.4 Applicable law</span></h3>
+        <p>
+          <span lang="it">Il presente sito e le presenti note sono regolati dalla legge italiana. Restano salvi i diritti riconosciuti ai consumatori dalla legge del Paese di residenza.</span>
+          <span lang="en">This site and these notes are governed by Italian law. Rights granted to consumers by the law of their country of residence remain unaffected.</span>
+        </p>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-links" aria-label="Informazioni legali / Legal information">
+      <a href="#privacy"><span lang="it">Privacy policy</span><span lang="en">Privacy policy</span></a>
+      <a href="#cookie"><span lang="it">Cookie policy</span><span lang="en">Cookie policy</span></a>
+      <a href="#note-legali"><span lang="it">Note legali</span><span lang="en">Legal notes</span></a>
+    </nav>
+    <div class="num">© 2026 Samuel Tavonatti</div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var html = document.documentElement;
+  var body = document.body;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth >= 900;
+  if (reduce) html.classList.add('reduce');
+
+  // Lingua
+  var TITLES = {
+    it: 'Samuel Tavonatti — UX/UI Designer e Front-End a Trento',
+    en: 'Samuel Tavonatti — UX/UI Designer and Front-End, Trento'
+  };
+  var DESCS = {
+    it: 'Portfolio di Samuel Tavonatti, UX/UI Designer e Front-End a Trento. Progetto interfacce chiare, ricerca sul campo e prodotti web.',
+    en: 'Portfolio of Samuel Tavonatti, UX/UI Designer and Front-End in Trento. I design clear interfaces, field research and web products.'
+  };
+  var lang = 'it';
+  function setLang(l) {
+    lang = l;
+    html.setAttribute('lang', l);
+    document.title = TITLES[l];
+    var md = document.querySelector('meta[name="description"]');
+    if (md) md.setAttribute('content', DESCS[l]);
+    document.querySelectorAll('[data-aria-it]').forEach(function (el) {
+      el.setAttribute('aria-label', el.getAttribute('data-aria-' + l));
+    });
+    document.querySelectorAll('[data-ph-it]').forEach(function (el) {
+      el.setAttribute('placeholder', el.getAttribute('data-ph-' + l));
+    });
+    document.querySelectorAll('.lang button').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-set') === l));
+    });
+    if (typeof validateBrief === 'function') validateBrief();
+  }
+
+  var langCharge = document.getElementById('langCharge');
+  var langChargeBar = langCharge ? langCharge.querySelector('.lang-charge-bar') : null;
+  var isLangSwitching = false;
+
+  function switchLanguage(targetLang, clickedBtn) {
+    if (targetLang === lang || isLangSwitching) return;
+    if (reduce) {
+      setLang(targetLang);
+      return;
+    }
+    isLangSwitching = true;
+    if (clickedBtn) clickedBtn.classList.add('charging');
+    if (langCharge) {
+      langCharge.classList.add('active');
+      if (langChargeBar) {
+        langChargeBar.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)';
+        langChargeBar.style.transform = 'scaleX(0.7)';
+      }
+    }
+    body.classList.add('lang-switching');
+
+    setTimeout(function () {
+      if (langChargeBar) {
+        langChargeBar.style.transition = 'transform 0.16s ease-out';
+        langChargeBar.style.transform = 'scaleX(1)';
+      }
+      setLang(targetLang);
+    }, 200);
+
+    setTimeout(function () {
+      body.classList.remove('lang-switching');
+      if (langCharge) langCharge.classList.remove('active');
+      if (clickedBtn) clickedBtn.classList.remove('charging');
+    }, 380);
+
+    setTimeout(function () {
+      if (langChargeBar) {
+        langChargeBar.style.transition = 'none';
+        langChargeBar.style.transform = 'scaleX(0)';
+      }
+      isLangSwitching = false;
+    }, 550);
+  }
+
+  document.querySelectorAll('.lang button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      switchLanguage(b.getAttribute('data-set'), b);
+    });
+  });
+
+  // Menu mobile accessibile
+  var navToggle = document.getElementById('navToggle');
+  var mobileMenu = document.getElementById('mobileMenu');
+  function closeMobileMenu() {
+    if (!mobileMenu || !navToggle) return;
+    mobileMenu.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+  if (navToggle && mobileMenu) {
+    navToggle.addEventListener('click', function () {
+      var isOpen = mobileMenu.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+    mobileMenu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', closeMobileMenu);
+    });
+  }
+
+  // Elementi
+  var landing = document.getElementById('landing');
+  var stage = document.querySelector('.stage');
+  var hero = document.querySelector('.hero');
+  var heroName = document.getElementById('heroName');
+  var heroLight = document.querySelector('.hero-light');
+  var chapters = Array.prototype.slice.call(document.querySelectorAll('.chapter'));
+  var hint = document.getElementById('hint');
+  var progress = document.querySelector('.progress');
+  var roleEl = document.querySelector('.hero .role');
+  var leadEl = document.querySelector('.hero .lead');
+  var ring = document.getElementById('ring');
+
+  // Titolo: lettere separate per l'interazione (fisica protetta)
+  var letters = [];
+  if (heroName) {
+    heroName.querySelectorAll('.w').forEach(function (w) {
+      var txt = w.textContent;
+      w.textContent = '';
+      txt.split('').forEach(function (c) {
+        var sp = document.createElement('span');
+        sp.className = 'ch';
+        sp.setAttribute('aria-hidden', 'true');
+        sp.textContent = c;
+        w.appendChild(sp);
+        letters.push(sp);
+      });
+    });
+  }
+
+  // Routing
+  var CASES = ['voltrep', 'esu', 'trentino'];
+  var LEGAL = ['legal', 'privacy', 'cookie', 'note-legali'];
+  var onLanding = true;
+  function route() {
+    var h = window.location.hash.slice(1);
+    document.querySelectorAll('.view').forEach(function (v) { v.hidden = true; });
+    onLanding = true;
+    if (CASES.indexOf(h) > -1) {
+      onLanding = false;
+      document.getElementById('case-' + h).hidden = false;
+      window.scrollTo(0, 0);
+    } else if (LEGAL.indexOf(h) > -1) {
+      onLanding = false;
+      document.getElementById('legal').hidden = false;
+      if (h === 'legal') { window.scrollTo(0, 0); }
+      else {
+        var el = document.getElementById(h);
+        if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 90);
+      }
+    }
+    landing.hidden = !onLanding;
+    if (ring) ring.hidden = !onLanding || !fine;
+    if (onLanding && h) {
+      var target = document.getElementById(h);
+      if (target && target.closest('#landing')) target.scrollIntoView();
+    }
+    if (onLanding && !h) window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+  route();
+
+  var pinned = !reduce;
+  if (pinned) stage.classList.add('pinned');
+  if (!reduce) setTimeout(function () { body.classList.add('opened'); }, 300);
+
+  function clamp(v) { return Math.min(1, Math.max(0, v)); }
+  function seg(u, a, b) { return clamp((u - a) / (b - a)); }
+
+  // Capitoli: fisica scroll pinned protetta
+  var CH = [[1.6, 2.6], [2.6, 3.6], [3.6, 4.6], [4.6, 5.4]];
+  function chapterState(t, exits) {
+    var inP = Math.min(1, t / 0.22);
+    var outP = exits ? Math.max(0, (t - 0.78) / 0.22) : 0;
+    var alpha = inP * (1 - outP);
+    return { o: alpha, y: (1 - inP) * 56 - outP * 56, b: (1 - alpha) * 6 };
+  }
+
+  function updateScene() {
+    if (landing.hidden) return;
+    var vh = window.innerHeight;
+    var u = Math.max(0, -stage.getBoundingClientRect().top) / vh;
+
+    var ht = seg(u, 1.1, 1.7);
+    hero.style.opacity = String(1 - ht);
+    hero.style.transform = 'scale(' + (1 - 0.08 * ht) + ') translateY(' + (-ht * 6) + 'vh)';
+    hero.style.filter = 'blur(' + (ht * 6) + 'px)';
+
+    if (pinned) {
+      chapters.forEach(function (el, i) {
+        var t = seg(u, CH[i][0], CH[i][1]);
+        var s = chapterState(t, i < chapters.length - 1);
+        el.style.opacity = String(s.o);
+        el.style.transform = 'translateY(' + s.y + 'px)';
+        el.style.filter = 'blur(' + s.b + 'px)';
+      });
+    }
+
+    if (hint) hint.style.opacity = String(1 - seg(u, 0, 0.3));
+    if (ring) ring.style.opacity = String(1 - seg(u, 0.6, 1.0));
+
+    var max = html.scrollHeight - vh;
+    progress.style.transform = 'scaleX(' + (max > 0 ? window.scrollY / max : 0) + ')';
+  }
+
+  if (hint) {
+    hint.addEventListener('click', function () {
+      var top = stage.getBoundingClientRect().top + window.scrollY + window.innerHeight * 1.6;
+      window.scrollTo({ top: top, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
+
+  document.querySelectorAll('.hero .actions a').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      var targetId = btn.getAttribute('href');
+      if (targetId && targetId.charAt(0) === '#') {
+        var targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          e.preventDefault();
+          targetEl.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+        }
+      }
+    });
+  });
+
+  // Interazioni con il mouse (fisica a molla cursore & parallasse titoli protette)
+  var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  var rx = mx, ry = my;
+  var accentRgb = getComputedStyle(html).getPropertyValue('--accent-rgb').trim() || '56, 189, 248';
+
+  if (fine) {
+    window.addEventListener('mousemove', function (e) {
+      if (landing.hidden) return;
+      mx = e.clientX; my = e.clientY;
+
+      var nx = e.clientX / window.innerWidth - 0.5;
+      var ny = e.clientY / window.innerHeight - 0.5;
+      if (heroName) heroName.style.translate = (nx * 18) + 'px ' + (ny * 10) + 'px';
+      if (roleEl) roleEl.style.translate = (nx * -8) + 'px ' + (ny * -4) + 'px';
+      if (leadEl) leadEl.style.translate = (nx * -4) + 'px ' + (ny * -2) + 'px';
+
+      if (heroLight && hero) {
+        var hr = hero.getBoundingClientRect();
+        heroLight.style.setProperty('--lx', (e.clientX - hr.left) + 'px');
+        heroLight.style.setProperty('--ly', (e.clientY - hr.top) + 'px');
+      }
+
+      letters.forEach(function (c) {
+        var r = c.getBoundingClientRect();
+        var dx = e.clientX - (r.left + r.width / 2);
+        var dy = e.clientY - (r.top + r.height / 2);
+        var d = Math.sqrt(dx * dx + dy * dy);
+        var k = clamp(1 - d / 170);
+        c.style.transform = 'translateY(' + (-k * 16) + 'px) rotate(' + (dx * 0.02 * k) + 'deg)';
+        c.style.textShadow = '0 0 ' + (k * 28) + 'px rgba(' + accentRgb + ', ' + (k * 0.45) + ')';
+      });
+    });
+
+    window.addEventListener('mouseout', function (e) {
+      if (!e.relatedTarget) {
+        if (heroName) heroName.style.translate = '';
+        letters.forEach(function (c) { c.style.transform = ''; c.style.textShadow = ''; });
+      }
+    });
+
+    document.addEventListener('mouseover', function (e) {
+      if (ring && e.target.closest && e.target.closest('a, button')) ring.classList.add('big');
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (ring && e.target.closest && e.target.closest('a, button')) ring.classList.remove('big');
+    });
+  }
+
+  function ringLoop() {
+    rx += (mx - rx) * 0.2;
+    ry += (my - ry) * 0.2;
+    if (ring && !ring.hidden) ring.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0)';
+    requestAnimationFrame(ringLoop);
+  }
+
+  // Scrivimi: copia l'indirizzo
+  var copyBtn = document.getElementById('copyMail');
+  var copyNote = document.getElementById('copyNote');
+  var ADDR = 'samuel.tavonatti05@gmail.com';
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function () {
+      var done = function (ok) {
+        if (ok) {
+          copyBtn.classList.add('done');
+          copyBtn.querySelector('[lang="it"]').textContent = 'Copiato';
+          copyBtn.querySelector('[lang="en"]').textContent = 'Copied';
+          setTimeout(function () {
+            copyBtn.classList.remove('done');
+            copyBtn.querySelector('[lang="it"]').textContent = 'Copia';
+            copyBtn.querySelector('[lang="en"]').textContent = 'Copy';
+          }, 2000);
+        }
+        copyNote.textContent = ok
+          ? (lang === 'it' ? 'Indirizzo copiato.' : 'Address copied.')
+          : (lang === 'it' ? 'Copia non riuscita: seleziona l’indirizzo a mano.' : 'Copy failed: select the address by hand.');
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ADDR).then(function () { done(true); }, function () { done(fallbackCopy(ADDR)); });
+      } else {
+        done(fallbackCopy(ADDR));
+      }
+    });
+  }
+
+  // Richiesta strutturata: validazione chiara + email precompilata
+  var bName = document.getElementById('bName');
+  var bEmail = document.getElementById('bEmail');
+  var bIdea = document.getElementById('bIdea');
+  var bPriv = document.getElementById('bPriv');
+  var bSend = document.getElementById('bSend');
+  var briefStatus = document.getElementById('briefStatus');
+  var cats = Array.prototype.slice.call(document.querySelectorAll('input[name="cat"]'));
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function checkedCats() {
+    return cats.filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+  }
+  function validateBrief() {
+    if (!bSend) return;
+    var missing = [];
+    var isIt = lang === 'it';
+    if (bName.value.trim().length <= 1) missing.push(isIt ? 'nome' : 'name');
+    if (!EMAIL_RE.test(bEmail.value.trim())) missing.push(isIt ? 'email valida' : 'valid email');
+    if (bIdea.value.trim().length === 0 && checkedCats().length === 0) missing.push(isIt ? 'un argomento o messaggio' : 'a topic or message');
+    if (!bPriv.checked) missing.push(isIt ? 'consenso privacy' : 'privacy consent');
+
+    bSend.disabled = missing.length > 0;
+    if (briefStatus) {
+      briefStatus.textContent = missing.length > 0
+        ? (isIt ? 'Per procedere manca: ' + missing.join(', ') + '.' : 'Required to proceed: ' + missing.join(', ') + '.')
+        : (isIt ? 'Pronto per aprire il tuo client email.' : 'Ready to open your email client.');
+    }
+  }
+  if (bSend) {
+    ['input', 'change'].forEach(function (ev) {
+      document.getElementById('brief').addEventListener(ev, validateBrief);
+    });
+    bSend.addEventListener('click', function () {
+      var isIt = lang === 'it';
+      var catList = checkedCats().join(', ');
+      var subject = (isIt ? 'Richiesta: ' : 'Inquiry: ') + (catList || (isIt ? 'progetto' : 'project')) + ' — ' + bName.value.trim();
+      var lines = isIt ? [
+        'Nome: ' + bName.value.trim(),
+        'Email: ' + bEmail.value.trim(),
+        'Categorie: ' + (catList || '—'),
+        '',
+        'Messaggio e progetto:',
+        bIdea.value.trim() || '—',
+        '',
+        'Consenso privacy fornito.'
+      ] : [
+        'Name: ' + bName.value.trim(),
+        'Email: ' + bEmail.value.trim(),
+        'Categories: ' + (catList || '—'),
+        '',
+        'Message and project:',
+        bIdea.value.trim() || '—',
+        '',
+        'Privacy consent given.'
+      ];
+      window.location.href = 'mailto:' + ADDR + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+    });
+  }
+
+  // Inizializza lingua e placeholder
+  setLang((new URLSearchParams(window.location.search).get('lang') || 'it').toLowerCase() === 'en' ? 'en' : 'it');
+
+  // Vetrina del caso studio: pannello da destra con focus trap
+  var drawer = document.createElement('aside');
+  drawer.className = 'drawer';
+  drawer.setAttribute('role', 'dialog');
+  drawer.setAttribute('aria-modal', 'true');
+  drawer.setAttribute('aria-label', 'Caso studio');
+  drawer.setAttribute('aria-hidden', 'true');
+  drawer.innerHTML = '<div class="drawer-bar">' +
+    '<a class="drawer-full" href="#" data-full><span lang="it">Pagina completa</span><span lang="en">Full page</span></a>' +
+    '<button type="button" class="drawer-close"><span lang="it">Chiudi</span><span lang="en">Close</span></button>' +
+    '</div><div class="drawer-body"></div>';
+  var scrim = document.createElement('div');
+  scrim.className = 'drawer-scrim';
+  document.body.appendChild(scrim);
+  document.body.appendChild(drawer);
+  var drawerBody = drawer.querySelector('.drawer-body');
+  var drawerClose = drawer.querySelector('.drawer-close');
+  var drawerFull = drawer.querySelector('[data-full]');
+  var drawerOpen = false;
+  var lastTrigger = null;
+  var currentCase = null;
+
+  function openDrawer(id, trigger) {
+    var src = document.getElementById('case-' + id);
+    if (!src) return;
+    lastTrigger = trigger || null;
+    currentCase = id;
+    var clone = src.cloneNode(true);
+    clone.hidden = false;
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
+    drawerBody.innerHTML = '';
+    drawerBody.appendChild(clone);
+    drawerFull.setAttribute('href', '#' + id);
+    drawer.classList.add('open');
+    scrim.classList.add('open');
+    document.body.classList.add('drawer-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    drawer.scrollTop = 0;
+    drawerOpen = true;
+    drawerClose.focus();
+  }
+  function closeDrawer() {
+    if (!drawerOpen) return;
+    drawer.classList.remove('open');
+    scrim.classList.remove('open');
+    document.body.classList.remove('drawer-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    drawerOpen = false;
+    if (lastTrigger) lastTrigger.focus();
+  }
+  drawerClose.addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  drawerFull.addEventListener('click', function (e) {
+    e.preventDefault();
+    var id = currentCase;
+    closeDrawer();
+    window.location.hash = id;
+  });
+
+  // Click su link contatti dentro il drawer chiude il drawer e scorre ai contatti
+  drawerBody.addEventListener('click', function (e) {
+    var contactLink = e.target.closest ? e.target.closest('a[href="#contatti"]') : null;
+    if (contactLink) {
+      e.preventDefault();
+      closeDrawer();
+      var el = document.getElementById('contatti');
+      if (el) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    var trigger = e.target.closest ? e.target.closest('.card-trigger') : null;
+    if (!trigger) return;
+    var card = trigger.closest('[data-case]');
+    if (!card || drawer.contains(e.target)) return;
+    e.preventDefault();
+    openDrawer(card.getAttribute('data-case'), trigger);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      closeDrawer();
+      closeMobileMenu();
+      return;
+    }
+    if (drawerOpen && e.key === 'Tab') {
+      var focusables = Array.prototype.slice.call(drawer.querySelectorAll('a[href], button:not([disabled]), input, textarea, [tabindex]:not([tabindex="-1"])')).filter(function (el) {
+        return el.offsetParent !== null;
+      });
+      if (focusables.length === 0) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  var ticking = false;
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(function () { updateScene(); ticking = false; });
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  updateScene();
+  if (fine && ring && !reduce) requestAnimationFrame(ringLoop);
+})();
+</script>
+
+</body>
+</html>
