@@ -277,17 +277,102 @@
     50% { transform: translateY(6px); opacity: 1; }
   }
 
-  /* Capitoli (stage pinned protetto) */
-  .chapter h2 { font-size: clamp(36px, 5.5vw, 72px); font-weight: 600; letter-spacing: -0.035em; line-height: 1.06; }
-  .chapter .body { margin: 24px auto 0; max-width: 580px; font-size: 18px; color: var(--soft); }
-  .chapter .trait { margin: 32px auto 0; max-width: 580px; font-size: 15px; color: var(--muted); }
+  /* Capitoli (stage pinned — motion graphic Apple ultra-minimal) */
+  .chapter h2 {
+    font-size: clamp(36px, 5.5vw, 72px);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.06;
+    will-change: transform, letter-spacing;
+  }
+  .chapter .body {
+    margin: 24px auto 0;
+    max-width: 580px;
+    font-size: 18px;
+    color: var(--muted);
+    will-change: transform, color;
+  }
+  .chapter .trait {
+    margin: 32px auto 0;
+    max-width: 580px;
+    font-size: 15px;
+    color: var(--muted);
+    will-change: transform;
+  }
   .chapter .trait span { color: var(--accent); }
 
   .stage.pinned { height: 560vh; }
   .stage.pinned .sticky { position: sticky; top: 0; height: 100vh; }
-  .stage.pinned .layer { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; padding: 0 24px; pointer-events: none; }
+  .stage.pinned .layer { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; padding: 0 24px; pointer-events: none; z-index: 3; }
   .stage.pinned .layer.hero { pointer-events: auto; z-index: 5; }
-  .stage.pinned .chapter { opacity: 0; pointer-events: none; }
+  .stage.pinned .chapter { opacity: 0; pointer-events: none; will-change: opacity, filter; }
+
+  /* Luce ambientale e filo geometrico unico nello .sticky */
+  .stage-ambient,
+  .stage-line,
+  .stage-counter { display: none; }
+  .stage.pinned .stage-ambient {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    background: radial-gradient(620px circle at var(--gx, 50%) var(--gy, 42%), rgba(var(--accent-rgb), 0.085), rgba(var(--accent-rgb), 0) 68%);
+    will-change: opacity;
+  }
+  .stage.pinned .stage-line {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 48px;
+    height: 1px;
+    margin-left: -24px;
+    background: var(--accent);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transform-origin: center center;
+    will-change: transform, opacity;
+  }
+  .stage.pinned .stage-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    will-change: opacity;
+  }
+  .counter-reel {
+    height: 18px;
+    overflow: hidden;
+    display: inline-block;
+  }
+  .counter-track {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+  .counter-track span {
+    height: 18px;
+    line-height: 18px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .counter-sep {
+    color: var(--line-strong);
+  }
 
   /* Cursore a molla (fisica protetta, palette grafite/ciano) */
   .cursor-ring {
@@ -865,8 +950,11 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .scroll-hint { display: none; }
-    .scroll-arrow, .curtain, .lang-charge-bar { animation: none !important; transition: none !important; }
+    .scroll-hint, .stage-ambient, .stage-line, .stage-counter { display: none !important; }
+    .chapter h2, .chapter .body, .chapter .trait { transform: none !important; letter-spacing: normal; }
+    .chapter h2 { letter-spacing: -0.035em; }
+    .chapter .body { color: var(--soft); }
+    .scroll-arrow, .curtain, .lang-charge-bar, .counter-track { animation: none !important; transition: none !important; }
     body.lang-switching main, body.lang-switching header nav { filter: none; transform: none; }
   }
 </style>
@@ -921,6 +1009,8 @@
 
   <div class="stage">
     <div class="sticky">
+      <div class="stage-ambient" id="stageAmbient" aria-hidden="true"></div>
+      <div class="stage-line" id="stageLine" aria-hidden="true"></div>
 
       <div class="layer hero" id="hero">
         <div class="hero-light" aria-hidden="true"></div>
@@ -992,6 +1082,16 @@
           <path d="M3 19L8 24L13 19" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
+
+      <div class="stage-counter" id="stageCounter" aria-hidden="true">
+        <span class="counter-reel">
+          <span class="counter-track" id="counterTrack">
+            <span>01</span><span>02</span><span>03</span><span>04</span>
+          </span>
+        </span>
+        <span class="counter-sep">—</span>
+        <span>04</span>
+      </div>
     </div>
   </div>
 
@@ -1630,14 +1730,44 @@
 
   function clamp(v) { return Math.min(1, Math.max(0, v)); }
   function seg(u, a, b) { return clamp((u - a) / (b - a)); }
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeIn(t) { return t * t * t; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
 
-  // Capitoli: fisica scroll pinned protetta
+  // Capitoli: motion graphic Apple ultra-minimal sincronizzata con lo scroll
   var CH = [[1.6, 2.6], [2.6, 3.6], [3.6, 4.6], [4.6, 5.4]];
+  var chapterParts = chapters.map(function (el) {
+    return {
+      el: el,
+      h2: el.querySelector('h2'),
+      body: el.querySelector('.body'),
+      trait: el.querySelector('.trait')
+    };
+  });
+  var stageAmbient = document.getElementById('stageAmbient');
+  var stageLine = document.getElementById('stageLine');
+  var stageCounter = document.getElementById('stageCounter');
+  var counterTrack = document.getElementById('counterTrack');
+  var lastCounterIdx = -1;
+
+  var STAGE_KF = [
+    { gx: 50, gy: 36, tx: 0, ty: -146, rot: 0, sx: 1.0 },
+    { gx: 36, gy: 46, tx: 0, ty: -156, rot: 90, sx: 0.72 },
+    { gx: 64, gy: 44, tx: 0, ty: -146, rot: 180, sx: 1.25 },
+    { gx: 50, gy: 56, tx: 0, ty: -146, rot: 360, sx: 1.0 }
+  ];
+
   function chapterState(t, exits) {
-    var inP = Math.min(1, t / 0.22);
-    var outP = exits ? Math.max(0, (t - 0.78) / 0.22) : 0;
+    var inP = easeOut(Math.min(1, t / 0.24));
+    var outP = exits ? easeIn(Math.max(0, (t - 0.76) / 0.24)) : 0;
     var alpha = inP * (1 - outP);
-    return { o: alpha, y: (1 - inP) * 56 - outP * 56, b: (1 - alpha) * 6 };
+    return {
+      o: alpha,
+      y: (1 - inP) * 44 - outP * 44,
+      sc: 0.97 + 0.03 * inP - 0.015 * outP,
+      ls: -0.035 + (1 - alpha) * 0.02,
+      b: (1 - alpha) * 4
+    };
   }
 
   function updateScene() {
@@ -1651,13 +1781,64 @@
     hero.style.filter = 'blur(' + (ht * 6) + 'px)';
 
     if (pinned) {
-      chapters.forEach(function (el, i) {
+      var activeIdx = 0;
+      var bestAlpha = -1;
+
+      chapterParts.forEach(function (part, i) {
         var t = seg(u, CH[i][0], CH[i][1]);
-        var s = chapterState(t, i < chapters.length - 1);
-        el.style.opacity = String(s.o);
-        el.style.transform = 'translateY(' + s.y + 'px)';
-        el.style.filter = 'blur(' + s.b + 'px)';
+        var s = chapterState(t, i < chapterParts.length - 1);
+        if (s.o > bestAlpha) {
+          bestAlpha = s.o;
+          activeIdx = i;
+        }
+        part.el.style.opacity = String(s.o);
+        part.el.style.filter = s.b > 0.05 ? 'blur(' + s.b.toFixed(2) + 'px)' : 'none';
+
+        if (part.h2) {
+          part.h2.style.transform = 'translate3d(0,' + s.y.toFixed(2) + 'px,0) scale(' + s.sc.toFixed(4) + ')';
+          part.h2.style.letterSpacing = s.ls.toFixed(4) + 'em';
+        }
+        if (part.body) {
+          var focus = Math.pow(s.o, 1.35);
+          var cr = Math.round(148 + (248 - 148) * focus);
+          var cg = Math.round(163 + (250 - 163) * focus);
+          var cb = Math.round(184 + (252 - 184) * focus);
+          part.body.style.color = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
+          part.body.style.transform = 'translate3d(0,' + (s.y * 1.16).toFixed(2) + 'px,0)';
+        }
+        if (part.trait) {
+          part.trait.style.transform = 'translate3d(0,' + (s.y * 1.3).toFixed(2) + 'px,0)';
+        }
       });
+
+      var stageVis = seg(u, 1.45, 1.78);
+      var cp = clamp((u - 2.1) / 2.9) * (STAGE_KF.length - 1);
+      var k0 = Math.min(STAGE_KF.length - 2, Math.floor(cp));
+      var kfT = easeOut(cp - k0);
+      var a = STAGE_KF[k0];
+      var b = STAGE_KF[k0 + 1];
+
+      if (stageAmbient) {
+        stageAmbient.style.opacity = String(stageVis);
+        stageAmbient.style.setProperty('--gx', lerp(a.gx, b.gx, kfT).toFixed(1) + '%');
+        stageAmbient.style.setProperty('--gy', lerp(a.gy, b.gy, kfT).toFixed(1) + '%');
+      }
+      if (stageLine) {
+        var mobileLift = window.innerWidth <= 640 ? -24 : 0;
+        var lx = lerp(a.tx, b.tx, kfT);
+        var ly = lerp(a.ty, b.ty, kfT) + mobileLift;
+        var lr = lerp(a.rot, b.rot, kfT);
+        var lsx = lerp(a.sx, b.sx, kfT);
+        stageLine.style.opacity = String(stageVis * 0.85);
+        stageLine.style.transform = 'translate3d(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px,0) rotate(' + lr.toFixed(1) + 'deg) scaleX(' + lsx.toFixed(3) + ')';
+      }
+      if (stageCounter) {
+        stageCounter.style.opacity = String(stageVis);
+      }
+      if (counterTrack && activeIdx !== lastCounterIdx) {
+        lastCounterIdx = activeIdx;
+        counterTrack.style.transform = 'translate3d(0,' + (-activeIdx * 18) + 'px,0)';
+      }
     }
 
     if (hint) hint.style.opacity = String(1 - seg(u, 0, 0.3));
