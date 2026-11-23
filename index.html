@@ -88,7 +88,7 @@
     border-radius: 4px;
   }
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
-  .num, .when, .step-n, .step-num, .meta { font-variant-numeric: tabular-nums; }
+  .num, .when, .step-n, .step-num, .skill-idx, .meta { font-variant-numeric: tabular-nums; }
 
   /* Skip to content */
   .skip-link {
@@ -400,46 +400,83 @@
   }
   .project a.more:hover { color: var(--text); border-color: var(--accent); }
 
-  /* Competenze: Opzione B — zero glow, zero text-shadow, contrasto pulito sulle superfici */
-  .skills {
-    margin-top: 48px;
+  /* Competenze: Indice Editoriale a Righe (Apple / Linear minimalism) */
+  .skills-index {
+    margin-top: 56px;
+    border-top: 1px solid var(--line);
+  }
+  .skill-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  .skills > div {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 28px;
-    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
-  }
-  .skills > div:hover {
-    border-color: var(--line-strong);
-    background: var(--surface-elevated);
-  }
-  .skills h3 {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    padding-bottom: 16px;
+    grid-template-columns: minmax(220px, 35%) 1fr;
+    gap: 32px;
+    padding: 36px 0;
     border-bottom: 1px solid var(--line);
+    align-items: start;
+    transition: opacity 0.28s var(--ease), border-color 0.28s var(--ease);
+  }
+  .skill-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .skill-idx {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .skill-row h3 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
     color: var(--text);
+    transition: color 0.25s var(--ease);
   }
-  .skills ul {
+  .skill-list {
     list-style: none;
-    margin-top: 16px;
     display: grid;
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 32px;
+    align-content: start;
   }
-  .skills ul li {
+  .skill-list li {
+    position: relative;
+    padding-left: 16px;
     font-size: 15px;
     line-height: 1.5;
-    color: var(--muted);
-    padding: 4px 0;
-    transition: color 0.2s var(--ease);
+    color: var(--soft);
+    transition: color 0.25s var(--ease);
   }
-  .skills ul li:hover { color: var(--text); }
+  .skill-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.8;
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .skills-index:hover .skill-row:not(:hover) {
+      opacity: 0.42;
+    }
+    .skill-row:hover {
+      border-bottom-color: var(--line-strong);
+    }
+    .skill-row:hover h3,
+    .skill-row:hover .skill-list li {
+      color: var(--text);
+    }
+    .skill-row:hover .skill-list li::before {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+  }
 
   /* Percorso / Timeline */
   .timeline { margin-top: 48px; position: relative; }
@@ -459,162 +496,184 @@
   .item p { max-width: 640px; margin-top: 4px; color: var(--muted); }
   .item ul { margin-top: 8px; padding-left: 20px; color: var(--muted); max-width: 640px; display: grid; gap: 8px; }
 
-  /* Contatti: 2 colonne asimmetriche, equal edges (120px top) */
+  /* Contatti: 2 colonne editoriali, zero box SaaS */
   .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1.15fr;
-    gap: 48px;
+    gap: 64px;
     align-items: start;
   }
   .contact-editorial {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    min-width: 0;
   }
   .contact-headline {
     font-size: clamp(32px, 3.6vw, 48px);
     font-weight: 600;
     letter-spacing: -0.03em;
-    line-height: 1.1;
+    line-height: 1.08;
     color: var(--text);
   }
-  .editorial-badge {
+  .availability-line {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: rgba(var(--accent-rgb), 0.1);
-    border: 1px solid rgba(var(--accent-rgb), 0.24);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--accent);
-    width: fit-content;
+    gap: 10px;
     margin-top: 20px;
-    margin-bottom: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--soft);
   }
   .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--accent);
     flex-shrink: 0;
   }
   .contact-pitch {
-    font-size: 17px;
+    margin-top: 20px;
+    font-size: 16px;
     line-height: 1.6;
-    color: var(--soft);
-    max-width: 480px;
+    color: var(--muted);
+    max-width: 440px;
   }
 
-  /* Direct Email Card */
-  .direct-card {
-    margin-top: 32px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 20px;
+  /* Contatto diretto tipografico (senza box) */
+  .direct-block {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .direct-label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .direct-row {
+    margin-top: 8px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+    gap: 14px;
+    flex-wrap: wrap;
   }
-  .direct-card:hover {
-    border-color: var(--line-strong);
-    background: var(--surface-elevated);
+  .direct-email {
+    font-size: clamp(19px, 2vw, 24px);
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    word-break: break-word;
+    transition: color 0.2s var(--ease);
   }
-  .direct-info { display: grid; gap: 4px; min-width: 0; }
-  .direct-label { font-size: 13px; color: var(--muted); }
-  .direct-email { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; word-break: break-all; }
+  .direct-email:hover { color: var(--accent); }
   .btn-copy {
-    flex: 0 0 auto; height: 44px; min-height: 44px; padding: 0 20px;
-    border-radius: 8px; border: 1px solid var(--line-strong); background: transparent;
-    color: var(--text); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+    flex: 0 0 auto;
+    height: 36px;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--soft);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
     transition: border-color 0.2s var(--ease), background 0.2s var(--ease), color 0.2s var(--ease);
   }
   .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
   .btn-copy.done { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-  .copy-feedback { min-height: 20px; font-size: 13px; color: var(--accent); margin-top: 8px; }
+  .copy-feedback { min-height: 20px; font-size: 13px; color: var(--accent); margin-top: 6px; }
 
-  /* Metadata Matrix */
-  .contact-matrix {
-    margin-top: 24px;
-    display: grid;
-    gap: 20px;
-    padding-top: 24px;
+  /* Metadati essenziali su riga pulita */
+  .contact-meta-row {
+    margin-top: 28px;
+    padding-top: 20px;
     border-top: 1px solid var(--line);
-  }
-  .matrix-item { display: grid; gap: 4px; }
-  .matrix-label { font-size: 13px; color: var(--muted); }
-  .matrix-value { font-size: 15px; color: var(--soft); font-weight: 500; }
-  .social-links { display: flex; gap: 20px; flex-wrap: wrap; }
-  .social-links a {
-    font-size: 15px; color: var(--soft);
-    border-bottom: 1px solid var(--line-strong);
-    padding: 4px 0;
-    min-height: 44px; min-width: 44px;
-    display: inline-flex; align-items: center;
-    transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
-  }
-  .social-links a:hover { color: var(--accent); border-color: var(--accent); }
-  .editorial-accent {
-    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 14px;
     font-size: 14px;
     color: var(--muted);
   }
+  .contact-meta-row .meta-sep {
+    color: var(--line-strong);
+    user-select: none;
+  }
+  .contact-meta-row a {
+    color: var(--soft);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s var(--ease);
+  }
+  .contact-meta-row a:hover { color: var(--accent); }
+  .editorial-accent {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
 
-  /* Right Column: Architectural Form Panel */
-  .contact-panel {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 32px;
+  /* Colonna Destra: Compositore Minimalista direttamente sul canvas */
+  .contact-composer {
     display: grid;
     gap: 24px;
+    min-width: 0;
   }
-  .panel-header { display: grid; gap: 4px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
-  .panel-title { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text); }
-  .panel-sub { font-size: 14px; color: var(--muted); }
-  .form-step { padding-bottom: 24px; border-bottom: 1px solid var(--line); }
-  .form-step:last-of-type { border-bottom: none; padding-bottom: 0; }
-  .step-label { display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600; margin-bottom: 16px; }
-  .step-label .step-num { font-size: 13px; color: var(--accent); font-weight: 500; }
-  .form-step .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { position: relative; cursor: pointer; display: inline-flex; }
-  .chip input { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; font-size: 16px; }
-  .chip .pill {
-    display: inline-flex; align-items: center; height: 44px; min-height: 44px; padding: 8px 16px;
-    border: 1px solid var(--line-strong); border-radius: 8px;
-    font-size: 14px; line-height: 1.2; color: var(--soft); background: var(--surface-elevated);
-    transition: border-color 0.2s var(--ease), color 0.2s var(--ease), background 0.2s var(--ease);
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
   }
-  .chip:hover .pill { color: var(--text); border-color: var(--muted); }
-  .chip input:checked + .pill { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 500; }
-  .chip input:focus-visible + .pill { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .field { display: grid; gap: 8px; font-size: 14px; color: var(--soft); min-width: 0; }
+  .field {
+    display: grid;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    min-width: 0;
+  }
   .field input, .field textarea {
-    background: var(--surface-elevated);
+    background: var(--surface);
     border: 1px solid var(--line-strong);
     border-radius: 10px;
     color: var(--text);
     font: inherit;
     font-size: 16px;
+    font-weight: 400;
     padding: 0 16px;
     height: 48px;
     width: 100%;
     transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
   }
+  .field input:hover, .field textarea:hover {
+    border-color: rgba(248, 250, 252, 0.26);
+  }
   .field input::placeholder, .field textarea::placeholder {
     color: var(--muted);
-    opacity: 0.85;
+    opacity: 0.7;
   }
-  .field textarea { padding: 12px 16px; height: auto; min-height: 136px; resize: vertical; }
-  .field input:focus, .field textarea:focus { border-color: var(--accent); background: var(--bg); }
+  .field textarea {
+    padding: 14px 16px;
+    height: auto;
+    min-height: 148px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+  .field input:focus, .field textarea:focus {
+    border-color: var(--accent);
+    background: var(--bg);
+    outline: none;
+  }
 
-  .form-foot { display: grid; gap: 20px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .form-foot {
+    display: grid;
+    gap: 16px;
+    padding-top: 8px;
+  }
   .check {
     position: relative; display: flex; gap: 12px; align-items: center;
     font-size: 14px; color: var(--muted); cursor: pointer; min-height: 44px;
@@ -625,7 +684,7 @@
   }
   .check .custom-check {
     width: 20px; height: 20px; min-width: 20px; min-height: 20px;
-    border-radius: 6px; border: 1.5px solid var(--line-strong); background: var(--surface-elevated);
+    border-radius: 6px; border: 1.5px solid var(--line-strong); background: transparent;
     display: inline-flex; align-items: center; justify-content: center;
     transition: border-color 0.2s var(--ease), background 0.2s var(--ease); flex-shrink: 0;
   }
@@ -648,7 +707,7 @@
     min-height: 20px;
   }
   .send-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .send-row .note { margin-top: 0; max-width: 360px; font-size: 13px; color: var(--muted); }
+  .send-row .note { margin-top: 0; max-width: 340px; font-size: 13px; color: var(--muted); }
   #bSend { justify-self: start; }
   #bSend:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
@@ -777,8 +836,9 @@
 
   /* Responsive breakpoints: 960px (tablet) & 640px (mobile) & 360px (compact) */
   @media (max-width: 960px) {
-    .work-grid, .skills { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    .work-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .skill-row { grid-template-columns: 1fr; gap: 20px; padding: 32px 0; }
+    .contact-grid { grid-template-columns: 1fr; gap: 48px; }
   }
   @media (max-width: 640px) {
     .nav .nav-right ul { display: none; }
@@ -786,18 +846,19 @@
     .nav-right { gap: 12px; }
     section { padding: 88px 0; }
     .layer { padding: 96px 24px; }
-    .work-grid, .skills, .case-grid, .field-row { grid-template-columns: 1fr; gap: 20px; }
-    .skills > div { padding: 24px; }
-    .contact-panel { padding: 24px; }
-    .direct-card { flex-direction: column; align-items: flex-start; padding: 20px; }
-    .direct-email { font-size: 15px; }
-    .check { font-size: 16px; }
+    .work-grid, .skill-list, .case-grid, .field-row { grid-template-columns: 1fr; gap: 16px; }
+    .skills-index { margin-top: 40px; }
+    .skill-row { padding: 28px 0; gap: 16px; }
+    .skill-row h3 { font-size: 20px; }
+    .direct-row { align-items: flex-start; gap: 12px; }
+    .direct-email { font-size: 18px; }
+    .check { font-size: 15px; }
     .drawer-bar { padding: 12px 20px; }
     .drawer-body .case { padding: 28px 20px 64px; }
   }
   @media (max-width: 360px) {
     .wrap { padding: 0 16px; }
-    .contact-panel { padding: 20px 16px; }
+    .direct-email { font-size: 16px; }
     .nav .brand { font-size: 14px; }
     .hero-name { font-size: 40px; }
   }
@@ -998,10 +1059,13 @@
         <span lang="en">Research, interface and code, with an eye on content.</span>
       </p>
 
-      <div class="skills">
-        <div>
-          <h3><span lang="it">UX/UI e ricerca</span><span lang="en">UX/UI and research</span></h3>
-          <ul>
+      <div class="skills-index">
+        <div class="skill-row">
+          <div class="skill-head">
+            <span class="skill-idx" aria-hidden="true">01</span>
+            <h3><span lang="it">UX/UI e ricerca</span><span lang="en">UX/UI and research</span></h3>
+          </div>
+          <ul class="skill-list">
             <li><span lang="it">Figma e prototipazione</span><span lang="en">Figma and prototyping</span></li>
             <li>Design system</li>
             <li>Double Diamond</li>
@@ -1010,9 +1074,13 @@
             <li>Usability testing</li>
           </ul>
         </div>
-        <div>
-          <h3><span lang="it">Front-End e motion</span><span lang="en">Front-end and motion</span></h3>
-          <ul>
+
+        <div class="skill-row">
+          <div class="skill-head">
+            <span class="skill-idx" aria-hidden="true">02</span>
+            <h3><span lang="it">Front-End e motion</span><span lang="en">Front-end and motion</span></h3>
+          </div>
+          <ul class="skill-list">
             <li>Vue.js <span lang="it">e</span><span lang="en">and</span> React</li>
             <li>TypeScript</li>
             <li>Tailwind CSS</li>
@@ -1020,9 +1088,13 @@
             <li>Firebase <span lang="it">e</span><span lang="en">and</span> Firestore</li>
           </ul>
         </div>
-        <div>
-          <h3><span lang="it">Contenuti, SEO e digitale</span><span lang="en">Content, SEO and digital</span></h3>
-          <ul>
+
+        <div class="skill-row">
+          <div class="skill-head">
+            <span class="skill-idx" aria-hidden="true">03</span>
+            <h3><span lang="it">Contenuti, SEO e digitale</span><span lang="en">Content, SEO and digital</span></h3>
+          </div>
+          <ul class="skill-list">
             <li>Pimcore CMS</li>
             <li>Google Analytics 4</li>
             <li><span lang="it">SEO e search architecture</span><span lang="en">SEO and search architecture</span></li>
@@ -1074,105 +1146,69 @@
   <section id="contatti" class="divider contact" aria-labelledby="t-contatti">
     <div class="wrap">
       <div class="contact-grid">
-        <!-- Left Column: Editorial Presence & Direct Contact -->
+        <!-- Left Column: Editorial Identity & Direct Contact -->
         <div class="contact-editorial">
           <h2 class="contact-headline" id="t-contatti">
             <span lang="it">Parliamo del tuo prossimo prodotto</span>
             <span lang="en">Let's talk about your next product</span>
           </h2>
 
-          <div class="editorial-badge">
+          <p class="availability-line">
             <span class="status-dot" aria-hidden="true"></span>
             <span lang="it">Disponibile per collaborazioni e ruoli UX/UI · 2026</span>
             <span lang="en">Available for select projects &amp; UX/UI roles · 2026</span>
-          </div>
-
-          <p class="contact-pitch">
-            <span lang="it">Se stai progettando un'interfaccia, cercando un supporto nella ricerca utente o costruendo un front-end in Vue o React, scrivimi direttamente o prepara un brief qui accanto.</span>
-            <span lang="en">If you are designing an interface, running user research, or building a front-end in Vue or React, email me directly or prepare a brief here.</span>
           </p>
 
-          <!-- Direct Email Card -->
-          <div class="direct-card">
-            <div class="direct-info">
-              <span class="direct-label"><span lang="it">Email diretta</span><span lang="en">Direct email</span></span>
-              <span class="direct-email">samuel.tavonatti05@gmail.com</span>
-            </div>
-            <button type="button" class="btn-copy" id="copyMail" data-aria-it="Copia indirizzo email" data-aria-en="Copy email address" aria-label="Copia indirizzo email">
-              <span lang="it">Copia</span>
-              <span lang="en">Copy</span>
-            </button>
-          </div>
-          <p class="copy-feedback" id="copyNote" aria-live="polite"></p>
+          <p class="contact-pitch">
+            <span lang="it">Scrivimi direttamente o usa il compositore qui accanto per preparare un'email ordinata.</span>
+            <span lang="en">Email me directly or use the composer alongside to draft a clear message.</span>
+          </p>
 
-          <!-- Structured Metadata Matrix -->
-          <div class="contact-matrix">
-            <div class="matrix-item">
-              <span class="matrix-label"><span lang="it">Sede e fuso orario</span><span lang="en">Location &amp; timezone</span></span>
-              <span class="matrix-value">Trento, Italia · CET (UTC+1)</span>
+          <!-- Direct Email (Typographic Protagonist, Zero Box) -->
+          <div class="direct-block">
+            <span class="direct-label"><span lang="it">Email diretta</span><span lang="en">Direct email</span></span>
+            <div class="direct-row">
+              <a class="direct-email" href="mailto:samuel.tavonatti05@gmail.com">samuel.tavonatti05@gmail.com</a>
+              <button type="button" class="btn-copy" id="copyMail" data-aria-it="Copia indirizzo email" data-aria-en="Copy email address" aria-label="Copia indirizzo email">
+                <span lang="it">Copia</span>
+                <span lang="en">Copy</span>
+              </button>
             </div>
-            <div class="matrix-item">
-              <span class="matrix-label"><span lang="it">Discipline</span><span lang="en">Focus</span></span>
-              <span class="matrix-value">UX/UI · User Research · Front-End</span>
-            </div>
-            <div class="matrix-item">
-              <span class="matrix-label"><span lang="it">Profili</span><span lang="en">Profiles</span></span>
-              <div class="social-links">
-                <a href="https://www.linkedin.com/in/samuel-tavonatti/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                <a href="https://www.instagram.com/samuel.tavonatti/" target="_blank" rel="noopener noreferrer">Instagram</a>
-              </div>
-            </div>
+            <p class="copy-feedback" id="copyNote" aria-live="polite"></p>
           </div>
 
-          <div class="editorial-accent">
+          <!-- Essential Metadata Row -->
+          <div class="contact-meta-row">
+            <span>Trento, IT</span>
+            <span class="meta-sep" aria-hidden="true">·</span>
+            <a href="https://www.linkedin.com/in/samuel-tavonatti/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <span class="meta-sep" aria-hidden="true">·</span>
+            <a href="https://www.instagram.com/samuel.tavonatti/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          </div>
+
+          <p class="editorial-accent">
             <span lang="it">Risposta di norma entro 24 ore lavorative.</span>
             <span lang="en">Typical reply within 24 business hours.</span>
-          </div>
+          </p>
         </div>
 
-        <!-- Right Column: Monolithic Architectural Form Panel -->
-        <div class="contact-panel" id="brief">
-          <div class="panel-header">
-            <h3 class="panel-title"><span lang="it">Richiesta strutturata</span><span lang="en">Structured inquiry</span></h3>
-            <p class="panel-sub"><span lang="it">Tre passaggi rapidi per preparare un'email ordinata.</span><span lang="en">Three quick steps to draft a clear email.</span></p>
-          </div>
-
-          <!-- Step 01: Chi sei -->
-          <div class="form-step">
-            <p class="step-label"><span class="step-num">01</span><span lang="it">Chi sei</span><span lang="en">Who you are</span></p>
-            <div class="field-row">
-              <label class="field">
-                <span lang="it">Nome e cognome</span><span lang="en">Your name</span>
-                <input id="bName" type="text" maxlength="80" autocomplete="name" data-ph-it="Mario Rossi" data-ph-en="Alex Rivera" placeholder="Mario Rossi" required>
-              </label>
-              <label class="field">
-                <span lang="it">Indirizzo email</span><span lang="en">Email address</span>
-                <input id="bEmail" type="email" maxlength="120" autocomplete="email" data-ph-it="nome@azienda.it" data-ph-en="name@company.com" placeholder="nome@azienda.it" required>
-              </label>
-            </div>
-          </div>
-
-          <!-- Step 02: Di cosa si tratta -->
-          <div class="form-step">
-            <p class="step-label"><span class="step-num">02</span><span lang="it">Di cosa si tratta</span><span lang="en">What it is about</span></p>
-            <div class="chips">
-              <label class="chip"><input type="checkbox" name="cat" value="UX/UI design"><span class="pill">UX/UI design</span></label>
-              <label class="chip"><input type="checkbox" name="cat" value="Ricerca utente"><span class="pill"><span lang="it">Ricerca utente</span><span lang="en">User research</span></span></label>
-              <label class="chip"><input type="checkbox" name="cat" value="Front-end"><span class="pill">Front-end</span></label>
-              <label class="chip"><input type="checkbox" name="cat" value="Design system"><span class="pill">Design system</span></label>
-              <label class="chip"><input type="checkbox" name="cat" value="Contenuti e SEO"><span class="pill"><span lang="it">Contenuti e SEO</span><span lang="en">Content &amp; SEO</span></span></label>
-              <label class="chip"><input type="checkbox" name="cat" value="Altro"><span class="pill"><span lang="it">Altro</span><span lang="en">Other</span></span></label>
-            </div>
-          </div>
-
-          <!-- Step 03: Il messaggio -->
-          <div class="form-step">
-            <p class="step-label"><span class="step-num">03</span><span lang="it">Il messaggio</span><span lang="en">Your message</span></p>
+        <!-- Right Column: Ultra-Clean Minimalist Composer on Canvas -->
+        <div class="contact-composer" id="brief">
+          <div class="field-row">
             <label class="field">
-              <span lang="it">Idee, contesto e obiettivi</span><span lang="en">Ideas, context and goals</span>
-              <textarea id="bIdea" rows="5" maxlength="1500" data-ph-it="Descrivi contesto e obiettivo del progetto" data-ph-en="Share the project context and goal" placeholder="Descrivi contesto e obiettivo del progetto"></textarea>
+              <span lang="it">Nome</span><span lang="en">Name</span>
+              <input id="bName" type="text" maxlength="80" autocomplete="name" data-ph-it="Mario Rossi" data-ph-en="Alex Rivera" placeholder="Mario Rossi" required>
+            </label>
+            <label class="field">
+              <span lang="it">Email</span><span lang="en">Email</span>
+              <input id="bEmail" type="email" maxlength="120" autocomplete="email" data-ph-it="nome@azienda.it" data-ph-en="name@company.com" placeholder="nome@azienda.it" required>
             </label>
           </div>
+
+          <label class="field">
+            <span lang="it">Messaggio</span><span lang="en">Message</span>
+            <textarea id="bIdea" rows="5" maxlength="1500" data-ph-it="Raccontami il contesto, l'obiettivo o il ruolo." data-ph-en="Share the project context, goal, or role." placeholder="Raccontami il contesto, l'obiettivo o il ruolo." required></textarea>
+          </label>
 
           <div class="form-foot">
             <label class="check">
@@ -1186,8 +1222,8 @@
                 <span lang="it">Prepara l'email &rarr;</span><span lang="en">Prepare email &rarr;</span>
               </button>
               <p class="note">
-                <span lang="it">Apre il tuo client di posta con il messaggio pronto. Nulla parte senza conferma.</span>
-                <span lang="en">Opens your mail app with the draft ready. Nothing is sent without confirmation.</span>
+                <span lang="it">Apre il tuo client di posta con il messaggio pronto.</span>
+                <span lang="en">Opens your mail app with the draft ready.</span>
               </p>
             </div>
           </div>
@@ -1744,26 +1780,22 @@
     });
   }
 
-  // Richiesta strutturata: validazione chiara + email precompilata
+  // Compositore contatti: validazione chiara + email precompilata
   var bName = document.getElementById('bName');
   var bEmail = document.getElementById('bEmail');
   var bIdea = document.getElementById('bIdea');
   var bPriv = document.getElementById('bPriv');
   var bSend = document.getElementById('bSend');
   var briefStatus = document.getElementById('briefStatus');
-  var cats = Array.prototype.slice.call(document.querySelectorAll('input[name="cat"]'));
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  function checkedCats() {
-    return cats.filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
-  }
   function validateBrief() {
     if (!bSend) return;
     var missing = [];
     var isIt = lang === 'it';
     if (bName.value.trim().length <= 1) missing.push(isIt ? 'nome' : 'name');
     if (!EMAIL_RE.test(bEmail.value.trim())) missing.push(isIt ? 'email valida' : 'valid email');
-    if (bIdea.value.trim().length === 0 && checkedCats().length === 0) missing.push(isIt ? 'un argomento o messaggio' : 'a topic or message');
+    if (bIdea.value.trim().length === 0) missing.push(isIt ? 'messaggio' : 'message');
     if (!bPriv.checked) missing.push(isIt ? 'consenso privacy' : 'privacy consent');
 
     bSend.disabled = missing.length > 0;
@@ -1779,24 +1811,24 @@
     });
     bSend.addEventListener('click', function () {
       var isIt = lang === 'it';
-      var catList = checkedCats().join(', ');
-      var subject = (isIt ? 'Richiesta: ' : 'Inquiry: ') + (catList || (isIt ? 'progetto' : 'project')) + ' — ' + bName.value.trim();
+      var cleanName = bName.value.replace(/[\r\n]+/g, ' ').trim();
+      var cleanEmail = bEmail.value.replace(/[\r\n]+/g, '').trim();
+      var cleanMsg = bIdea.value.trim();
+      var subject = (isIt ? 'Contatto da portfolio — ' : 'Portfolio inquiry — ') + cleanName;
       var lines = isIt ? [
-        'Nome: ' + bName.value.trim(),
-        'Email: ' + bEmail.value.trim(),
-        'Categorie: ' + (catList || '—'),
+        'Nome: ' + cleanName,
+        'Email: ' + cleanEmail,
         '',
-        'Messaggio e progetto:',
-        bIdea.value.trim() || '—',
+        'Messaggio:',
+        cleanMsg,
         '',
         'Consenso privacy fornito.'
       ] : [
-        'Name: ' + bName.value.trim(),
-        'Email: ' + bEmail.value.trim(),
-        'Categories: ' + (catList || '—'),
+        'Name: ' + cleanName,
+        'Email: ' + cleanEmail,
         '',
-        'Message and project:',
-        bIdea.value.trim() || '—',
+        'Message:',
+        cleanMsg,
         '',
         'Privacy consent given.'
       ];
