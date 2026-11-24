@@ -430,9 +430,8 @@
   .stage.pinned .layer.hero { pointer-events: auto; z-index: 5; }
   .stage.pinned .chapter { opacity: 0; pointer-events: none; will-change: opacity; }
 
-  /* Luce ambientale e filo geometrico unico nello .sticky */
+  /* Luce ambientale nello .sticky */
   .stage-ambient,
-  .stage-line,
   .stage-counter { display: none; }
   .stage.pinned .stage-ambient {
     display: block;
@@ -443,21 +442,6 @@
     opacity: 0;
     background: radial-gradient(640px circle at var(--gx, 50%) var(--gy, 42%), rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0) 68%);
     will-change: opacity;
-  }
-  .stage.pinned .stage-line {
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 48px;
-    height: 1px;
-    margin-left: -24px;
-    background: var(--accent);
-    pointer-events: none;
-    z-index: 4;
-    opacity: 0;
-    transform-origin: center center;
-    will-change: transform, opacity;
   }
   .stage.pinned .stage-counter {
     display: inline-flex;
@@ -1090,7 +1074,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .preloader, .scroll-hint, .stage-ambient, .stage-line, .stage-counter { display: none !important; }
+    .preloader, .scroll-hint, .stage-ambient, .stage-counter { display: none !important; }
     .stage-frame { clip-path: none !important; opacity: 1 !important; }
     .chapter h2, .k-inner, .chapter .body, .chapter .trait, .hero-inner, .chapter-inner { transform: none !important; letter-spacing: normal; }
     .chapter h2 { letter-spacing: -0.04em; }
@@ -1187,7 +1171,6 @@
 
       <div class="stage-frame" id="stageFrame">
         <div class="stage-ambient" id="stageAmbient" aria-hidden="true"></div>
-        <div class="stage-line" id="stageLine" aria-hidden="true"></div>
 
         <div class="layer chapter">
           <div class="chapter-inner">
@@ -1960,7 +1943,6 @@
   });
   var stageFrame = document.getElementById('stageFrame');
   var stageAmbient = document.getElementById('stageAmbient');
-  var stageLine = document.getElementById('stageLine');
   var stageCounter = document.getElementById('stageCounter');
   var counterTrack = document.getElementById('counterTrack');
   var heroInner = document.getElementById('heroInner');
@@ -2077,16 +2059,6 @@
         stageAmbient.style.opacity = String(stageVis);
         stageAmbient.style.setProperty('--gx', lerp(a.gx, b.gx, kfT).toFixed(1) + '%');
         stageAmbient.style.setProperty('--gy', lerp(a.gy, b.gy, kfT).toFixed(1) + '%');
-      }
-      if (stageLine) {
-        var mobileLift = isNarrow ? -24 : 0;
-        var lx = lerp(a.tx, b.tx, kfT);
-        var ly = lerp(a.ty, b.ty, kfT) + mobileLift;
-        var lr = lerp(a.rot, b.rot, kfT);
-        var velStretch = 1 + Math.min(0.65, Math.abs(scrollVel) * 0.018);
-        var lsx = lerp(a.sx, b.sx, kfT) * velStretch;
-        stageLine.style.opacity = String(stageVis * 0.85);
-        stageLine.style.transform = 'translate3d(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px,0) rotate(' + lr.toFixed(1) + 'deg) scaleX(' + lsx.toFixed(3) + ')';
       }
       if (stageCounter) {
         stageCounter.style.opacity = String(stageVis);
