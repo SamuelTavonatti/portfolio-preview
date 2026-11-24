@@ -294,45 +294,6 @@
     will-change: transform;
   }
 
-  /* Dual-Direction Kinetic Velocity Bands (edge-to-edge) */
-  .kinetic-rail {
-    position: absolute;
-    left: 0;
-    right: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 1;
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-    padding: 9px 0;
-    opacity: 0.72;
-    will-change: opacity;
-  }
-  .kinetic-rail.top { top: 68px; }
-  .kinetic-rail.bottom { bottom: 100px; }
-  .kinetic-track {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    width: max-content;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-variant-numeric: tabular-nums;
-    color: var(--muted);
-    will-change: transform;
-  }
-  .kinetic-track .k-dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--accent);
-    display: inline-block;
-    flex-shrink: 0;
-  }
-  .kinetic-track .k-accent { color: var(--accent); }
-
   /* Monumental Edge-to-Edge Hero Typography */
   .hero-name {
     font-size: clamp(3.6rem, 9.5vw, 8.5rem);
@@ -341,10 +302,14 @@
     line-height: 0.96;
     display: flex; gap: 0.2em; justify-content: center; flex-wrap: wrap;
     will-change: transform;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .hero-name .w { display: inline-flex; }
   .hero-name .ch {
     display: inline-block;
+    user-select: none;
+    -webkit-user-select: none;
     transition: transform 0.35s var(--ease), text-shadow 0.35s;
     will-change: transform;
   }
@@ -532,19 +497,33 @@
     color: var(--line-strong);
   }
 
-  /* Cursore a molla (fisica protetta, palette grafite/ciano) */
+  /* Cursore a molla (fisica protetta, palette grafite/ciano + contrasto adattivo) */
   .cursor-ring {
     position: fixed; left: 0; top: 0;
     width: 8px; height: 8px; margin: -4px 0 0 -4px;
     background: var(--accent); border-radius: 50%;
-    border: none;
+    border: 0 solid transparent;
     pointer-events: none; z-index: 9999; display: none; will-change: transform;
-    transition: width 0.22s var(--ease), height 0.22s var(--ease), margin 0.22s var(--ease), background 0.2s, border 0.2s;
+    transition: width 0.22s var(--ease), height 0.22s var(--ease), margin 0.22s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease), border-width 0.2s var(--ease);
   }
   .cursor-ring.big {
     width: 28px; height: 28px; margin: -14px 0 0 -14px;
     background: rgba(var(--accent-rgb), 0.14);
     border: 1.5px solid var(--accent);
+  }
+  .cursor-ring.on-light {
+    background: var(--accent-strong);
+  }
+  .cursor-ring.big.on-light {
+    background: rgba(2, 132, 199, 0.14);
+    border-color: var(--accent-strong);
+  }
+  .cursor-ring.on-accent {
+    background: #FFFFFF;
+  }
+  .cursor-ring.big.on-accent {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #FFFFFF;
   }
   .cursor-ring[hidden] { display: none !important; }
   @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
@@ -1090,8 +1069,6 @@
     section { padding: 88px 0; }
     .layer { padding: 96px 20px; }
     .hero-name { font-size: clamp(2.6rem, 11vw, 3.6rem); }
-    .kinetic-rail.top { top: 62px; }
-    .kinetic-rail.bottom { bottom: 90px; }
     .preloader-word { display: none; }
     .work-grid, .skill-list, .case-grid, .field-row { grid-template-columns: 1fr; gap: 16px; }
     .skills-index { margin-top: 40px; }
@@ -1113,7 +1090,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .preloader, .scroll-hint, .stage-ambient, .stage-line, .stage-counter, .kinetic-rail { display: none !important; }
+    .preloader, .scroll-hint, .stage-ambient, .stage-line, .stage-counter { display: none !important; }
     .stage-frame { clip-path: none !important; opacity: 1 !important; }
     .chapter h2, .k-inner, .chapter .body, .chapter .trait, .hero-inner, .chapter-inner { transform: none !important; letter-spacing: normal; }
     .chapter h2 { letter-spacing: -0.04em; }
@@ -1191,23 +1168,6 @@
       <div class="layer hero" id="hero">
         <div class="hero-light" aria-hidden="true"></div>
 
-        <div class="kinetic-rail top" aria-hidden="true">
-          <div class="kinetic-track" id="railTop">
-            <span>46.07° N · 11.12° E</span><span class="k-dot"></span>
-            <span>TRENTO, ITALY</span><span class="k-dot"></span>
-            <span class="k-accent">01 — UX/UI DESIGN</span><span class="k-dot"></span>
-            <span>USER RESEARCH</span><span class="k-dot"></span>
-            <span>FRONT-END &amp; MOTION</span><span class="k-dot"></span>
-            <span>60 / 120 FPS</span><span class="k-dot"></span>
-            <span>46.07° N · 11.12° E</span><span class="k-dot"></span>
-            <span>TRENTO, ITALY</span><span class="k-dot"></span>
-            <span class="k-accent">01 — UX/UI DESIGN</span><span class="k-dot"></span>
-            <span>USER RESEARCH</span><span class="k-dot"></span>
-            <span>FRONT-END &amp; MOTION</span><span class="k-dot"></span>
-            <span>60 / 120 FPS</span><span class="k-dot"></span>
-          </div>
-        </div>
-
         <div class="hero-inner" id="heroInner">
           <h1 class="hero-name" id="heroName" aria-label="Samuel Tavonatti"><span class="w">Samuel</span> <span class="w">Tavonatti</span></h1>
           <p class="role">
@@ -1221,23 +1181,6 @@
           <div class="actions">
             <a href="#progetti" class="btn btn-primary"><span lang="it">Vedi i progetti</span><span lang="en">View projects</span></a>
             <a href="#contatti" class="btn btn-ghost"><span lang="it">Scrivimi</span><span lang="en">Write to me</span></a>
-          </div>
-        </div>
-
-        <div class="kinetic-rail bottom" aria-hidden="true">
-          <div class="kinetic-track" id="railBottom">
-            <span class="k-accent">VOLTREP</span><span class="k-dot"></span>
-            <span>ESU HCI RESEARCH</span><span class="k-dot"></span>
-            <span>TRENTINO MARKETING</span><span class="k-dot"></span>
-            <span class="k-accent">PORTFOLIO 2026</span><span class="k-dot"></span>
-            <span>DESIGN SYSTEMS</span><span class="k-dot"></span>
-            <span>COGNITIVE ERGONOMICS</span><span class="k-dot"></span>
-            <span class="k-accent">VOLTREP</span><span class="k-dot"></span>
-            <span>ESU HCI RESEARCH</span><span class="k-dot"></span>
-            <span>TRENTINO MARKETING</span><span class="k-dot"></span>
-            <span class="k-accent">PORTFOLIO 2026</span><span class="k-dot"></span>
-            <span>DESIGN SYSTEMS</span><span class="k-dot"></span>
-            <span>COGNITIVE ERGONOMICS</span><span class="k-dot"></span>
           </div>
         </div>
       </div>
@@ -2021,8 +1964,6 @@
   var stageCounter = document.getElementById('stageCounter');
   var counterTrack = document.getElementById('counterTrack');
   var heroInner = document.getElementById('heroInner');
-  var railTop = document.getElementById('railTop');
-  var railBottom = document.getElementById('railBottom');
   var lastCounterIdx = -1;
 
   var STAGE_KF = [
@@ -2032,11 +1973,9 @@
     { gx: 50, gy: 56, tx: 0, ty: -158, rot: 360, sx: 1.0 }
   ];
 
-  // Continuous Scroll Velocity & Kinetic Velocity Bands (60/120 FPS)
+  // Continuous Scroll Velocity (60/120 FPS)
   var lastScrollY = window.scrollY;
   var scrollVel = 0;
-  var railPosTop = 0;
-  var railPosBot = 0;
 
   function kineticLoop() {
     if (!landing.hidden && !reduce) {
@@ -2045,21 +1984,6 @@
       lastScrollY = curY;
       scrollVel = lerp(scrollVel, Math.max(-60, Math.min(60, delta)), 0.14);
 
-      var speedBoost = Math.abs(scrollVel) * 0.22;
-      var skew = Math.max(-6, Math.min(6, scrollVel * 0.14));
-
-      if (railTop) {
-        var halfT = railTop.scrollWidth / 2 || 600;
-        railPosTop = (railPosTop - (0.45 + speedBoost)) % halfT;
-        if (railPosTop > 0) railPosTop -= halfT;
-        railTop.style.transform = 'translate3d(' + railPosTop.toFixed(1) + 'px,0,0) skewX(' + (-skew).toFixed(2) + 'deg)';
-      }
-      if (railBottom) {
-        var halfB = railBottom.scrollWidth / 2 || 600;
-        railPosBot = (railPosBot + (0.45 + speedBoost)) % halfB;
-        if (railPosBot > 0) railPosBot -= halfB;
-        railBottom.style.transform = 'translate3d(' + railPosBot.toFixed(1) + 'px,0,0) skewX(' + skew.toFixed(2) + 'deg)';
-      }
       if (progress) {
         var extraGlow = Math.min(1, Math.abs(scrollVel) / 24);
         progress.style.boxShadow = extraGlow > 0.05 ? '0 0 ' + (8 + extraGlow * 14).toFixed(1) + 'px rgba(' + accentRgb + ',' + (0.45 + extraGlow * 0.4).toFixed(2) + ')' : 'none';
@@ -2234,21 +2158,57 @@
         c.style.transform = 'translateY(' + (-k * 16) + 'px) rotate(' + (dx * 0.02 * k) + 'deg)';
         c.style.textShadow = '0 0 ' + (k * 28) + 'px rgba(' + accentRgb + ', ' + (k * 0.45) + ')';
       });
+
+      updateCursorContrast(e.target);
     });
+
+    function updateCursorContrast(target) {
+      if (!ring) return;
+      var el = target && target.nodeType === 1 ? target : null;
+      var mode = '';
+      if (el && el.closest) {
+        if (el.closest('.btn-primary:hover, .btn-copy.done, .skip-link')) {
+          mode = 'accent';
+        } else {
+          var cur = el;
+          while (cur && cur !== document.documentElement) {
+            var bg = getComputedStyle(cur).backgroundColor;
+            var m = bg && bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+            if (m && (m[4] === undefined || parseFloat(m[4]) > 0.25)) {
+              var r = parseInt(m[1], 10), g = parseInt(m[2], 10), b = parseInt(m[3], 10);
+              if (b >= 170 && r <= 100 && g >= 110) {
+                mode = 'accent';
+              } else if (r >= 220 && g >= 220 && b >= 220) {
+                mode = 'light';
+              }
+              break;
+            }
+            cur = cur.parentElement;
+          }
+        }
+      }
+      ring.classList.toggle('on-accent', mode === 'accent');
+      ring.classList.toggle('on-light', mode === 'light');
+    }
 
     window.addEventListener('mouseout', function (e) {
       if (!e.relatedTarget) {
         if (heroInner) heroInner.style.transform = '';
         if (heroName) heroName.style.translate = '';
         letters.forEach(function (c) { c.style.transform = ''; c.style.textShadow = ''; });
+        if (ring) {
+          ring.classList.remove('big', 'on-accent', 'on-light');
+        }
       }
     });
 
     document.addEventListener('mouseover', function (e) {
       if (ring && e.target.closest && e.target.closest('a, button')) ring.classList.add('big');
+      updateCursorContrast(e.target);
     });
     document.addEventListener('mouseout', function (e) {
       if (ring && e.target.closest && e.target.closest('a, button')) ring.classList.remove('big');
+      updateCursorContrast(e.relatedTarget);
     });
   }
 
