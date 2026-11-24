@@ -133,54 +133,73 @@
   }
   .lang button.charging { color: var(--accent); }
 
-  /* Kinetic "S" & "T" Motion-Graphics Preloader */
+  /* Progressive SVG Stroke-Reveal "ST" Monogram Preloader */
   .preloader {
     position: fixed;
     inset: 0;
     z-index: 80;
     background: #09090B;
+    display: grid;
+    place-items: center;
     overflow: hidden;
-    opacity: 1;
-    transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s;
-    will-change: opacity;
+    clip-path: inset(0% 0% 0% 0%);
+    transition: clip-path 0.56s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.56s;
+    will-change: clip-path;
   }
   .preloader.done {
-    opacity: 0;
+    clip-path: inset(0% 0% 100% 0%);
     visibility: hidden;
     pointer-events: none;
   }
-  .preloader-glow {
+  .preloader-frame {
     position: absolute;
-    inset: 0;
+    inset: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
     pointer-events: none;
-    background: radial-gradient(480px circle at 50% 50%, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0) 70%);
-    opacity: 0;
-    will-change: opacity;
   }
-  .preloader-initial {
-    position: fixed;
-    left: 0;
-    top: 0;
-    margin: 0;
-    font-family: var(--font);
-    font-size: clamp(3.6rem, 9.5vw, 8.5rem);
-    font-weight: 600;
-    letter-spacing: -0.045em;
-    line-height: 0.96;
+  .preloader-stack {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .preloader-svg {
+    width: clamp(160px, 24vw, 230px);
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .preloader-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .preloader-pct-readout {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
     color: #F8FAFC;
-    text-shadow: 0 0 32px rgba(var(--accent-rgb), 0.22);
-    transform-origin: center center;
-    will-change: transform, opacity;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-select: none;
-    opacity: 0;
+    line-height: 1;
   }
-  @media (max-width: 640px) {
-    .preloader-initial { font-size: clamp(2.6rem, 11vw, 3.6rem); }
+  .preloader-track {
+    width: 120px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    overflow: hidden;
   }
-  @media (max-width: 360px) {
-    .preloader-initial { font-size: 38px; }
+  .preloader-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #38BDF8 0%, #F8FAFC 100%);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    will-change: transform;
   }
   html:not(.js) .preloader, html.reduce .preloader { display: none; }
 
@@ -277,19 +296,25 @@
     transition: transform 0.35s var(--ease), text-shadow 0.35s;
     will-change: transform;
   }
-  html.js body:not(.opened) .hero-name .ch-init { opacity: 0; }
-  html.js body:not(.pre-reveal):not(.opened) .hero-name .ch:not(.ch-init),
-  html.js body:not(.pre-reveal):not(.opened) .hero .role,
-  html.js body:not(.pre-reveal):not(.opened) .hero .lead,
-  html.js body:not(.pre-reveal):not(.opened) .hero .actions {
+  html.js body:not(.opened) .hero-name,
+  html.js body:not(.opened) .hero .role,
+  html.js body:not(.opened) .hero .lead,
+  html.js body:not(.opened) .hero .actions {
     opacity: 0;
-    transform: translate3d(0, 14px, 0);
+    transform: translate3d(0, 18px, 0);
   }
-  html.js .hero-name .ch:not(.ch-init),
+  html.js .hero-name,
   html.js .hero .role,
   html.js .hero .lead,
   html.js .hero .actions {
-    transition: opacity 0.48s cubic-bezier(0.16, 1, 0.3, 1), transform 0.56s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  body.opened .hero-name,
+  body.opened .hero .role,
+  body.opened .hero .lead,
+  body.opened .hero .actions {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 
   .hero .role { margin-top: 24px; font-size: clamp(16px, 2vw, 21px); color: var(--muted); font-weight: 500; letter-spacing: -0.01em; }
@@ -1064,9 +1089,23 @@
 <a href="#top" class="skip-link"><span lang="it">Vai al contenuto principale</span><span lang="en">Skip to main content</span></a>
 
 <div class="preloader" id="preloader" aria-hidden="true">
-  <div class="preloader-glow" id="preloaderGlow"></div>
-  <span class="preloader-initial" id="preS">S</span>
-  <span class="preloader-initial" id="preT">T</span>
+  <div class="preloader-frame"></div>
+  <div class="preloader-stack">
+    <svg class="preloader-svg" viewBox="0 0 280 140" fill="none" aria-hidden="true">
+      <!-- Leading cyan-azure (#38BDF8) stroke tips -->
+      <path class="st-tip" data-seg="0" d="M 114 40 C 110 24, 88 20, 68 24 C 46 28, 40 44, 46 56 C 52 68, 86 68, 106 80 C 122 90, 118 112, 92 118 C 68 122, 46 114, 38 98" stroke="#38BDF8" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="st-tip" data-seg="1" d="M 156 26 L 244 26" stroke="#38BDF8" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="st-tip" data-seg="2" d="M 200 26 L 200 118" stroke="#38BDF8" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Crisp pure white (#F8FAFC) solidifying strokes -->
+      <path class="st-fill" data-seg="0" d="M 114 40 C 110 24, 88 20, 68 24 C 46 28, 40 44, 46 56 C 52 68, 86 68, 106 80 C 122 90, 118 112, 92 118 C 68 122, 46 114, 38 98" stroke="#F8FAFC" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="st-fill" data-seg="1" d="M 156 26 L 244 26" stroke="#F8FAFC" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="st-fill" data-seg="2" d="M 200 26 L 200 118" stroke="#F8FAFC" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="preloader-meta">
+      <div class="preloader-pct-readout" id="preloaderPct">0%</div>
+      <div class="preloader-track"><div class="preloader-fill" id="preloaderFill"></div></div>
+    </div>
+  </div>
 </div>
 <div class="cursor-ring" id="ring" aria-hidden="true"></div>
 <div class="progress" aria-hidden="true"></div>
@@ -1803,24 +1842,20 @@
 
   // Titolo: lettere separate per l'interazione (fisica protetta)
   var letters = [];
-  var initLetters = [];
   if (heroName) {
     heroName.querySelectorAll('.w').forEach(function (w) {
       var txt = w.textContent;
       w.textContent = '';
-      txt.split('').forEach(function (c, idx) {
+      txt.split('').forEach(function (c) {
         var sp = document.createElement('span');
-        sp.className = idx === 0 ? 'ch ch-init' : 'ch';
+        sp.className = 'ch';
         sp.setAttribute('aria-hidden', 'true');
         sp.textContent = c;
         w.appendChild(sp);
         letters.push(sp);
-        if (idx === 0) initLetters.push(sp);
       });
     });
   }
-  var targetS = initLetters[0] || null;
-  var targetT = initLetters[1] || null;
 
   // Routing
   var CASES = ['voltrep', 'esu', 'trentino'];
@@ -1857,113 +1892,72 @@
   var pinned = !reduce;
   if (pinned) stage.classList.add('pinned');
 
-  // 1. Kinetic "S" & "T" Motion-Graphics Preloader (3-phase orbital + FLIP lockup)
+  // 1. Progressive SVG Stroke-Reveal "ST" Monogram Preloader (0% -> 100% + 180ms hold + upward reveal)
   var preloader = document.getElementById('preloader');
-  var preS = document.getElementById('preS');
-  var preT = document.getElementById('preT');
-  var preGlow = document.getElementById('preloaderGlow');
+  var prePct = document.getElementById('preloaderPct');
+  var preFill = document.getElementById('preloaderFill');
+  var tipPaths = preloader ? Array.prototype.slice.call(preloader.querySelectorAll('.st-tip')) : [];
+  var fillPaths = preloader ? Array.prototype.slice.call(preloader.querySelectorAll('.st-fill')) : [];
 
-  function expoOut(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
-  function power3InOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function power2InOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
 
-  if (reduce || !preloader || !preS || !preT || !onLanding || !targetS || !targetT) {
-    body.classList.add('pre-reveal', 'opened');
+  if (reduce || !preloader || tipPaths.length === 0 || fillPaths.length === 0) {
+    body.classList.add('opened');
     if (preloader) preloader.classList.add('done');
   } else {
-    var sBox = preS.getBoundingClientRect();
-    var tBox = preT.getBoundingClientRect();
-    var sw = sBox.width || 60;
-    var sh = sBox.height || 100;
-    var tw = tBox.width || 60;
-    var th = tBox.height || 100;
+    var segWindows = [
+      [0.0, 0.56],
+      [0.56, 0.78],
+      [0.78, 1.0]
+    ];
+    var strokePairs = tipPaths.map(function (tipEl, idx) {
+      var fillEl = fillPaths[idx];
+      var len = tipEl.getTotalLength();
+      tipEl.style.strokeDasharray = String(len);
+      tipEl.style.strokeDashoffset = String(len);
+      fillEl.style.strokeDasharray = String(len);
+      fillEl.style.strokeDashoffset = String(len);
+      return {
+        tip: tipEl,
+        fill: fillEl,
+        len: len,
+        start: segWindows[idx][0],
+        end: segWindows[idx][1]
+      };
+    });
 
-    var P1_DUR = 520;
-    var P2_DUR = 720;
-    var P3_DUR = 640;
-    var TOTAL_DUR = P1_DUR + P2_DUR + P3_DUR;
+    var DRAW_DUR = 1950;
+    var HOLD_DUR = 180;
     var preStart = performance.now();
-    var lockMeasured = false;
-    var revealedRest = false;
-    var destSx = 0, destSy = 0, destScaleS = 1;
-    var destTx = 0, destTy = 0, destScaleT = 1;
-
-    function setInitialTransform(el, cx, cy, w, h, rot, sc, op) {
-      var tx = cx - w / 2;
-      var ty = cy - h / 2;
-      el.style.opacity = op.toFixed(3);
-      el.style.transform = 'translate3d(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px,0) rotate(' + rot.toFixed(2) + 'deg) scale(' + sc.toFixed(4) + ')';
-    }
+    var holdTriggered = false;
 
     function runPreloader(now) {
       var elapsed = now - preStart;
-      var vw = window.innerWidth;
-      var vh = window.innerHeight;
-      var baseCy = vh / 2;
-      var baseSx = vw / 2 - sw * 0.56;
-      var baseTx = vw / 2 + tw * 0.56;
+      var raw = Math.min(1, elapsed / DRAW_DUR);
+      var eased = power2InOut(raw);
+      var pctVal = Math.round(eased * 100);
 
-      if (elapsed < P1_DUR) {
-        // Phase 1: Center Spin & Ignition (expo.out)
-        var p1 = elapsed / P1_DUR;
-        var e1 = expoOut(p1);
-        var op1 = Math.min(1, p1 * 2.4);
-        var sc1 = 0.68 + 0.47 * e1;
-        var rotS1 = -180 * (1 - e1);
-        var rotT1 = 180 * (1 - e1);
-        if (preGlow) preGlow.style.opacity = (0.9 * e1).toFixed(3);
-        setInitialTransform(preS, baseSx, baseCy, sw, sh, rotS1, sc1, op1);
-        setInitialTransform(preT, baseTx, baseCy, tw, th, rotT1, sc1, op1);
-      } else if (elapsed < P1_DUR + P2_DUR) {
-        // Phase 2: Wide Orbital Sweep Around the Sides (power3.inOut)
-        var p2 = (elapsed - P1_DUR) / P2_DUR;
-        var u2 = power3InOut(p2);
-        var theta = u2 * Math.PI;
-        var rx = Math.min(vw * 0.34, 420);
-        var ry = Math.min(vh * 0.22, 175);
-        var cxS2 = baseSx - Math.sin(theta) * rx;
-        var cyS2 = baseCy - Math.sin(theta * 2) * (ry * 0.55);
-        var cxT2 = baseTx + Math.sin(theta) * rx;
-        var cyT2 = baseCy + Math.sin(theta * 2) * (ry * 0.55);
-        var bank = Math.sin(theta);
-        var sc2 = 1.15 - 0.08 * bank;
-        setInitialTransform(preS, cxS2, cyS2, sw, sh, -22 * bank, sc2, 1);
-        setInitialTransform(preT, cxT2, cyT2, tw, th, 22 * bank, sc2, 1);
-      } else {
-        // Phase 3: Magnetic Precision Lockup onto "Samuel Tavonatti" (expo.out FLIP)
-        if (!lockMeasured) {
-          lockMeasured = true;
-          var sRect = targetS.getBoundingClientRect();
-          var tRect = targetT.getBoundingClientRect();
-          destSx = sRect.left + sRect.width / 2;
-          destSy = sRect.top + sRect.height / 2;
-          destScaleS = sh > 0 ? sRect.height / sh : 1;
-          destTx = tRect.left + tRect.width / 2;
-          destTy = tRect.top + tRect.height / 2;
-          destScaleT = th > 0 ? tRect.height / th : 1;
-        }
-        var p3 = Math.min(1, (elapsed - P1_DUR - P2_DUR) / P3_DUR);
-        var e3 = expoOut(p3);
-        var cxS3 = baseSx + (destSx - baseSx) * e3;
-        var cyS3 = baseCy + (destSy - baseCy) * e3;
-        var scS3 = 1.15 + (destScaleS - 1.15) * e3;
-        var cxT3 = baseTx + (destTx - baseTx) * e3;
-        var cyT3 = baseCy + (destTy - baseCy) * e3;
-        var scT3 = 1.15 + (destScaleT - 1.15) * e3;
-        if (preGlow) preGlow.style.opacity = (0.9 * (1 - e3)).toFixed(3);
-        setInitialTransform(preS, cxS3, cyS3, sw, sh, 0, scS3, 1);
-        setInitialTransform(preT, cxT3, cyT3, tw, th, 0, scT3, 1);
+      if (prePct) prePct.textContent = pctVal + '%';
+      if (preFill) preFill.style.transform = 'scaleX(' + eased.toFixed(4) + ')';
 
-        if (!revealedRest && p3 >= 0.7) {
-          revealedRest = true;
-          body.classList.add('pre-reveal');
-        }
-      }
+      strokePairs.forEach(function (sp) {
+        var span = sp.end - sp.start;
+        var localP = Math.min(1, Math.max(0, (eased - sp.start) / span));
+        // Cyan tip leads slightly ahead of crisp white fill, both converge cleanly at 1.0
+        var tipP = Math.min(1, localP * 1.12);
+        var fillP = localP === 1 ? 1 : Math.max(0, localP * 1.12 - 0.12);
+        sp.tip.style.strokeDashoffset = (sp.len * (1 - tipP)).toFixed(2);
+        sp.fill.style.strokeDashoffset = (sp.len * (1 - fillP)).toFixed(2);
+      });
 
-      if (elapsed < TOTAL_DUR) {
+      if (raw < 1) {
         requestAnimationFrame(runPreloader);
-      } else {
-        body.classList.add('pre-reveal', 'opened');
-        preloader.classList.add('done');
+      } else if (!holdTriggered) {
+        holdTriggered = true;
+        setTimeout(function () {
+          body.classList.add('opened');
+          preloader.classList.add('done');
+        }, HOLD_DUR);
       }
     }
     requestAnimationFrame(runPreloader);
